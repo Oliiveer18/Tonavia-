@@ -1,0 +1,115 @@
+{
+ "formato": 2,
+ "id": "santuario/umbral",
+ "nombre": "Umbral del Santuario",
+ "region": null,
+ "ancho": 15,
+ "alto": 13,
+ "capas": {
+  "suelo": [
+   "ttttttttttttttt",
+   "ttttttt=ttttttt",
+   "tt..f..=..f..tt",
+   "tt.....=.....tt",
+   "tt..=======..tt",
+   "tt..=.....=..tt",
+   "tt..=.....=..tt",
+   "tt..=.....=..tt",
+   "tt..=======..tt",
+   "tt.....=.....tt",
+   "tt..f..=..f..tt",
+   "ttttttt=ttttttt",
+   "ttttttttttttttt"
+  ]
+ },
+ "objetos": [
+  {
+   "tipo": "fuente",
+   "x": 7,
+   "y": 6
+  },
+  {
+   "tipo": "farola",
+   "x": 3,
+   "y": 3
+  },
+  {
+   "tipo": "farola",
+   "x": 11,
+   "y": 3
+  },
+  {
+   "tipo": "farola",
+   "x": 3,
+   "y": 9
+  },
+  {
+   "tipo": "farola",
+   "x": 11,
+   "y": 9
+  }
+ ],
+ "animar": true,
+ "anclas": {
+  "inicio": [
+   7,
+   9
+  ],
+  "portal": [
+   7,
+   10
+  ],
+  "hogar": [
+   7,
+   2
+  ]
+ },
+ "puertas": [
+  {
+   "id": "hogar",
+   "x": 7,
+   "y": 1,
+   "destino": {
+    "mapa": "santuario/umbral",
+    "ancla": "hogar"
+   },
+   "portal": {
+    "color": "#8fe0a8",
+    "icono": "hoja",
+    "nombre": "Tu Santuario"
+   }
+  },
+  {
+   "id": "portal_nexus",
+   "x": 7,
+   "y": 11,
+   "destino": {
+    "mapa": "nexus/plaza_cruce",
+    "ancla": "volver"
+   },
+   "portal": {
+    "color": "#b9a2ff",
+    "icono": "eco",
+    "nombre": "Portal al Cruce"
+   }
+  }
+ ],
+ "conexiones": {
+  "norte": null,
+  "sur": null,
+  "este": null,
+  "oeste": null
+ },
+ "zonas": [],
+ "npcs": [
+  {
+   "id": "guardiana",
+   "tipo": "npc",
+   "nombre": "Guardiana Sela",
+   "x": 9,
+   "y": 3,
+   "dir": "down",
+   "alcance": 2.2
+  }
+ ]
+}

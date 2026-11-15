@@ -1,0 +1,10 @@
+// volcar_banco.js — escribe en la salida estándar la geometría real del banco (polígonos con color liso) para tools/formas_banco.py. Uso: node tools/volcar_banco.js > /tmp/banco_geo.json
+const noop = () => {}, mk = () => { const ctx = new Proxy({ getImageData: (x, y, w, h) => ({ data: new Uint8ClampedArray(w * h * 4) }), measureText: () => ({ width: 40 }) }, { get: (t, k) => k in t ? t[k] : noop, set: (t, k, v) => { t[k] = v; return true; } }); return { width: 10, height: 10, getContext: () => ctx, style: {}, addEventListener: noop, classList: { add: noop, remove: noop, toggle: noop }, appendChild: noop, setAttribute: noop }; };
+const els = { game: mk(), ui: mk(), pad: mk(), menu: { hidden: false }, who: {} };
+global.window = global; global.document = { createElement: mk, getElementById: (id) => els[id], querySelectorAll: () => [] };
+global.addEventListener = noop; global.requestAnimationFrame = noop; global.innerWidth = 390; global.innerHeight = 800; global.setTimeout = () => 0; global.clearTimeout = noop;
+const orden = require('../src/orden.json'); orden.datos.concat(orden.juego).forEach((f) => require('../' + f));
+const G = window.G, V = G.volumenes, TX = G.volTex, d = G.OBJETOS.banco, g = V.geometria(d.huella, d.vol);
+// v2.106: lienzo que ANOTA los píxeles (fillRect) para poder ver las texturas de verdad; fuera del navegador el lienzo falso no guarda nada
+G.makeCanvas = (w, h) => { const px = new Array(w * h).fill(null), x = { fillStyle: '#000', imageSmoothingEnabled: false, fillRect(a, b, ww, hh) { for (let j = Math.max(0, b); j < Math.min(h, b + hh); j++) for (let i = Math.max(0, a); i < Math.min(w, a + ww); i++) px[j * w + i] = this.fillStyle; }, clearRect: noop, drawImage: noop }; return { width: w, height: h, px, getContext: () => x }; };
+process.stdout.write(JSON.stringify({ poly: g.poligonos.map((p) => { const t = TX.textura('banco', p); return { v: p.v, n: p.n, c: TX.rampa(p.mat, p.tono).md, uv: p.uv, tw: t.w, th: t.h, px: t.c.px, pz: p.pz }; }), tri: g.triangulos }));

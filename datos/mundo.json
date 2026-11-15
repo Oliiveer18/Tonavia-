@@ -1,0 +1,952 @@
+{
+ "_ayuda": [
+  "MUNDO · plan de Tonavia como DATOS (propuesta para aprobar). Lo leen tools/validar_mundo.js y, más adelante, el compositor de mapas.",
+  "Un mapa nuevo = una entrada en «mapas». conexiones: borde → id del mapa vecino (deben ser recíprocas: A.este=B ⇔ B.oeste=A). puertas: destino = id de mapa o «@prof» (cueva generada).",
+  "hecho:true = ya existe en maps/<id>.json (el validador comprueba que exista y que el tamaño coincida).",
+  "Cambios: node tools/validar_mundo.js"
+ ],
+ "version": 1,
+ "tamanos": {
+  "pueblo": [
+   48,
+   36
+  ],
+  "ruta_h": [
+   64,
+   32
+  ],
+  "ruta_v": [
+   32,
+   64
+  ],
+  "gimnasio": [
+   24,
+   30
+  ],
+  "santuario": [
+   20,
+   20
+  ],
+  "cumbre": [
+   48,
+   48
+  ],
+  "interior": [
+   10,
+   8
+  ],
+  "_interior": "Los interiores no tienen tamaño fijo (casa de plantilla ≈ 10×8, servicio ≈ 11-13 × 8-10); los hechos usan su tamaño real."
+ },
+ "regiones": {
+  "silvara": {
+   "nombre": "Silvara",
+   "elemento": "hoja",
+   "terreno": "prado y bosque claro",
+   "cuevaBioma": "hongos",
+   "biomaNuevo": false
+  },
+  "carbuna": {
+   "nombre": "Carbuna",
+   "elemento": "fuego",
+   "terreno": "volcán, ceniza y lava",
+   "cuevaBioma": "lava",
+   "biomaNuevo": true
+  },
+  "marenda": {
+   "nombre": "Marenda",
+   "elemento": "agua",
+   "terreno": "costa, lagos y puentes",
+   "cuevaBioma": "inundada",
+   "biomaNuevo": false
+  },
+  "fulgoria": {
+   "nombre": "Fulgoria",
+   "elemento": "electrico",
+   "terreno": "llanura con torres y cables",
+   "cuevaBioma": "cristal",
+   "biomaNuevo": false
+  },
+  "cirrena": {
+   "nombre": "Cirrena",
+   "elemento": "aire",
+   "terreno": "montaña, nieve y hielo",
+   "cuevaBioma": "hielo",
+   "biomaNuevo": false
+  },
+  "obsidra": {
+   "nombre": "Obsidra",
+   "elemento": "roca",
+   "terreno": "cañón y desierto de obsidiana",
+   "cuevaBioma": "mina",
+   "biomaNuevo": false
+  },
+  "umbrada": {
+   "nombre": "Umbrada",
+   "elemento": "sombra",
+   "terreno": "bosque oscuro y pantano",
+   "cuevaBioma": "sombra",
+   "biomaNuevo": true
+  },
+  "albanota": {
+   "nombre": "Albanota",
+   "elemento": null,
+   "terreno": "pueblo de hierba y arroyo",
+   "cuevaBioma": "cristal",
+   "biomaNuevo": false
+  }
+ },
+ "mapas": [
+  {
+   "id": "albanota",
+   "tipo": "pueblo",
+   "region": "albanota",
+   "ancho": 48,
+   "alto": 36,
+   "conexiones": {
+    "oeste": "ruta_silvara_1",
+    "este": "ruta_carbuna_1",
+    "sur": "ruta_obsidra_1",
+    "norte": "ruta_cirrena_1"
+   },
+   "puertas": [
+    {
+     "id": "centro_pc",
+     "destino": "centro_pc"
+    },
+    {
+     "id": "tienda",
+     "destino": "tienda"
+    },
+    {
+     "id": "laboratorio",
+     "destino": "laboratorio"
+    },
+    {
+     "id": "casa_de_oli",
+     "destino": "casa_de_oli"
+    },
+    {
+     "id": "casa_de_lali",
+     "destino": "casa_de_lali"
+    },
+    {
+     "id": "ermita",
+     "destino": "ermita"
+    },
+    {
+     "id": "profundidades",
+     "destino": "@prof"
+    },
+    {
+     "id": "carbuna_provisional",
+     "destino": "pueblo_carbuna"
+    }
+   ],
+   "hecho": true,
+   "nota": "Hoy sus bordes están sin conectar: hay que abrir las 4 salidas. PROVISIONAL (v2.322): puerta directa al este (45,17-19) a pueblo_carbuna; se sustituirá por ruta_carbuna_1."
+  },
+  {
+   "id": "centro_pc",
+   "tipo": "interior",
+   "region": "albanota",
+   "ancho": 13,
+   "alto": 10,
+   "conexiones": {},
+   "puertas": [],
+   "hecho": true,
+   "nota": "Centro PC y Tienda son un solo mapa compartido por todos los pueblos (ancla volver)."
+  },
+  {
+   "id": "tienda",
+   "tipo": "interior",
+   "region": "albanota",
+   "ancho": 11,
+   "alto": 8,
+   "conexiones": {},
+   "puertas": [],
+   "hecho": true,
+   "nota": "Centro PC y Tienda son un solo mapa compartido por todos los pueblos (ancla volver)."
+  },
+  {
+   "id": "laboratorio",
+   "tipo": "interior",
+   "region": "albanota",
+   "ancho": 13,
+   "alto": 9,
+   "conexiones": {},
+   "puertas": [],
+   "hecho": true,
+   "nota": ""
+  },
+  {
+   "id": "casa_de_oli",
+   "tipo": "interior",
+   "region": "albanota",
+   "ancho": 9,
+   "alto": 7,
+   "conexiones": {},
+   "puertas": [],
+   "hecho": true,
+   "nota": ""
+  },
+  {
+   "id": "casa_de_lali",
+   "tipo": "interior",
+   "region": "albanota",
+   "ancho": 9,
+   "alto": 7,
+   "conexiones": {},
+   "puertas": [],
+   "hecho": true,
+   "nota": ""
+  },
+  {
+   "id": "ermita",
+   "tipo": "interior",
+   "region": "albanota",
+   "ancho": 11,
+   "alto": 10,
+   "conexiones": {},
+   "puertas": [],
+   "hecho": true,
+   "nota": ""
+  },
+  {
+   "id": "ruta_silvara_1",
+   "tipo": "ruta",
+   "region": "silvara",
+   "ancho": 64,
+   "alto": 32,
+   "conexiones": {
+    "este": "albanota",
+    "oeste": "pueblo_silvara"
+   },
+   "puertas": [
+    {
+     "id": "entrada_cueva",
+     "destino": "@prof"
+    }
+   ],
+   "hecho": false,
+   "nota": "Ruta de entrada: aquí se aprende el Choque (acto 0). Entrada de la cueva de hongos."
+  },
+  {
+   "id": "ruta_carbuna_1",
+   "tipo": "ruta",
+   "region": "carbuna",
+   "ancho": 64,
+   "alto": 32,
+   "conexiones": {
+    "oeste": "albanota",
+    "este": "pueblo_carbuna"
+   },
+   "puertas": [
+    {
+     "id": "entrada_cueva",
+     "destino": "@prof"
+    }
+   ],
+   "hecho": false,
+   "nota": "Entrada de la cueva (lava) de Carbuna."
+  },
+  {
+   "id": "ruta_obsidra_1",
+   "tipo": "ruta",
+   "region": "obsidra",
+   "ancho": 32,
+   "alto": 64,
+   "conexiones": {
+    "norte": "albanota",
+    "sur": "pueblo_obsidra"
+   },
+   "puertas": [
+    {
+     "id": "entrada_cueva",
+     "destino": "@prof"
+    }
+   ],
+   "hecho": false,
+   "nota": "Entrada de la cueva (mina) de Obsidra."
+  },
+  {
+   "id": "ruta_cirrena_1",
+   "tipo": "ruta",
+   "region": "cirrena",
+   "ancho": 32,
+   "alto": 64,
+   "conexiones": {
+    "sur": "albanota",
+    "norte": "pueblo_cirrena"
+   },
+   "puertas": [
+    {
+     "id": "entrada_cueva",
+     "destino": "@prof"
+    }
+   ],
+   "hecho": false,
+   "nota": "Cerrada hasta tener 6 ecos (propuesta). Entrada de la cueva de hielo."
+  },
+  {
+   "id": "ruta_silvara_marenda",
+   "tipo": "ruta",
+   "region": "marenda",
+   "ancho": 32,
+   "alto": 64,
+   "conexiones": {
+    "norte": "pueblo_silvara",
+    "sur": "pueblo_marenda"
+   },
+   "puertas": [
+    {
+     "id": "entrada_cueva",
+     "destino": "@prof"
+    }
+   ],
+   "hecho": false,
+   "nota": "Entrada de la cueva inundada."
+  },
+  {
+   "id": "ruta_carbuna_fulgoria",
+   "tipo": "ruta",
+   "region": "fulgoria",
+   "ancho": 32,
+   "alto": 64,
+   "conexiones": {
+    "sur": "pueblo_carbuna",
+    "norte": "pueblo_fulgoria"
+   },
+   "puertas": [
+    {
+     "id": "entrada_cueva",
+     "destino": "@prof"
+    }
+   ],
+   "hecho": false,
+   "nota": "Entrada de la cueva de cristal."
+  },
+  {
+   "id": "ruta_obsidra_umbrada",
+   "tipo": "ruta",
+   "region": "umbrada",
+   "ancho": 64,
+   "alto": 32,
+   "conexiones": {
+    "oeste": "pueblo_obsidra",
+    "este": "pueblo_umbrada"
+   },
+   "puertas": [
+    {
+     "id": "entrada_cueva",
+     "destino": "@prof"
+    }
+   ],
+   "hecho": false,
+   "nota": "Entrada de la cueva de sombra."
+  },
+  {
+   "id": "pueblo_silvara",
+   "tipo": "pueblo",
+   "region": "silvara",
+   "ancho": 48,
+   "alto": 36,
+   "conexiones": {
+    "este": "ruta_silvara_1",
+    "sur": "ruta_silvara_marenda"
+   },
+   "puertas": [
+    {
+     "id": "gimnasio",
+     "destino": "gimnasio_silvara"
+    },
+    {
+     "id": "casa_1",
+     "destino": "casa_silvara_1"
+    },
+    {
+     "id": "casa_2",
+     "destino": "casa_silvara_2"
+    },
+    {
+     "id": "centro_pc",
+     "destino": "centro_pc"
+    },
+    {
+     "id": "tienda",
+     "destino": "tienda"
+    }
+   ],
+   "hecho": false,
+   "nota": ""
+  },
+  {
+   "id": "gimnasio_silvara",
+   "tipo": "gimnasio",
+   "region": "silvara",
+   "ancho": 24,
+   "alto": 30,
+   "conexiones": {},
+   "puertas": [
+    {
+     "id": "santuario",
+     "destino": "santuario_silvara"
+    }
+   ],
+   "hecho": false,
+   "nota": ""
+  },
+  {
+   "id": "santuario_silvara",
+   "tipo": "santuario",
+   "region": "silvara",
+   "ancho": 20,
+   "alto": 20,
+   "conexiones": {},
+   "puertas": [],
+   "hecho": false,
+   "nota": "Aquí se devuelve el Eco de Silvara."
+  },
+  {
+   "id": "casa_silvara_1",
+   "tipo": "interior",
+   "region": "silvara",
+   "ancho": 10,
+   "alto": 8,
+   "conexiones": {},
+   "puertas": [],
+   "hecho": false,
+   "nota": ""
+  },
+  {
+   "id": "casa_silvara_2",
+   "tipo": "interior",
+   "region": "silvara",
+   "ancho": 10,
+   "alto": 8,
+   "conexiones": {},
+   "puertas": [],
+   "hecho": false,
+   "nota": ""
+  },
+  {
+   "id": "pueblo_carbuna",
+   "tipo": "pueblo",
+   "region": "carbuna",
+   "ancho": 48,
+   "alto": 36,
+   "conexiones": {
+    "oeste": "ruta_carbuna_1",
+    "norte": "ruta_carbuna_fulgoria"
+   },
+   "puertas": [
+    {
+     "id": "gimnasio",
+     "destino": "gimnasio_carbuna"
+    },
+    {
+     "id": "casa_1",
+     "destino": "casa_carbuna_1"
+    },
+    {
+     "id": "casa_2",
+     "destino": "casa_carbuna_2"
+    },
+    {
+     "id": "centro_pc",
+     "destino": "centro_pc"
+    },
+    {
+     "id": "tienda",
+     "destino": "tienda"
+    },
+    {
+     "id": "albanota_provisional",
+     "destino": "albanota"
+    }
+   ],
+   "hecho": true,
+   "nota": ""
+  },
+  {
+   "id": "gimnasio_carbuna",
+   "tipo": "gimnasio",
+   "region": "carbuna",
+   "ancho": 24,
+   "alto": 30,
+   "conexiones": {},
+   "puertas": [
+    {
+     "id": "santuario",
+     "destino": "santuario_carbuna"
+    }
+   ],
+   "hecho": false,
+   "nota": ""
+  },
+  {
+   "id": "santuario_carbuna",
+   "tipo": "santuario",
+   "region": "carbuna",
+   "ancho": 20,
+   "alto": 20,
+   "conexiones": {},
+   "puertas": [],
+   "hecho": false,
+   "nota": "Aquí se devuelve el Eco de Carbuna."
+  },
+  {
+   "id": "casa_carbuna_1",
+   "tipo": "interior",
+   "region": "carbuna",
+   "ancho": 10,
+   "alto": 8,
+   "conexiones": {},
+   "puertas": [],
+   "hecho": false,
+   "nota": ""
+  },
+  {
+   "id": "casa_carbuna_2",
+   "tipo": "interior",
+   "region": "carbuna",
+   "ancho": 10,
+   "alto": 8,
+   "conexiones": {},
+   "puertas": [],
+   "hecho": false,
+   "nota": ""
+  },
+  {
+   "id": "pueblo_marenda",
+   "tipo": "pueblo",
+   "region": "marenda",
+   "ancho": 48,
+   "alto": 36,
+   "conexiones": {
+    "norte": "ruta_silvara_marenda"
+   },
+   "puertas": [
+    {
+     "id": "gimnasio",
+     "destino": "gimnasio_marenda"
+    },
+    {
+     "id": "casa_1",
+     "destino": "casa_marenda_1"
+    },
+    {
+     "id": "casa_2",
+     "destino": "casa_marenda_2"
+    },
+    {
+     "id": "centro_pc",
+     "destino": "centro_pc"
+    },
+    {
+     "id": "tienda",
+     "destino": "tienda"
+    }
+   ],
+   "hecho": false,
+   "nota": ""
+  },
+  {
+   "id": "gimnasio_marenda",
+   "tipo": "gimnasio",
+   "region": "marenda",
+   "ancho": 24,
+   "alto": 30,
+   "conexiones": {},
+   "puertas": [
+    {
+     "id": "santuario",
+     "destino": "santuario_marenda"
+    }
+   ],
+   "hecho": false,
+   "nota": ""
+  },
+  {
+   "id": "santuario_marenda",
+   "tipo": "santuario",
+   "region": "marenda",
+   "ancho": 20,
+   "alto": 20,
+   "conexiones": {},
+   "puertas": [],
+   "hecho": false,
+   "nota": "Aquí se devuelve el Eco de Marenda."
+  },
+  {
+   "id": "casa_marenda_1",
+   "tipo": "interior",
+   "region": "marenda",
+   "ancho": 10,
+   "alto": 8,
+   "conexiones": {},
+   "puertas": [],
+   "hecho": false,
+   "nota": ""
+  },
+  {
+   "id": "casa_marenda_2",
+   "tipo": "interior",
+   "region": "marenda",
+   "ancho": 10,
+   "alto": 8,
+   "conexiones": {},
+   "puertas": [],
+   "hecho": false,
+   "nota": ""
+  },
+  {
+   "id": "pueblo_fulgoria",
+   "tipo": "pueblo",
+   "region": "fulgoria",
+   "ancho": 48,
+   "alto": 36,
+   "conexiones": {
+    "sur": "ruta_carbuna_fulgoria"
+   },
+   "puertas": [
+    {
+     "id": "gimnasio",
+     "destino": "gimnasio_fulgoria"
+    },
+    {
+     "id": "casa_1",
+     "destino": "casa_fulgoria_1"
+    },
+    {
+     "id": "casa_2",
+     "destino": "casa_fulgoria_2"
+    },
+    {
+     "id": "centro_pc",
+     "destino": "centro_pc"
+    },
+    {
+     "id": "tienda",
+     "destino": "tienda"
+    }
+   ],
+   "hecho": false,
+   "nota": ""
+  },
+  {
+   "id": "gimnasio_fulgoria",
+   "tipo": "gimnasio",
+   "region": "fulgoria",
+   "ancho": 24,
+   "alto": 30,
+   "conexiones": {},
+   "puertas": [
+    {
+     "id": "santuario",
+     "destino": "santuario_fulgoria"
+    }
+   ],
+   "hecho": false,
+   "nota": ""
+  },
+  {
+   "id": "santuario_fulgoria",
+   "tipo": "santuario",
+   "region": "fulgoria",
+   "ancho": 20,
+   "alto": 20,
+   "conexiones": {},
+   "puertas": [],
+   "hecho": false,
+   "nota": "Aquí se devuelve el Eco de Fulgoria."
+  },
+  {
+   "id": "casa_fulgoria_1",
+   "tipo": "interior",
+   "region": "fulgoria",
+   "ancho": 10,
+   "alto": 8,
+   "conexiones": {},
+   "puertas": [],
+   "hecho": false,
+   "nota": ""
+  },
+  {
+   "id": "casa_fulgoria_2",
+   "tipo": "interior",
+   "region": "fulgoria",
+   "ancho": 10,
+   "alto": 8,
+   "conexiones": {},
+   "puertas": [],
+   "hecho": false,
+   "nota": ""
+  },
+  {
+   "id": "pueblo_obsidra",
+   "tipo": "pueblo",
+   "region": "obsidra",
+   "ancho": 48,
+   "alto": 36,
+   "conexiones": {
+    "norte": "ruta_obsidra_1",
+    "este": "ruta_obsidra_umbrada"
+   },
+   "puertas": [
+    {
+     "id": "gimnasio",
+     "destino": "gimnasio_obsidra"
+    },
+    {
+     "id": "casa_1",
+     "destino": "casa_obsidra_1"
+    },
+    {
+     "id": "casa_2",
+     "destino": "casa_obsidra_2"
+    },
+    {
+     "id": "centro_pc",
+     "destino": "centro_pc"
+    },
+    {
+     "id": "tienda",
+     "destino": "tienda"
+    }
+   ],
+   "hecho": false,
+   "nota": ""
+  },
+  {
+   "id": "gimnasio_obsidra",
+   "tipo": "gimnasio",
+   "region": "obsidra",
+   "ancho": 24,
+   "alto": 30,
+   "conexiones": {},
+   "puertas": [
+    {
+     "id": "santuario",
+     "destino": "santuario_obsidra"
+    }
+   ],
+   "hecho": false,
+   "nota": ""
+  },
+  {
+   "id": "santuario_obsidra",
+   "tipo": "santuario",
+   "region": "obsidra",
+   "ancho": 20,
+   "alto": 20,
+   "conexiones": {},
+   "puertas": [],
+   "hecho": false,
+   "nota": "Aquí se devuelve el Eco de Obsidra."
+  },
+  {
+   "id": "casa_obsidra_1",
+   "tipo": "interior",
+   "region": "obsidra",
+   "ancho": 10,
+   "alto": 8,
+   "conexiones": {},
+   "puertas": [],
+   "hecho": false,
+   "nota": ""
+  },
+  {
+   "id": "casa_obsidra_2",
+   "tipo": "interior",
+   "region": "obsidra",
+   "ancho": 10,
+   "alto": 8,
+   "conexiones": {},
+   "puertas": [],
+   "hecho": false,
+   "nota": ""
+  },
+  {
+   "id": "pueblo_umbrada",
+   "tipo": "pueblo",
+   "region": "umbrada",
+   "ancho": 48,
+   "alto": 36,
+   "conexiones": {
+    "oeste": "ruta_obsidra_umbrada"
+   },
+   "puertas": [
+    {
+     "id": "gimnasio",
+     "destino": "gimnasio_umbrada"
+    },
+    {
+     "id": "casa_1",
+     "destino": "casa_umbrada_1"
+    },
+    {
+     "id": "casa_2",
+     "destino": "casa_umbrada_2"
+    },
+    {
+     "id": "centro_pc",
+     "destino": "centro_pc"
+    },
+    {
+     "id": "tienda",
+     "destino": "tienda"
+    }
+   ],
+   "hecho": false,
+   "nota": ""
+  },
+  {
+   "id": "gimnasio_umbrada",
+   "tipo": "gimnasio",
+   "region": "umbrada",
+   "ancho": 24,
+   "alto": 30,
+   "conexiones": {},
+   "puertas": [
+    {
+     "id": "santuario",
+     "destino": "santuario_umbrada"
+    }
+   ],
+   "hecho": false,
+   "nota": ""
+  },
+  {
+   "id": "santuario_umbrada",
+   "tipo": "santuario",
+   "region": "umbrada",
+   "ancho": 20,
+   "alto": 20,
+   "conexiones": {},
+   "puertas": [],
+   "hecho": false,
+   "nota": "Aquí se devuelve el Eco de Umbrada."
+  },
+  {
+   "id": "casa_umbrada_1",
+   "tipo": "interior",
+   "region": "umbrada",
+   "ancho": 10,
+   "alto": 8,
+   "conexiones": {},
+   "puertas": [],
+   "hecho": false,
+   "nota": ""
+  },
+  {
+   "id": "casa_umbrada_2",
+   "tipo": "interior",
+   "region": "umbrada",
+   "ancho": 10,
+   "alto": 8,
+   "conexiones": {},
+   "puertas": [],
+   "hecho": false,
+   "nota": ""
+  },
+  {
+   "id": "pueblo_cirrena",
+   "tipo": "pueblo",
+   "region": "cirrena",
+   "ancho": 48,
+   "alto": 36,
+   "conexiones": {
+    "sur": "ruta_cirrena_1"
+   },
+   "puertas": [
+    {
+     "id": "gimnasio",
+     "destino": "gimnasio_cirrena"
+    },
+    {
+     "id": "casa_1",
+     "destino": "casa_cirrena_1"
+    },
+    {
+     "id": "casa_2",
+     "destino": "casa_cirrena_2"
+    },
+    {
+     "id": "centro_pc",
+     "destino": "centro_pc"
+    },
+    {
+     "id": "tienda",
+     "destino": "tienda"
+    }
+   ],
+   "hecho": false,
+   "nota": ""
+  },
+  {
+   "id": "gimnasio_cirrena",
+   "tipo": "gimnasio",
+   "region": "cirrena",
+   "ancho": 24,
+   "alto": 30,
+   "conexiones": {},
+   "puertas": [
+    {
+     "id": "santuario",
+     "destino": "santuario_cirrena"
+    }
+   ],
+   "hecho": false,
+   "nota": ""
+  },
+  {
+   "id": "santuario_cirrena",
+   "tipo": "santuario",
+   "region": "cirrena",
+   "ancho": 20,
+   "alto": 20,
+   "conexiones": {},
+   "puertas": [
+    {
+     "id": "cumbre",
+     "destino": "cumbre_aire"
+    }
+   ],
+   "hecho": false,
+   "nota": "Aquí se devuelve el Eco de Cirrena."
+  },
+  {
+   "id": "casa_cirrena_1",
+   "tipo": "interior",
+   "region": "cirrena",
+   "ancho": 10,
+   "alto": 8,
+   "conexiones": {},
+   "puertas": [],
+   "hecho": false,
+   "nota": ""
+  },
+  {
+   "id": "casa_cirrena_2",
+   "tipo": "interior",
+   "region": "cirrena",
+   "ancho": 10,
+   "alto": 8,
+   "conexiones": {},
+   "puertas": [],
+   "hecho": false,
+   "nota": ""
+  },
+  {
+   "id": "cumbre_aire",
+   "tipo": "cumbre",
+   "region": "cirrena",
+   "ancho": 48,
+   "alto": 48,
+   "conexiones": {},
+   "puertas": [],
+   "hecho": false,
+   "nota": "Tras los 7 ecos: camino a Zefirax. Acceso desde santuario_cirrena (propuesta)."
+  }
+ ]
+}

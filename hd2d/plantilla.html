@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="es"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Oli en HD-2D</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+:root{--bg:#f4ecdc;--tx:#33283a;--bt:#33283a;--bt-tx:#fff6e6;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1d1824;--tx:#f3e9d8;--bt:#f3e9d8;--bt-tx:#1d1824}}
+html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--tx);font:15px/1.35 Georgia,"Times New Roman",serif;display:flex;flex-direction:column}
+header{padding:10px max(16px,env(safe-area-inset-right,0px)) 6px max(16px,env(safe-area-inset-left,0px))}
+h1{font-size:18px;margin:0;letter-spacing:.02em}
+p{margin:2px 0 0;font-size:13px;opacity:.75}
+#stage{position:relative;flex:1;min-height:0;overflow:hidden;background:#b9d9b0;touch-action:none}
+#stage.fx{background:linear-gradient(#8fc8f5 0%,#cfe6e8 45%,#f7dfb4 100%)}
+canvas{display:block;width:100%;height:100%}
+#stage.fx canvas{filter:saturate(1.18) contrast(1.06)}
+.ts{position:absolute;left:0;right:0;pointer-events:none;display:none;-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)}
+#stage.fx .ts{display:block}
+#ta{top:0;height:24%;-webkit-mask-image:linear-gradient(#000,transparent);mask-image:linear-gradient(#000,transparent)}
+#tb{bottom:0;height:28%;-webkit-mask-image:linear-gradient(to top,#000,transparent);mask-image:linear-gradient(to top,#000,transparent)}
+#vig{position:absolute;inset:0;pointer-events:none;display:none;background:radial-gradient(ellipse at 50% 45%,transparent 55%,rgba(40,20,50,.35))}
+#stage.fx #vig{display:block}
+footer{display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:10px max(16px,env(safe-area-inset-right,0px)) 12px max(16px,env(safe-area-inset-left,0px))}
+button{font:inherit;font-size:14px;border:0;border-radius:999px;padding:10px 18px;background:var(--bt);color:var(--bt-tx);min-height:44px}
+footer span{font-size:12.5px;opacity:.7}
+#joy,#run{position:absolute;z-index:3;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent}
+#joy{left:max(16px,env(safe-area-inset-left,0px));bottom:16px;width:132px;height:132px;border-radius:50%;background:rgba(255,246,230,.26);border:2px solid rgba(255,246,230,.75);box-shadow:0 2px 10px rgba(30,15,40,.25)}
+#knob{position:absolute;left:50%;top:50%;width:56px;height:56px;margin:-28px 0 0 -28px;border-radius:50%;background:rgba(51,40,58,.88);border:2px solid #fff6e6;pointer-events:none}
+#run{right:max(16px,env(safe-area-inset-right,0px));bottom:44px;width:76px;height:76px;border-radius:50%;padding:0;background:rgba(51,40,58,.82);color:#fff6e6;border:2px solid #fff6e6;font-size:13px}
+#run.on{background:#d94a3f}
+#tag{position:absolute;z-index:3;left:max(16px,env(safe-area-inset-left,0px));top:10px;font:12px/1.2 ui-monospace,Menlo,monospace;color:#fff6e6;background:rgba(51,40,58,.62);padding:4px 8px;border-radius:6px;pointer-events:none}
+@media (hover:hover) and (pointer:fine){#joy,#run{display:none}}
+</style></head><body>
+<header><h1 id="h1">Oli en HD-2D</h1><p>Mueve al personaje con el joystick (o WASD / flechas, Mayús corre). Arrastra para girar la cámara.</p></header>
+<div id="stage" class="fx"><canvas id="c"></canvas><div class="ts" id="ta"></div><div class="ts" id="tb"></div><div id="vig"></div><div id="tag">Oli</div><div id="joy"><div id="knob"></div></div><button id="run" type="button">Correr</button></div>
+<footer><button id="b">Efectos: sí</button><button id="z">Cámara: cerca</button><span>Q / E giran la cámara.</span></footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+const T=THREE,W=14,$=id=>document.getElementById(id),stage=$('stage'),cv=$('c');
+const calm=matchMedia('(prefers-reduced-motion: reduce)').matches?0:1;
+const R=new T.WebGLRenderer({canvas:cv,antialias:true,alpha:true});R.setPixelRatio(Math.min(devicePixelRatio,2));
+const scene=new T.Scene(),cam=new T.PerspectiveCamera(30,1,.1,90);
+const amb=new T.AmbientLight(0xc4d4ff,.62),sun=new T.DirectionalLight(0xfff0d0,.95);sun.position.set(-6,10,4);scene.add(amb,sun);
+let s=7;const rnd=()=>(s=s*16807%2147483647)/2147483647;
+// ── texturas de píxeles (se dibujan por código) ──
+function tex(w,h,f){const c=document.createElement('canvas');c.width=w;c.height=h;f(c.getContext('2d'));const t=new T.CanvasTexture(c);t.magFilter=t.minFilter=T.NearestFilter;t.generateMipmaps=false;return t}
+function grid(rows,p){return tex(rows[0].length,rows.length,x=>rows.forEach((r,j)=>[...r].forEach((ch,i)=>{if(p[ch]){x.fillStyle=p[ch];x.fillRect(i,j,1,1)}})))}
+function disc(x,cx,cy,r,col){x.fillStyle=col;for(let j=-r;j<=r;j++)for(let i=-r;i<=r;i++)if(i*i+j*j<=r*r+r*.6)x.fillRect(cx+i,cy+j,1,1)}
+// sprites REALES del juego (los pone tools/hd2d.js: 4 direcciones × 2 pasos, RGBA en base64)
+const SPR=/*SPRITES*/null;
+// Oli (sprites reales del juego): 4 direcciones × 3 fotogramas (0 quieto, 1 y 2 pasos)
+const OLI=/*OLI*/null;
+// Lali (id 'luna'): mismos fotogramas; su perfil izquierdo es el espejo del derecho, como en el juego
+const LALI=/*LALI*/null;
+const PJ=location.hash==='#lali'?LALI:OLI; // jugador: Oli por defecto; #lali para Lali (el selector en pantalla llega en la v2.51b)
+function sprTex(o){const b=atob(o.d),u=new Uint8ClampedArray(b.length);for(let i=0;i<b.length;i++)u[i]=b.charCodeAt(i);return tex(o.w,o.h,x=>x.putImageData(new ImageData(u,o.w,o.h),0,0))}
+const TX={};Object.keys(SPR).forEach(id=>{TX[id]={};Object.keys(SPR[id]).forEach(k=>TX[id][k]=sprTex(SPR[id][k]))});
+const tArbol=tex(20,28,x=>{x.fillStyle='#7a5638';x.fillRect(9,17,3,11);x.fillStyle='#5e412a';x.fillRect(11,17,1,11);disc(x,10,10,8,'#2f7d3f');disc(x,8,8,6,'#43a04f');disc(x,7,6,3,'#6cc06a');disc(x,13,12,3,'#2a6e38')});
+const tMata=tex(7,6,x=>{x.fillStyle='#3f9a4a';[[1,3],[3,1],[5,3],[2,2],[4,2]].forEach(([i,j])=>x.fillRect(i,j,1,6-j));x.fillStyle='#8fe08a';[[3,1],[1,3],[5,3]].forEach(([i,j])=>x.fillRect(i,j,1,1))});
+const flor=c=>tex(5,8,x=>{x.fillStyle='#3f9a4a';x.fillRect(2,4,1,4);x.fillStyle=c;x.fillRect(1,1,3,3);x.fillStyle='#f09a3e';x.fillRect(2,2,1,1)});
+const tFl=[flor('#f5a8bd'),flor('#f7d54a'),flor('#ffffff')];
+const tSom=tex(16,8,x=>{x.fillStyle='rgba(20,10,40,.3)';for(let j=0;j<8;j++)for(let i=0;i<16;i++){const a=(i-7.5)/8,b=(j-3.5)/4;if(a*a+b*b<=1)x.fillRect(i,j,1,1)}});
+// ── terreno por casillas con relieve ──
+const hh=[],ag=[];
+for(let x=0;x<W;x++){hh[x]=[];ag[x]=[];for(let z=0;z<W;z++){let h=0;if(x>=9&&z<=5)h=1;else if(x>=8&&z<=6)h=.5;const w=(x-4)**2+(z-9)**2<=3.2;hh[x][z]=w?-.3:h;ag[x][z]=w}}
+const L=c=>new T.MeshLambertMaterial({color:c}),dirt=L(0x8a6a4a),pasto=[L(0x72c05f),L(0x6bb85a),L(0x7acb66)],alto=L(0x88d470),agua=L(0x4fa7e8),gb=new T.BoxGeometry(1,1,1);
+for(let x=0;x<W;x++)for(let z=0;z<W;z++){const h=hh[x][z],top=ag[x][z]?agua:h>.4?alto:pasto[(x*3+z*5)%3];const m=new T.Mesh(gb,[dirt,dirt,top,dirt,dirt,dirt]);m.scale.y=h+1;m.position.set(x,(h-1)/2,z);scene.add(m)}
+const gy=(x,z)=>hh[Math.max(0,Math.min(W-1,Math.round(x)))][Math.max(0,Math.min(W-1,Math.round(z)))];
+// ── sprites que miran a la cámara ──
+const bbs=[];
+function bb(t,pw,ph,k,x,z){const w=pw/16*k,h=ph/16*k,g=new T.PlaneGeometry(w,h);g.translate(0,h/2,0);const m=new T.Mesh(g,new T.MeshBasicMaterial({map:t,transparent:true,alphaTest:.5}));m.rotation.order='YXZ';m.position.set(x,gy(x,z),z);scene.add(m);bbs.push(m);return m}
+function sombra(x,z,k){const m=new T.Mesh(new T.PlaneGeometry(k,k/2),new T.MeshBasicMaterial({map:tSom,transparent:true,depthWrite:false}));m.rotation.x=-Math.PI/2;m.position.set(x,gy(x,z)+.02,z);scene.add(m);return m}
+const sway=[],obs=[]; // obs: obstáculos redondos [x,z,radio]
+[[2,2],[3,5],[11,3],[12,7],[10,11],[6,12],[1,10],[12,1]].forEach(([x,z])=>{sombra(x,z,1.3);bb(tArbol,20,28,1.5,x+.1,z+.1);obs.push([x+.1,z+.1,.32])});
+for(let i=0;i<46;i++){const x=rnd()*(W-1),z=rnd()*(W-1);if(ag[Math.round(x)][Math.round(z)])continue;sway.push(bb(tMata,7,6,.7,x,z))}
+for(let i=0;i<30;i++){const x=rnd()*(W-1),z=rnd()*(W-1);if(ag[Math.round(x)][Math.round(z)])continue;sway.push(bb(tFl[i%3],5,8,.8,x,z))}
+const cr=[['aguacato',[1,7,1,6]],['fosforin',[9,12,1,5]],['pompon',[7,12,8,12]]].map(([id,r])=>{const o=SPR[id].down0,x=r[0]+rnd()*(r[1]-r[0]),z=r[2]+rnd()*(r[3]-r[2]);return{id,m:bb(TX[id].down0,o.w,o.h,1.15,x,z),sh:sombra(x,z,o.w/16*1.15),r,x,z,tx:x,tz:z,y:gy(x,z),wait:rnd()*2,hop:0,dir:'down',f:0}});
+// ── Oli: el jugador ──
+const OT={};Object.keys(PJ).forEach(k=>OT[k]=sprTex(PJ[k]));
+const OS=PJ.down0,OK=1.15,RAD=.28,SAFE=.55;
+const pl={x:6,z:6,vx:0,vz:0,hx:0,hz:1,dir:'down',ph:0,mv:0,f:0,k:'',y:0,lv:0};
+pl.y=pl.lv=gy(pl.x,pl.z);
+const oli=bb(OT.down0,OS.w,OS.h,OK,pl.x,pl.z),oliSh=sombra(pl.x,pl.z,OS.w/16*OK*.8);
+const clampC=(v)=>Math.max(0,Math.min(W-1,Math.round(v)));
+const PR=[[0,0],[RAD,0],[-RAD,0],[0,RAD],[0,-RAD],[.7*RAD,.7*RAD],[-.7*RAD,.7*RAD],[.7*RAD,-.7*RAD],[-.7*RAD,-.7*RAD]];
+// un punto es libre si está dentro del mapa, no es agua y no sube ni baja más de un escalón (.5) respecto al nivel de Oli
+const libre=(x,z)=>PR.every(([a,b])=>{const i=Math.round(x+a),j=Math.round(z+b);return i>=0&&j>=0&&i<W&&j<W&&!ag[i][j]&&Math.abs(hh[i][j]-pl.lv)<=SAFE});
+function empuja(){obs.concat(cr.map(c=>[c.x,c.z,.3])).forEach(([ox,oz,r])=>{const dx=pl.x-ox,dz=pl.z-oz,d=Math.hypot(dx,dz),m=r+RAD*.8;if(d<m&&d>1e-4){const nx=pl.x+dx/d*(m-d),nz=pl.z+dz/d*(m-d);if(libre(nx,pl.z))pl.x=nx;if(libre(pl.x,nz))pl.z=nz}})}
+// polvo al correr
+const tDu=tex(2,2,x=>{x.fillStyle='#fff6e6';x.fillRect(0,0,2,2)}),dust=[];let dn=0;
+for(let i=0;i<10;i++){const m=new T.Mesh(new T.PlaneGeometry(.16,.16),new T.MeshBasicMaterial({map:tDu,transparent:true,depthWrite:false}));m.visible=false;m.userData.life=0;scene.add(m);dust.push(m);bbs.push(m)}
+function puff(){const m=dust[dn++%dust.length];m.userData.life=.4;m.position.set(pl.x-pl.hx*.2+(rnd()-.5)*.15,pl.y+.06,pl.z-pl.hz*.2+(rnd()-.5)*.15);m.visible=true}
+// entrada: teclado + joystick
+const keys={};let jp=null,jx=0,jy=0,runBtn=false;
+addEventListener('keydown',e=>{if(e.metaKey||e.ctrlKey)return;keys[e.code]=1;if(/^Arrow|Space/.test(e.code))e.preventDefault()});
+addEventListener('keyup',e=>{keys[e.code]=0});addEventListener('blur',()=>{for(const k in keys)keys[k]=0;jp=null;jx=jy=0});
+const joy=$('joy'),knob=$('knob');
+function jset(e){const r=joy.getBoundingClientRect(),R0=r.width/2-8;let dx=e.clientX-(r.left+r.width/2),dy=e.clientY-(r.top+r.height/2);const d=Math.hypot(dx,dy);if(d>R0){dx*=R0/d;dy*=R0/d}knob.style.transform='translate('+dx+'px,'+dy+'px)';const mx=dx/R0,my=dy/R0;if(Math.hypot(mx,my)<.15){jx=jy=0}else{jx=mx;jy=-my}}
+function jend(){jp=null;jx=jy=0;knob.style.transform=''}
+joy.addEventListener('pointerdown',e=>{if(jp!==null)return;jp=e.pointerId;joy.setPointerCapture(e.pointerId);jset(e);e.preventDefault()});
+joy.addEventListener('pointermove',e=>{if(e.pointerId===jp)jset(e)});
+['pointerup','pointercancel','lostpointercapture'].forEach(n=>joy.addEventListener(n,e=>{if(e.pointerId===jp)jend()}));
+const rb=$('run');rb.addEventListener('pointerdown',e=>{runBtn=true;rb.classList.add('on');rb.setPointerCapture(e.pointerId);e.preventDefault()});
+['pointerup','pointercancel','lostpointercapture'].forEach(n=>rb.addEventListener(n,()=>{runBtn=false;rb.classList.remove('on')}));
+const kv=()=>{const x=(keys.KeyD||keys.ArrowRight?1:0)-(keys.KeyA||keys.ArrowLeft?1:0),y=(keys.KeyW||keys.ArrowUp?1:0)-(keys.KeyS||keys.ArrowDown?1:0),m=Math.hypot(x,y)||1;return[x/m,y/m]};
+const SEQ=[0,1,0,2];
+function actualiza(dt){
+ const [ix,iy]=jp!==null?[jx,jy]:kv(),m=Math.min(1,Math.hypot(ix,iy));
+ // la pantalla manda: arriba del joystick = hacia el fondo de la imagen, sea cual sea el giro de la cámara
+ const wx=ix*Math.cos(az)-iy*Math.sin(az),wz=-ix*Math.sin(az)-iy*Math.cos(az),L=Math.hypot(wx,wz)||1;
+ const sp=(runBtn||keys.ShiftLeft||keys.ShiftRight?4.6:2.8)*m,a=Math.min(1,dt*(m?14:20));
+ pl.vx+=((m?wx/L*sp:0)-pl.vx)*a;pl.vz+=((m?wz/L*sp:0)-pl.vz)*a;
+ if(m){pl.hx=wx/L;pl.hz=wz/L}
+ const dx=pl.vx*dt,dz=pl.vz*dt;
+ if(dx&&libre(pl.x+dx,pl.z))pl.x+=dx;else pl.vx=0; // choca: se detiene en ese eje y desliza por el otro
+ if(dz&&libre(pl.x,pl.z+dz))pl.z+=dz;else pl.vz=0;
+ empuja();pl.lv=gy(pl.x,pl.z);
+ const spd=Math.hypot(pl.vx,pl.vz),mv=spd>.3?1:0;
+ const sx=pl.hx*Math.cos(az)-pl.hz*Math.sin(az),sy=-pl.hx*Math.sin(az)-pl.hz*Math.cos(az); // el giro de la cámara cambia hacia dónde mira
+ if(Math.abs(sx)>Math.abs(sy)*1.2)pl.dir=sx>0?'right':'left';else if(Math.abs(sy)>Math.abs(sx)*1.2)pl.dir=sy>0?'up':'down';
+ if(mv){if(!pl.mv)pl.ph=1;pl.ph+=dt*(3+spd*.9)}else pl.ph=0;pl.mv=mv;
+ const f=mv?SEQ[Math.floor(pl.ph)%4]:0,key=pl.dir+f;
+ if(key!==pl.k){if(mv&&f&&spd>3.5)puff();pl.k=key;oli.material.map=OT[key]}
+ pl.y+=(pl.lv-pl.y)*Math.min(1,dt*14);
+ oli.position.set(pl.x,pl.y+(mv?Math.abs(Math.sin(pl.ph*Math.PI))*.05:0),pl.z);oliSh.position.set(pl.x,pl.y+.02,pl.z);
+ dust.forEach(d=>{if(d.userData.life>0){d.userData.life-=dt;d.position.y+=dt*.4;d.material.opacity=Math.max(0,d.userData.life/.4)*.8;d.scale.setScalar(1+(.4-d.userData.life)*2);if(d.userData.life<=0)d.visible=false}});
+ // cámara: sigue a Oli con suavidad y no se sale de la isla
+ const k=Math.min(1,dt*4.5);C.x+=(Math.max(2.5,Math.min(W-3.5,pl.x))-C.x)*k;C.z+=(Math.max(2.5,Math.min(W-3.5,pl.z))-C.z)*k;C.y+=(pl.lv+.3-C.y)*k;
+ D+=(Dn-D)*Math.min(1,dt*5);
+ if(keys.KeyQ)az=Math.min(1.7,az+1.6*dt);if(keys.KeyE)az=Math.max(-.9,az-1.6*dt)}
+window.HD2D={pl,keys,obs,cr};if(PJ===LALI){$('tag').textContent='Lali';document.title='Lali en HD-2D';$('h1').textContent='Lali en HD-2D'}
+// ── cámara y arrastre ──
+let az=.5,drag=null,D=14,Dn=14,zoomFar=false;const EL=.62,C=new T.Vector3(6,.3,6);
+cv.addEventListener('pointerdown',e=>{drag=e.clientX;cv.setPointerCapture(e.pointerId)});
+cv.addEventListener('pointermove',e=>{if(drag===null)return;az=Math.max(-.9,Math.min(1.7,az-(e.clientX-drag)*.006));drag=e.clientX});
+['pointerup','pointercancel'].forEach(n=>cv.addEventListener(n,()=>drag=null));
+function size(){const w=stage.clientWidth,h=stage.clientHeight;R.setSize(w,h,false);cam.aspect=w/h;cam.fov=30;Dn=(w/h<.8?26:14)*(zoomFar?1.6:1);cam.updateProjectionMatrix()}
+addEventListener('resize',size);size();D=Dn;
+// ── con y sin efectos ──
+let fx=true;function setFx(on){fx=on;amb.intensity=on?.62:1.1;sun.intensity=on?.95:0;scene.fog=on?new T.Fog(0xcfe3d0,24,48):null;stage.classList.toggle('fx',on);$('b').textContent='Efectos: '+(on?'sí':'no')}
+$('b').onclick=()=>setFx(!fx);setFx(true);
+$('z').onclick=()=>{zoomFar=!zoomFar;$('z').textContent='Cámara: '+(zoomFar?'lejos':'cerca');size()};
+let t0=performance.now();
+function frame(now){const dt=Math.min(.05,(now-t0)/1e3),t=now/1e3;t0=now;
+ actualiza(dt);
+ cam.position.set(C.x+Math.sin(az)*Math.cos(EL)*D,C.y+Math.sin(EL)*D,C.z+Math.cos(az)*Math.cos(EL)*D);cam.lookAt(C);
+ bbs.forEach(m=>m.rotation.y=az);
+ sway.forEach((m,i)=>m.rotation.z=calm*Math.sin(t*1.6+m.position.x*.7+m.position.z*.4)*.09);
+ agua.color.setHex(Math.floor(t*2)%2?0x4fa7e8:0x62b6f0);
+ cr.forEach(c=>{let mov=0;if(c.wait>0)c.wait-=dt;else{const dx=c.tx-c.x,dz=c.tz-c.z,d=Math.hypot(dx,dz);if(d<.06){c.wait=1+rnd()*2.5;c.tx=c.r[0]+rnd()*(c.r[1]-c.r[0]);c.tz=c.r[2]+rnd()*(c.r[3]-c.r[2])}else{c.x+=dx/d*.9*dt;c.z+=dz/d*.9*dt;c.hop+=dt*9;mov=1;
+   const sx=dx*Math.cos(az)-dz*Math.sin(az),sy=-dx*Math.sin(az)-dz*Math.cos(az);c.dir=Math.abs(sx)>Math.abs(sy)?(sx>0?'right':'left'):(sy>0?'up':'down')}} // la dirección se decide en la pantalla, no en el mundo
+  const f=mov?Math.floor(c.hop/Math.PI)%2:0;if(f!==c.f||c.k!==c.dir){c.f=f;c.k=c.dir;c.m.material.map=TX[c.id][c.dir+f]}
+  c.y+=(gy(c.x,c.z)-c.y)*Math.min(1,dt*8);c.m.position.set(c.x,c.y+Math.abs(Math.sin(c.hop))*.14*mov,c.z);c.sh.position.set(c.x,c.y+.02,c.z)});
+ R.render(scene,cam);requestAnimationFrame(frame)}
+requestAnimationFrame(frame);
+</script></body></html>

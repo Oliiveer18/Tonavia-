@@ -1,0 +1,9 @@
+{
+  "_nota": "Dimensión original del juego (Multiverso F3). Esquema v1: docs/multiverso/06_ESQUEMA_DIMENSION.md. Validar: node tools/validar_dimension.js tonavia",
+  "v": 1,
+  "id": "tonavia",
+  "nombre": "Tonavia",
+  "entrada": { "mapa": "albanota", "ancla": "inicio" },
+  "regiones": ["silvara", "carbuna", "marenda", "fulgoria", "cirrena", "obsidra", "umbrada", "albanota"],
+  "reglas": { "ciclo": "global" }
+}

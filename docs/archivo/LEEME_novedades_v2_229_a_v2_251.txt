@@ -1,0 +1,2 @@
+NOVEDAD v2.251: árboles más grandes que una persona y 10 colocados en el parque; juncos y nenúfares en 3D; cartel con el nombre del pueblo; hierba alta simple. Antes: Somnel 3D, menús, suelo con grano, ciclo de día y noche. Documentos al día: docs/CONTINUAR.md, docs/ROADMAP.md, docs/LISTA_DECORACIONES_3D.md.
+NOVEDAD v2.229: Nimbel y Arenel ya existen en 3D (HD-2D, interruptor CRIATURAS3D). Método y lecciones en docs/GUIA_MODELADO_3D.md; texturas generadas con tools/generar_sprites3d.py.

@@ -1,0 +1,123 @@
+{
+  "formato": 2,
+  "id": "centro_pc",
+  "nombre": "Centro PC (interior)",
+  "region": null,
+  "ancho": 13,
+  "alto": 10,
+  "capas": {
+    "suelo": [
+      "#############",
+      "#############",
+      "#___________#",
+      "#___________#",
+      "#___________#",
+      "#___________#",
+      "#___________#",
+      "#___________#",
+      "#___________#",
+      "######d######"
+    ]
+  },
+  "objetos": [
+    {
+      "tipo": "sala_centro_pc",
+      "x": 0,
+      "y": 0
+    },
+    {
+      "tipo": "mostrador_centro",
+      "x": 5,
+      "y": 4
+    },
+    {
+      "tipo": "terminal_pc",
+      "x": 1,
+      "y": 3
+    },
+    {
+      "tipo": "terminal_pc",
+      "x": 1,
+      "y": 5
+    },
+    {
+      "tipo": "terminal_pc",
+      "x": 11,
+      "y": 3
+    },
+    {
+      "tipo": "terminal_pc",
+      "x": 11,
+      "y": 5
+    },
+    {
+      "tipo": "banco_doble",
+      "x": 2,
+      "y": 7
+    },
+    {
+      "tipo": "banco_doble_e",
+      "x": 9,
+      "y": 7
+    },
+    {
+      "tipo": "planta_interior",
+      "x": 1,
+      "y": 8
+    },
+    {
+      "tipo": "planta_interior",
+      "x": 11,
+      "y": 8
+    }
+  ],
+  "animar": false,
+  "anclas": {
+    "inicio": [
+      6,
+      8
+    ],
+    "entrada": [
+      6,
+      8
+    ],
+    "npc": [
+      6,
+      3
+    ],
+    "npc_frente": [
+      6,
+      5
+    ]
+  },
+  "puertas": [
+    {
+      "id": "salida",
+      "x": 6,
+      "y": 9,
+      "destino": {
+        "mapa": "albanota",
+        "ancla": "volver"
+      }
+    }
+  ],
+  "conexiones": {
+    "norte": null,
+    "sur": null,
+    "este": null,
+    "oeste": null
+  },
+  "zonas": [],
+  "npcs": [
+    {
+      "id": "enfermera",
+      "tipo": "npc",
+      "nombre": "Enfermera Alba",
+      "x": 6,
+      "y": 3,
+      "dir": "down",
+      "alcance": 2.6,
+      "dy": -12
+    }
+  ]
+}

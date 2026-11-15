@@ -1,0 +1,133 @@
+NOVEDAD v2.314: enfermera Alba en el Centro PC (cura y gestiona el equipo de hasta 6 criaturas), vida permanente, especial manual, panel Equipo, rótulo de la Tienda y escalones de la Ermita en 2D, y arreglos (muro, barra de vida, salir de interiores). Detalle: docs/SESION.md · estado: docs/CONTINUAR.md
+NOVEDAD v2.305: música de tensión en los combates (adaptativa, 4 niveles según el tiempo y la vida; src/musica_combate.js). Demo: python3 tools/demo_musica_combate.py
+NOVEDAD v2.304 (y v2.305 música de combate, ya recogida arriba): niveles de criatura (1-50), sonido del combate sintetizado con variedad por movimiento, tema «pixel cálido», Ignel en 3D (GLB), combate de noche con foco de luz. Estado exacto y siguientes pasos: docs/CONTINUAR.md · detalle: docs/SESION.md
+CRIATURAS DE LALI Y OLI · v2.314 (antes v2.222: pesca completa, fauna marina completa: 20 criaturas dibujadas a mano). Historial de versiones: docs/SESION.md y docs/archivo/.
+Historial de novedades antiguas: docs/archivo/LEEME_novedades_hasta_v2_132.txt y docs/archivo/LEEME_novedades_v2_229_a_v2_251.txt · estado y siguientes pasos: docs/ROADMAP.md · últimas sesiones: docs/SESION.md · traspaso: docs/CONTINUAR.md
+
+Juego web estilo "monstruos" en pixel art, todo dibujado por código. Cada jugador desde su móvil.
+
+CÓMO PROBARLO
+  node build.js      -> crea dist/criaturas.html (un solo archivo, sin instalar nada)
+  node test.js       -> comprobaciones sin navegador (108 grupos)
+  python3 tools/prueba_farolas_hd2d.py --three node_modules/three/build/three.min.js [carpeta] [--docs] -> prueba con Three.js REAL la luz de las farolas del HD-2D (v2.103): 12 luces, intensidades, ?farolas=0, +2 llamadas, más luz en los 4 giros, parpadeo, ?movimiento=0 y rendimiento
+  python3 tools/demo_sonido_movimientos.py [salida.wav] -> renderiza fuera de línea los 56 movimientos y los estados y mide pico/NaN (v2.302); tools/demo_sonido_combate.py hace lo mismo por elemento (v2.301)
+  python3 tools/prueba_glb_hd2d.py --three ruta/three.min.js --glb ruta/ignel_glb.wasm -> prueba Ignel 3D en HD-2D (v2.297); tools/tema_ui.py regenera el bloque de tema de index.html (v2.298)
+  python3 tools/prueba_pesca.py [carpeta] -> prueba en Chromium móvil los puntos de pesca de Albanota (v2.180); node tools/huella_juego.js --comprobar -> la huella del 2D no debe cambiar
+  tools/dibuja_peces_hires.py -> herramienta de diseño (Python + Pillow, solo para dibujar peces: curvas a alta resolución → píxel; ver docs/GUIA_PECES_A_MANO.md §5)
+  python3 tools/prueba_minimapa.py -> prueba en Chromium móvil el minimapa y el mapa grande: botón de 44 px que no tapa el mando, puntos de los dos jugadores, se mueven al andar, abrir/cerrar (v2.73; antes node build.js; necesita playwright)
+  python3 tools/prueba_casas.py -> prueba en Chromium las casas de Albanota, 2D y texturas 3D (v2.72)
+  python3 tools/captura_igual.py -> 12 capturas móviles (MD5) para comprobar que el dibujo no cambia (v2.33)
+  node tools/editor_mapas.js -> crea tools/editor_mapas.html (editor de mapas, un solo archivo; ábrelo en el navegador; v2.59: ve y mueve los objetos de Albanota; exporta y pasa el .json a maps/ + node build.js)
+  python3 tools/prueba_editar_en_juego.py [carpeta] -> prueba «✏️ Editar mapa» dentro del juego en Chromium móvil (v2.62; antes node build.js; necesita playwright)
+  python3 tools/prueba_editor.py [carpeta] -> prueba el editor en Chromium móvil y escritorio (v2.59; necesita playwright)
+  node tools/hd2d_albanota.js [--comprobar] -> genera el terreno 3D de Albanota (hd2d/albanota_hd2d.html) con el mapa real y el suelo del 2D; python3 tools/prueba_hd2d_albanota.py [carpeta] [--three ruta] lo prueba en Chromium móvil (v2.63)
+  tools/historico/  -> herramientas que ya no son del día a día: crear_albanota.js (plano ORIGINAL v2.53, solo con --salida; nunca escribe en maps/) y plano_albanota.py; maps/albanota.json es la fuente única (se edita en el juego con «✏️ Editar mapa»); ver tools/historico/LEEME.txt
+  node tools/huella.js       -> hash de TODOS los sprites (41 formas × 4 direcciones × 4 frames); sirve para demostrar que mover dibujos no cambia ni un píxel (sin sombreado; con --sombreado da la huella de los sprites sombreados, v2.21)
+  node tools/luz.js          -> test de luz de las criaturas con volumen (v2.23); node tools/simetria.js --sombreado -> el estirado no mete asimetría
+  python3 tools/contorno.py  -> comprueba que ningún sprite (41 formas × 4 dir × 4 frames) tiene el contorno cortado (v2.27.1)
+  python3 tools/paletas.py   -> comprueba las 8 paletas regionales (rampas, daltonismo) y el contraste de la interfaz (v2.29)
+  node tools/brillo.js       -> (v2.47) mide cuánto oscurece el sombreado a las 41 formas (pérdida media ≤ 4, la peor ≤ 8) y que la silueta no cambie; también va en test.js
+  python3 tools/cobertura_agua.py -> mapa de calor del agua (v2.44): dice si alguna casilla de agua se queda sin olas; el mismo control está en el grupo 30 de test.js
+  node tools/catalogo.js     -> regenera docs/CATALOGO.md desde src/lineas.js (--comprobar: solo avisa si está desfasado)
+  node tools/snapshot_datos.js -> hash de todos los datos del juego (sirve para demostrar que una refactorización no cambia nada; --guardar f.json)
+  python3 tools/prueba_galeria.py [dist/criaturas.html] [carpeta_capturas] -> prueba la galería en Chromium a 390x780 (necesita playwright): filtros, páginas, 20 reales y 200 simuladas, botones táctiles, sin errores de consola (v2.8)
+  python3 tools/presupuesto.py [--rapido] -> PRESUPUESTOS (v2.9): peso (real, extrapolado y muestra simulada de 410 formas), arranque (también con la CPU 4x más lenta), memoria, sprites en caché con la galería abierta de arriba abajo y estrés con caché de 1 sprite; sale con código 1 si algo se pasa del presupuesto (necesita playwright)
+  node tools/huella.js --cache N -> igual que huella.js pero con la caché limitada a N y dos vueltas (la 2.ª con todo redibujado): el hash debe ser el mismo (v2.9)
+  node tools/equilibrio.js   -> TEST DE EQUILIBRIO (reglas E, T y N del PLAN_200); --detalle muestra medidas, --cierre es para cierres de hito
+  Abre dist/criaturas.html en el navegador (móvil o PC). Flechas/WASD o los botones de abajo.
+
+DOCUMENTOS (orden de lectura, carpeta docs/)
+  FICHA_BANCO_3D.md        ficha del banco en volumen 3D (v2.104, paso 1 de 5); la de la farola, ya cerrada, está en FICHAS_OBJETOS_3D.md
+  FICHA_PECES.md           las 20 criaturas de pesca: zonas, probabilidades, kg, forcejeo y tamaño (v2.222)
+  GUIA_PECES_A_MANO.md     cómo se dibuja una criatura de pesca a mano: estilo, técnica, contorno y cierre de cada lote
+  PROMPT_PARA_CONTINUAR.md texto listo para pegar al abrir una sesión nueva
+  BIBLIA_VISUAL.md         ESTILO ÚNICO DEL MUNDO (v2.29): paletas por región, luz, escala, animación, motivos de música e interfaz
+  ESTANDAR_SOMBREADO.md    reglas fijas de sombreado y detalle de criaturas (v2.24.5; mandan sobre el detalle a mano)
+  REGLAS_DE_LUZ.md         luz, sombra y paleta (v2.21), plan (v2.22) y sistema B1 hecho (v2.23)
+  CONTINUAR.md             EMPIEZA AQUÍ en una sesión nueva: estado, reglas de trabajo, comandos, trampas, decisiones pendientes y tabla de ids
+  PASOS_1_1_A_1_5.md       especificación detallada de los pasos técnicos 1.1-1.5 (qué, cómo, línea base, prueba de cierre, riesgos)
+  PLAN_200.md              PLAN MAESTRO: meta de 200 líneas (≈410 formas), reparto por elemento, rareza y fases, hitos y reglas de equilibrio
+  ROADMAP.md               estado, lo que queda por esfuerzo (LOW/MEDIUM) y decisiones tomadas (limpiado en la v2.223; la versión completa anterior está en docs/archivo/)
+  METODO_DE_TRABAJO.md     reglas de oro y cómo se hace una línea evolutiva
+  CATALOGO.md              inventario de lo hecho (por elemento y rareza)
+  GUIA_DE_NOMBRES.md       reglas de nombres N1-N10 y registro de las 41 formas
+  DISENO_CRIATURAS.md      reglas de diseño: elementos, rarezas, fases, tamaños
+  FICHAS_IDENTIDAD.md, BLOQUE_2.md   fichas de las líneas hechas (archivo)
+  SESION.md                diario técnico de cada versión
+  PROMPT_IMAGEN.md         prompts para generar criaturas y evoluciones
+
+QUÉ HAY (v0.1)
+  - Oli (id "rex": trenzas rojas y castañas, gafas oscuras, chaqueta rosa) y Lali (id "luna": rubia, ojos verdes, chaqueta azul): pixel art a medida COPIADO TAL CUAL de Lali & Oli Cases (sprites_b.js), con frente, espalda, perfiles y pasos.
+  - Cámara con zoom entero (≈ 8 casillas de ancho en un móvil, mínimo 6 de alto): sigue suave al jugador y nunca se sale del mapa.
+  - Mapa 36x26 (v1.4): cruce de caminos central y 7 claros, uno por elemento (Aire, Agua, Eléctrico, Sombra, Roca, Fuego, Hoja); césped, flores, caminos, árboles y agua (los árboles y el agua bloquean).
+  - Eliges con quién juegas; el otro personaje se queda parado en el mapa (hueco del segundo móvil).
+
+  (también en docs/: voltel_propuesta_siluetas.png, boceto previo de siluetas y paleta de Voltel)
+
+ESTRUCTURA
+  index.html       página y botones
+  src/chars.js     paleta, sprites de Oli y Lali (copiados de Lali & Oli Cases)
+  src/lineas.js    REGISTRO ÚNICO DE DATOS (v2.6): una entrada por línea evolutiva (Nº, nombres, elementos, rareza, tamaño, peso, rasgos de movimiento, dónde aparece). De aquí salen G.PHASES_PLAN, G.LINE_PLAN, G.TRAITS y G.SPAWN
+  src/creatures.js derivación de los datos desde el registro, validador (G.validarLineas) y G.defCreature; las criaturas base de 16×16
+  src/formas_base.js  ayudantes comunes de dibujo (G.F) y def2/set, que enlazan un dibujo con su entrada de src/lineas.js
+  src/formas_hoja.js, formas_fuego.js, formas_agua.js, formas_electrico.js, formas_aire.js, formas_roca.js, formas_sombra.js  los DIBUJOS, un archivo por elemento principal (v2.7)
+  src/orden.json   LISTA ÚNICA de archivos y su orden de carga: la usan build.js, test.js y todas las herramientas
+  src/sombreado.js sombreado (v2.21): contorno selectivo y luz/sombra de los sprites, y suelo del mapa (hierba, camino, agua, árboles); interruptor G.SOMBREADO.ACTIVO
+  src/font.js      fuente de píxeles para los nombres
+  src/galeria.js   galería de criaturas (botón «Galería»): lista por Nº, filtros, búsqueda, páginas de 20 y dibujo al verse (v2.8); la lógica pura está en G.galeria
+  maps/*.json      un archivo por mapa (los hace tools/editor_mapas.html)
+  src/mapas.js     datos y reglas del mundo: casillas, puertas, bordes, anclas
+  src/motor.js     estado de partida y órdenes de los dos jugadores (sin dibujo)
+  src/game.js      dibujo de baldosas, cámara y entrada (teclado y botones)
+  build.js, test.js
+
+NOVEDAD v1.6b: Zumbel, Zumbarix, Arenel y Arenax rehechos (ojos grandes y simétricos, cabeza separada, silueta clara). Nueva herramienta tools/ojos.py que mide si los ojos de la vista frontal están centrados.
+NOVEDAD v1.6: lote B1 del Bloque 2 (Zumbel → Zumbarix, Eléctrico, y Arenel → Arenax, Roca; 15 criaturas en el mapa y 30 formas). Se prueban con ✨ junto a Zumbel y junto a Arenel, y se ven en la «Galería».
+NOVEDAD v1.5: lote A del Bloque 2 (Cenel, Ferrel, Dandel; 13 criaturas en el mapa) y GALERÍA: botón «Galería» para ver todas las criaturas en grande por línea evolutiva, con filtro por elemento y ficha con sus vistas.
+NOVEDAD v1.4: mapa grande 36x26 con claros por elemento (paso 0 del Bloque 2). Oli y Lali empiezan en el cruce de caminos y cada criatura está en el claro de su elemento.
+NOVEDAD v1.2: línea de Voltel hecha (Voltel → Voltavar → Voltorax, Eléctrico, Rara, 3 fases). Voltavar: batería de arranque con pinzas y arco azul entre los bornes; Voltorax: bobina de tormentas con esfera de luz y rayos. Se prueban con ✨ junto a Voltel.
+
+NOVEDAD v0.5
+  - 5 criaturas nuevas (diseño de Claude, fase 1): Ignel (Fuego), Voltel (Eléctrico), Nimbel (Aire), Cuarel (Roca, rara) y Somnel (Sombra, rara).
+  - Nombre sobre cada criatura con fuente de píxeles clásica (blanca con contorno oscuro, src/font.js). Para añadir letras o signos nuevos: editar la tabla D de font.js.
+  - Las criaturas empiezan agrupadas cerca del inicio y solo pasean cerca de su sitio, para revisarlas.
+
+NOVEDAD v0.3
+  - src/creatures.js: registro de criaturas (G.defCreature). Ondel (diseño de Claude, de prueba) pasea por el mapa sin pisar árboles ni agua.
+  - v0.4: Aguacato (diseño de Oli, gato-aguacate con llave de cuerda) con frente, perfil y espalda. Nombre y frase puestos por Claude: cámbialos en creatures.js.
+  - Botón 💬 (o tecla E/Espacio) junto a una criatura: dice su frase y el autor del diseño.
+  - Para añadir una criatura de Oli: G.defCreature('id', {name, by:'Oli', line, draw}) y añadir su entrada `aparece` en src/lineas.js (hasta el 1.3b las criaturas salen en las casillas de G.SPAWN).
+
+SIGUIENTE: ver docs/ROADMAP.md (§2: lo que queda por esfuerzo). La lista de abajo es la antigua del inicio del proyecto.
+SIGUIENTE ANTIGUO (en este orden, un ZIP por paso)
+  1. Dos móviles conectados: cada uno ve moverse al otro (PeerJS, como en Lali & Oli Cases).
+  2. (HECHO en v0.2) Cámara con zoom. Falta: mapa algo mayor.
+  3. NPC con diálogo y 1-2 criaturas caminando (con las fotos/dibujos de Oli, convertidos a pixel).
+  4. Combate y captura (v2).
+Las criaturas serán 100% originales: diseños de Oli, nada copiado de otros juegos.
+
+NOVEDAD v0.6: cada criatura tiene tamaño, silueta, movimiento y sombra propios (src/creatures.js: G.TRAITS · src/formas.js: dibujos propios).
+NOVEDAD v0.7: lote 2 (Micel, Espirel, Lunel) = 10 criaturas.
+NOVEDAD v0.8: datos de juego (ventajas entre elementos, fases previstas, tamaño por fase). Aún sin combate ni evolución en pantalla.
+NOVEDAD v0.9: primera línea evolutiva completa (Aguacato 18×18 → Aguacaryn 22×22 → Aguacarax 26×26, Hoja, Rara; solo evoluciones, sin condiciones).
+  - Botón ✨ (arriba a la izquierda del mando): hace evolucionar a la criatura más cercana a su siguiente fase. Es solo para probar; solo Aguacato tiene evoluciones por ahora.
+  - Nuevas entradas 'aguacaton' y 'aguacatigre' en src/formas.js (dibujos propios) con family/stage/evolvesTo; en el mapa salen solo las 10 criaturas de fase 1.
+NOVEDAD v1.0: identidad propia en cada fase de Aguacato (se prueba con ✨).
+  - Historia: fruta con llave (Aguacato) → fruta madura con hueso (Aguacaryn) → felino (Aguacarax).
+  - Aguacaryn (22×22): silueta de pera ancha, piel rugosa tipo Hass más oscura, hueso grande con brillo, brazos fuertes, cejas, llave de BRONCE, cola gruesa con hojita. Se contonea al andar (1 px a cada lado) y va más lento.
+  - Aguacarax (26×26): hombros anchos y cintura fina, patas largas con garras, orejas altas con puntas y mechón, marca en la frente, rayas por todo el cuerpo (también en la cola con anillos), ojos ámbar, colmillos, hueso-gema con aro de oro en el pecho y llave de ORO. Anda más rápido y, parado, mueve la cola (frame 2 del sprite).
+  - Paleta por fase (maduración): verde claro → verde Hass → verde profundo con rayas casi negras. La llave pasa de gris a bronce y a oro.
+  - Se conserva de Oli: nombre de familia, orejas de gato con interior rosa, barriga clara y la llave de cuerda. Aguacato (fase 1) no se ha tocado.
+  - Código: src/formas.js (aguatonDraw, aguatigreDraw), nuevos rasgos sway y flick en G.TRAITS, game.js (creatureDraw). Tests nuevos al final de test.js.
+NOVEDAD v1.1: tamaños más contenidos. Aguacato 18×18 → Aguacaryn 20×20 → Aguacarax 22×22 (+2 px por fase, antes +4). Las dos evoluciones están redibujadas a su nueva medida con la misma identidad de v1.0 (los tamaños citados en la NOVEDAD v1.0 eran 22 y 26).
+HERRAMIENTAS: tools/render_sprites.js y tools/hoja_sprites.py generan una hoja PNG con las 4 direcciones × 2 pasos de las criaturas (ver docs/SESION.md). SIGUIENTE: plan de evoluciones de las demás criaturas (docs/SESION.md, sección SIGUIENTE).
+NOVEDAD v1.1 (tamaño y peso): cada línea evolutiva tiene su propio tamaño y peso por fase (G.LINE_PLAN en src/creatures.js), ya no +2 fijo. Nombres nuevos estilo Charmander-Charmeleon-Charizard (Ondel, Ignel, Micel, Espirel, Somnel, Cuarel, Lunel, Voltel, Nimbel, Aguacaryn, Aguacarax). Fichas de las 7 líneas en docs/FICHAS_IDENTIDAD.md (aprobadas).
+NOVEDAD v1.1 (línea de Ondel): Ondel evoluciona a Ondavar (18×12, nenúfar que gotea). Se prueba con el botón ✨ junto a Ondel.
+NOVEDAD v1.1 (línea de Ignel): Ignel evoluciona a Ignavar (14×16, cabeza roja con melena de llama asimétrica que parpadea y suelta chispas). Se prueba con el botón ✨ junto a Ignel.
+NOVEDAD v1.1 (línea de Micel): Micel evoluciona a Micavar (18×18, seta en «T» con sombrero granate ancho, anillo y musgo; suelta esporas al parar). Se prueba con el botón ✨ junto a Micel.
+ARREGLO v1.1 (móvil): al mantener pulsados los botones ya no se selecciona nada ni sale «copiar» (index.html y src/game.js).
+NOVEDAD v1.1 (línea de Espirel): Espirel evoluciona a Espiravar (20×18, caracol con concha-torre de nácar y ventanita con pececito; burbujas al parar). Se prueba con el botón ✨ junto a Espirel.
+NOVEDAD v1.1 (línea de Somnel): Somnel evoluciona a Somnaris (16×22, mago de los sueños: gorro alto y torcido con borla-estrella, capa índigo con estrellas y luna al cuello, flota). Parado, la capa ondea; al hablarle (💬) abre un ojo. Se prueba con el botón ✨ junto a Somnel.
+NOVEDAD v1.1 (línea de Cuarel): Cuarel evoluciona a Cuarvel (20×18, minero de pizarra con casco naranja, pico y mochila con cristales; parado se apoya en el pico) y este a Cuarzoth (22×24, coloso de cristal: aguja y cristales teal y violeta en hombros y espalda, casco dorado, gema en el pecho; parado destella). Se prueba con el botón ✨ junto a Cuarel (dos veces). tools/render_sprites.js acepta ahora una lista de frames (0,1,2) y hoja_sprites.py una lista de columnas.
+NOVEDAD v1.1 (línea de Lunel): Lunel evoluciona a Lunareth (26×20, búho del eclipse con alas abiertas y la luna medio tapada en el pecho) y este a Lunaroth (24×26, guardián del cielo: corona de luna llena, alas largas de cielo nocturno con estrellas, cola de cometa). Se prueba con ✨ junto a Lunel (dos veces). Con esta, las 7 líneas evolutivas están hechas.
+  python3 tools/prueba_mapas_juego.py -> prueba en Chromium el camino editor -> juego (importar, rechazar, jugar, volver a los oficiales)

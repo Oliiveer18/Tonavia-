@@ -1,0 +1,110 @@
+{
+ "_nota": "SANTUARIO UNIVERSAL · datos (Etapa A, v2.364). Todo lo de aquí lo valida G.santuario.validarDatos (node tools/validar_santuario.js). Añadir un hábitat o un temperamento = añadir una entrada; no se toca código. Contrato: docs/multiverso/19_SANTUARIO_ETAPA_A.md",
+ "v": 1,
+ "_acceso": "Puerta por la que se llega al Umbral (hoy, la provisional del Nexus técnico). Cuando exista el Nexus real, basta con cambiarla aquí y en su mapa.",
+ "acceso": { "mapa": "nexus/plaza_cruce", "puerta": "portal_santuario" },
+ "_niveles": "Uno por nivel (1-5), en orden. ancho/alto del mapa generado; filas de parcelas (dos por fila, una a cada lado de la avenida) de pw×ph casillas; solares = parcelas reservadas a instalaciones (Etapa B); habitats = el resto; residentes = tope de criaturas.",
+ "niveles": [
+  { "nombre": "Refugio", "ancho": 24, "alto": 18, "filas": 1, "pw": 8, "ph": 6, "solares": 1, "habitats": 1, "residentes": 6 },
+  { "nombre": "Patio", "coste": { "combates": 15, "minimo": 450 }, "ancho": 32, "alto": 24, "filas": 2, "pw": 11, "ph": 5, "solares": 2, "habitats": 2, "residentes": 12 },
+  { "nombre": "Aldea", "coste": { "combates": 45, "minimo": 1800 }, "ancho": 40, "alto": 30, "filas": 3, "pw": 15, "ph": 5, "solares": 2, "habitats": 4, "residentes": 24 },
+  { "nombre": "Valle", "coste": { "combates": 100, "minimo": 5500 }, "ancho": 48, "alto": 36, "filas": 4, "pw": 19, "ph": 5, "solares": 2, "habitats": 6, "residentes": 48 },
+  { "nombre": "Gran Santuario", "coste": { "combates": 200, "minimo": 15000 }, "ancho": 64, "alto": 48, "filas": 5, "pw": 27, "ph": 6, "solares": 2, "habitats": 8, "residentes": 300 }
+ ],
+ "_habitats": "clave = UNA letra única (viaja en el id del mapa: no cambiarla nunca). suelo/borde = casillas transitables; rasgo = casilla del rincón característico (2 columnas al fondo de la parcela; si es sólida, las criaturas pasean por el resto). elemento = el de las criaturas que prefieren vivir ahí.",
+ "habitatInicial": "prado",
+ "habitats": {
+  "prado": { "nivel": 1, "clave": "p", "nombre": "Prado", "elemento": "hoja", "suelo": ".", "borde": "g", "rasgo": "f", "don": { "tipo": "cura", "valor": 1, "texto": "Reposo: cada día amanecen curadas" }, "actividad": { "frase": "se revuelca entre las flores", "emo": "flor", "peso": 2, "afin": 3 } },
+  "charca": { "nivel": 2, "clave": "c", "nombre": "Charca", "elemento": "agua", "suelo": ".", "borde": "s", "rasgo": "~", "don": { "tipo": "vinculo", "valor": 0.4, "texto": "Remanso: aquí las amistades crecen antes" }, "actividad": { "frase": "chapotea en la orilla", "emo": "gota", "peso": 2, "afin": 4 } },
+  "brasa": { "nivel": 3, "clave": "b", "nombre": "Brasal", "elemento": "fuego", "suelo": "c", "borde": "s", "rasgo": "l", "don": { "tipo": "tope", "valor": 0.4, "texto": "Fragua: aprenden más cada día" }, "actividad": { "frase": "se calienta junto a la lava", "emo": "llama", "peso": 1, "afin": 4 } },
+  "cumbre": { "nivel": 3, "clave": "r", "nombre": "Pedregal", "elemento": "roca", "suelo": "s", "borde": "c", "rasgo": "r", "don": { "tipo": "eficiencia", "valor": 0.4, "texto": "Temple: aprovechan mejor tus vivencias" }, "actividad": { "frase": "se afila contra las rocas", "emo": "piedra", "peso": 1, "afin": 4 } },
+  "brisa": { "nivel": 2, "clave": "a", "nombre": "Claro de Brisa", "elemento": "aire", "suelo": ".", "borde": "f", "rasgo": "g", "don": { "tipo": "encuentros", "valor": 0.25, "texto": "Recreo: se buscan mucho más para jugar" }, "actividad": { "frase": "salta contra el viento", "emo": "viento", "peso": 2, "afin": 4 } },
+  "chispa": { "nivel": 4, "clave": "e", "nombre": "Llano de Chispas", "elemento": "electrico", "suelo": "=", "borde": "s", "rasgo": "r", "don": { "tipo": "techo", "valor": 3, "texto": "Sobrecarga: pueden superar en 3 niveles a tu mejor criatura" }, "actividad": { "frase": "se carga de chispas", "emo": "rayo", "peso": 1, "afin": 4 } },
+  "penumbra": { "nivel": 4, "clave": "s", "nombre": "Arboleda Umbría", "elemento": "sombra", "suelo": "c", "borde": "g", "rasgo": "t", "don": { "tipo": "concordia", "valor": 1, "texto": "Tregua: bajo los árboles nadie se lleva mal" }, "actividad": { "frase": "acecha entre los árboles", "emo": "luna", "peso": 2, "afin": 4 } }
+ },
+ "_cambioHabitat": "Elegir hábitat para una parcela vacía es gratis; cambiar uno que ya existe cuesta esto (mismo criterio que la tienda: nº de combates de tu nivel, con un mínimo).",
+ "cambioHabitat": { "combates": 3, "minimo": 90 },
+ "_instalaciones": "Edificios que se levantan en los SOLARES (parcelas reservadas). clave = UN dígito 1-9 único (viaja en el id del mapa: no cambiarlo nunca). efecto.tipo: tope (más XP al día para todas) · cura (todas amanecen curadas) · vinculo (las amistades crecen antes en todo el Santuario) · vivencias (cabe más en la reserva) · expedicion (APORTE: lo que ganas en «donde» llena la reserva más deprisa). APORTES de otras dimensiones: llevan origen (dimensión instalada) y req (al menos un hito de ese origen; contrato docs/multiverso/21_SANTUARIO_APORTES.md); solo se piden al elegir/construir, nunca derriban lo hecho. objetos = [tipo del catálogo, dx, dy] desde el centro del solar. Los talleres de crafteo NO están aquí: llegarán en su fase.",
+ "instalaciones": {
+  "campo": { "clave": "1", "nombre": "Campo de prácticas", "nivel": 1, "coste": { "combates": 25, "minimo": 800 }, "efecto": { "tipo": "tope", "valor": 0.25 }, "texto": "Todas aprenden un 25 % más cada día", "suelo": "s", "objetos": [["espantapajaros", -1, 0], ["espantapajaros", 1, 0], ["barril", 0, 1]] },
+  "manantial": { "clave": "2", "nombre": "Manantial", "nivel": 2, "coste": { "combates": 40, "minimo": 1500 }, "efecto": { "tipo": "cura", "valor": 1 }, "texto": "Todas las residentes amanecen curadas", "suelo": "=", "objetos": [["fuente", 0, 0]] },
+  "glorieta": { "clave": "3", "nombre": "Glorieta", "nivel": 2, "coste": { "combates": 40, "minimo": 1500 }, "efecto": { "tipo": "vinculo", "valor": 0.25 }, "texto": "Las amistades crecen un 25 % antes en todo el Santuario", "suelo": "f", "objetos": [["banco", -2, 0], ["banco", 1, 0], ["farola", 0, -1]] },
+  "hoguera": { "clave": "4", "nombre": "Hoguera de relatos", "nivel": 3, "coste": { "combates": 60, "minimo": 3000 }, "efecto": { "tipo": "vivencias", "valor": 1 }, "texto": "Guarda el doble de vivencias", "suelo": "c", "objetos": [["brasero_carbuna", 0, 0], ["banco", -3, 1], ["banco", 2, 1]] },
+  "campamento": { "clave": "5", "nombre": "Campamento de expedición", "nivel": 3, "coste": { "combates": 60, "minimo": 3000 }, "origen": "tonavia", "req": [{ "t": "profundidad", "n": 10 }], "efecto": { "tipo": "expedicion", "donde": "profundidades", "valor": 0.5 }, "texto": "Lo que ganas en las Profundidades llena la reserva de vivencias un 50 % más deprisa", "suelo": "c", "objetos": [["brasero_carbuna", 0, 0], ["barril", -2, 1], ["barril", 2, 1]] }
+ },
+
+ "_decoracion": "PERSONALIZACIÓN (B4). Piezas del catálogo de objetos (1×1) que se colocan en los HUECOS fijos del trazado: «plaza» (4, junto a la cabaña, sobre el camino) y «borde» (2 por fila de parcelas, a los lados de la avenida, sobre la hierba). clave = UNA letra única (viaja en el id del mapa tras «_d»: no cambiarla nunca). Es solo estético: no da efectos ni Brillos. Quitar es gratis (sin devolución); cambiar una pieza cuesta como colocarla. Una pieza puede ser un APORTE (origen + req, como en las instalaciones). Contrato: docs/multiverso/22_SANTUARIO_DECORACION.md",
+ "decoracion": { "piezas": {
+  "maceta": { "clave": "a", "nombre": "Maceta", "objeto": "maceta", "nivel": 1, "coste": { "combates": 1, "minimo": 40 }, "donde": ["plaza", "borde"] },
+  "barril": { "clave": "b", "nombre": "Barril", "objeto": "barril", "nivel": 1, "coste": { "combates": 2, "minimo": 60 }, "donde": ["plaza", "borde"] },
+  "farola": { "clave": "c", "nombre": "Farola", "objeto": "farola", "nivel": 1, "coste": { "combates": 3, "minimo": 90 }, "donde": ["plaza", "borde"] },
+  "roca": { "clave": "d", "nombre": "Roca", "objeto": "roca", "nivel": 2, "coste": { "combates": 2, "minimo": 60 }, "donde": ["borde"] },
+  "arbol": { "clave": "e", "nombre": "Árbol joven", "objeto": "arbol_pequeno", "nivel": 2, "coste": { "combates": 3, "minimo": 90 }, "donde": ["borde"] },
+  "abeto": { "clave": "f", "nombre": "Abeto", "objeto": "abeto", "nivel": 2, "coste": { "combates": 3, "minimo": 90 }, "donde": ["borde"] },
+  "espantapajaros": { "clave": "g", "nombre": "Espantapájaros", "objeto": "espantapajaros", "nivel": 3, "coste": { "combates": 4, "minimo": 120 }, "donde": ["borde"] }
+ } },
+ "_cabana": "CABAÑA (B5, v2.369). Interior de la fachada del hogar: id santuario/cabana_<jugador> (no cambia al decorar, construir ni ampliar, así que el panel funciona dentro). Sala 11×8: columnas 0 y 10 y fila 7 son pared (puerta en la fila 7), fila 0-1 pared trasera; suelo = columnas 1-9, filas 2-6. Muebles de solo objetos del catálogo; 'accion' marca los que se pueden usar (leen el estado, no cambian nada): libro = resumen del Santuario, aportes = vitrina de lo que han traído otras dimensiones. 'cama' se elige por jugador. Lirio (la archivera) atiende el mismo panel de Residentes que Brezo. NO cura al equipo (eso es de la Doctora) ni da nada: es un lugar para estar y para consultar. Contrato: docs/multiverso/23_SANTUARIO_CABANA.md",
+ "cabana": { "ancho": 11, "alto": 8, "sala": "sala_cabana", "tema": "casa", "puerta": { "x": 5, "fuera": [5, 7] }, "entrada": [5, 6], "archivera": { "x": 5, "y": 2, "alcance": 2.1 },
+   "camas": { "oli": "cama_azul", "lali": "cama_rosa", "otro": "cama_azul" },
+   "muebles": [
+     { "tipo": "cama", "x": 1, "y": 2 },
+     { "tipo": "estante", "x": 2, "y": 2, "accion": "libro" },
+     { "tipo": "planta_interior", "x": 4, "y": 2 },
+     { "tipo": "planta_interior", "x": 6, "y": 2 },
+     { "tipo": "vitrina", "x": 7, "y": 2, "accion": "aportes" },
+     { "tipo": "mostrador_madera", "x": 4, "y": 3 },
+     { "tipo": "mesa_sillas", "x": 7, "y": 5 }
+   ] },
+ "_entrenamiento": "Las residentes NO ganan XP por el paso del tiempo. Aprenden de tus VIVENCIAS: cada punto de XP de entrenador que ganas jugando (combates, pesca, intercambios) llena la reserva (tope por nivel de Santuario). Estando tú en casa, cada residente toma de la reserva hasta su dosis del día. dosis = combates de su nivel que vale un día (0,6 = poco más de medio combate); afin = extra por vivir en el hábitat de su elemento; amistad = extra por convivir con alguien según el vínculo [desconocidas, se conocen, amigas, inseparables]; ritmo = segundos de visita que tarda en repartirse la dosis. Techo: ninguna pasa del nivel de la mejor criatura de tu equipo.",
+ "entrenamiento": { "dosis": 0.6, "afin": 0.25, "amistad": [0, 0.05, 0.1, 0.15], "ritmo": 40, "vivencias": [300, 800, 2000, 5000, 12000] },
+ "_ritmo": "tramo = segundos de juego que dura cada decisión de una criatura (se multiplica por la «calma» de su temperamento). noche = [desde, hasta) en horas del reloj único (duermen las diurnas); siesta = lo mismo para las nocturnas. obligado = cada cuántos tramos despierta pasea sí o sí. alcance = px del mapa para hablarle.",
+ "ritmo": { "tramo": 7, "noche": [21, 6], "siesta": [8, 18], "obligado": 4, "alcance": 26, "persecucion": 2.5 },
+ "_temperamentos": "Pesos de cada actividad despierta (pasear, descansar, mirar), calma (1 = normal; menos = más inquieta) y nocturna (duerme de día). Se resuelven por elemento → línea (familia) → forma; cada nivel pisa solo lo que declara.",
+ "temperamentos": {
+  "base": { "pasear": 4, "descansar": 3, "mirar": 2, "calma": 1, "nocturna": false },
+  "elemento": {
+   "hoja": { "pasear": 4, "descansar": 3, "mirar": 2 },
+   "fuego": { "pasear": 6, "descansar": 1, "mirar": 2, "calma": 0.8 },
+   "agua": { "pasear": 4, "descansar": 2, "mirar": 3 },
+   "electrico": { "pasear": 7, "descansar": 1, "mirar": 2, "calma": 0.7 },
+   "aire": { "pasear": 5, "descansar": 2, "mirar": 3, "calma": 0.9 },
+   "roca": { "pasear": 2, "descansar": 6, "mirar": 2, "calma": 1.4 },
+   "sombra": { "pasear": 3, "descansar": 3, "mirar": 3, "nocturna": true }
+  },
+  "linea": {
+   "somnin": { "pasear": 1, "descansar": 7, "mirar": 1, "calma": 1.6 },
+   "caracolin": { "pasear": 2, "descansar": 4, "mirar": 3, "calma": 1.5 },
+   "zumbel": { "pasear": 9, "descansar": 1, "mirar": 1, "calma": 0.6 },
+   "nubecin": { "pasear": 3, "descansar": 4, "mirar": 3 }
+  },
+  "forma": {
+   "cuarzoth": { "pasear": 1, "descansar": 8, "mirar": 2, "calma": 1.8 },
+   "forjadrax": { "pasear": 1, "descansar": 6, "mirar": 3, "calma": 1.6 }
+  }
+ },
+ "_social": "Vida en común. bloque = segundos de cada «ronda» de encuentros en un hábitat. base = probabilidad de que una pareja se junte en una ronda. dias = días de convivencia que cuentan como máximo. niveles = relación según los puntos (días × ritmo de la pareja; el ritmo sale de su familia, elementos, carácter y química). recelo = compatibilidad a partir de la cual dos criaturas no se tragan.",
+ "social": { "bloque": 18, "base": 0.5, "dias": 10, "recelo": -2, "cerca": 26,
+  "niveles": [ { "id": "conocidas", "desde": 2, "nombre": "se conocen" }, { "id": "amigas", "desde": 5, "nombre": "son amigas" }, { "id": "inseparables", "desde": 8, "nombre": "son inseparables" } ] },
+ "_rasgos": "Carácter de CADA ejemplar (sale de su ID permanente: no se guarda y no cambia nunca). Suma a los pesos de su especie; social sube o baja las ganas de juntarse.",
+ "rasgos": {
+  "juguetona": { "nombre": "juguetona", "pasear": 2, "social": 0.25 },
+  "dormilona": { "nombre": "dormilona", "descansar": 3, "calma": 0.25 },
+  "curiosa": { "nombre": "curiosa", "mirar": 3 },
+  "timida": { "nombre": "tímida", "mirar": 1, "social": -0.25 },
+  "inquieta": { "nombre": "inquieta", "pasear": 3, "calma": -0.15 },
+  "tranquila": { "nombre": "tranquila", "descansar": 2, "calma": 0.15 },
+  "carinosa": { "nombre": "cariñosa", "social": 0.3 },
+  "solitaria": { "nombre": "solitaria", "pasear": 1, "social": -0.3 }
+ },
+ "frases": {
+  "pasear": "está de paseo",
+  "descansar": "descansa a gusto",
+  "mirar": "lo mira todo con curiosidad",
+  "dormir": "duerme… chsss",
+  "jugar": "juega con {con}",
+  "juntas": "descansa junto a {con}",
+  "saludo": "saluda a {con}",
+  "recelo": "mira de reojo a {con}",
+  "aprende": "está aprendiendo de tus aventuras"
+ }
+}

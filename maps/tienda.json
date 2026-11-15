@@ -1,0 +1,121 @@
+{
+ "formato": 2,
+ "id": "tienda",
+ "nombre": "Tienda (interior)",
+ "region": null,
+ "ancho": 11,
+ "alto": 8,
+ "capas": {
+  "suelo": [
+   "###########",
+   "###########",
+   "#_________#",
+   "#_________#",
+   "#_________#",
+   "#_________#",
+   "#_________#",
+   "#####d#####"
+  ]
+ },
+ "objetos": [
+  {
+   "tipo": "sala_tienda",
+   "x": 0,
+   "y": 0
+  },
+  {
+   "tipo": "estante_tienda",
+   "x": 1,
+   "y": 2
+  },
+  {
+   "tipo": "estante_tienda",
+   "x": 8,
+   "y": 2
+  },
+  {
+   "tipo": "vitrina",
+   "x": 1,
+   "y": 4
+  },
+  {
+   "tipo": "vitrina_frasco",
+   "x": 7,
+   "y": 5
+  },
+  {
+   "tipo": "mostrador_tienda",
+   "x": 6,
+   "y": 3
+  },
+  {
+   "tipo": "barril_frutas",
+   "x": 1,
+   "y": 6
+  },
+  {
+   "tipo": "sacos_cajas",
+   "x": 9,
+   "y": 6
+  }
+ ],
+ "animar": false,
+ "anclas": {
+  "inicio": [
+   5,
+   6
+  ],
+  "entrada": [
+   5,
+   6
+  ],
+  "npc": [
+   7,
+   2
+  ],
+  "npc_frente": [
+   7,
+   4
+  ]
+ },
+ "puertas": [
+  {
+   "id": "salida",
+   "x": 5,
+   "y": 7,
+   "destino": {
+    "mapa": "albanota",
+    "ancla": "volver"
+   }
+  }
+ ],
+ "conexiones": {
+  "norte": null,
+  "sur": null,
+  "este": null,
+  "oeste": null
+ },
+ "zonas": [],
+ "npcs": [
+  {
+   "id": "tendero",
+   "tipo": "npc",
+   "nombre": "Tendero Teo",
+   "x": 7,
+   "y": 2,
+   "dir": "down",
+   "alcance": 2.6,
+   "dy": -12
+  },
+  {
+   "id": "tablon",
+   "tipo": "npc",
+   "nombre": "Tablón de intercambios",
+   "x": 3,
+   "y": 2,
+   "dir": "down",
+   "alcance": 1.9,
+   "dy": 4
+  }
+ ]
+}

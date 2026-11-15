@@ -1,0 +1,32 @@
+{
+ "_nota": "FN (v2.360): base TÉCNICA de la Isla Pirata. Solo el mar (mosaico 3×3 de 64×64) y tres balizas de prueba; sin islas, muelles ni NPC (eso es contenido, de Sonnet). No hay portal que lleve aquí: se prueba con ?mapa=pirata/mar_1_1. Contrato: docs/multiverso/15_NAVEGACION_FN.md",
+ "v": 4,
+ "id": "pirata",
+ "nombre": "Isla Pirata",
+ "entrada": { "mapa": "pirata/mar_1_1", "ancla": "inicio" },
+ "regiones": [],
+ "reglas": { "ciclo": "global" },
+ "navegacion": {
+  "mar": { "mapas": [["pirata/mar_0_0", "pirata/mar_0_1", "pirata/mar_0_2"], ["pirata/mar_1_0", "pirata/mar_1_1", "pirata/mar_1_2"], ["pirata/mar_2_0", "pirata/mar_2_1", "pirata/mar_2_2"]] },
+  "puntos": [
+   { "id": "baliza_a", "tipo": "faro", "nombre": "Baliza de prueba A", "mapa": "pirata/mar_0_0", "tx": 24, "ty": 24 },
+   { "id": "baliza_b", "tipo": "faro", "nombre": "Baliza de prueba B", "mapa": "pirata/mar_0_2", "tx": 22, "ty": 40 },
+   { "id": "baliza_c", "tipo": "faro", "nombre": "Baliza de prueba C", "mapa": "pirata/mar_2_1", "tx": 32, "ty": 22 }
+  ],
+  "rutas": [
+   { "id": "a_b", "desde": "baliza_a", "hasta": "baliza_b", "puntos": [[24, 24], [90, 60], [150, 40]] },
+   { "id": "a_c", "desde": "baliza_a", "hasta": "baliza_c", "puntos": [[24, 24], [96, 150]] },
+   { "id": "b_c", "desde": "baliza_b", "hasta": "baliza_c", "puntos": [[150, 40], [96, 150]] }
+  ],
+  "mareas": { "baja": [[5, 11], [17, 23]] },
+  "eventos": {
+   "ventana": 600, "por_mapa": 3, "radio": 2.5,
+   "tipos": [
+    { "id": "cofre_flotante", "tipo": "cofre", "peso": 3, "texto": "Un cofre flotante" },
+    { "id": "botella", "tipo": "botella", "peso": 3, "texto": "Una botella con un mensaje" },
+    { "id": "remolino", "tipo": "remolino", "peso": 2, "texto": "Un remolino" },
+    { "id": "tormenta", "tipo": "tormenta", "peso": 1, "texto": "Una nube de tormenta", "casco": 1 }
+   ]
+  }
+ }
+}

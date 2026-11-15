@@ -1,0 +1,6 @@
+// agentes_pesca_diag.js — v2.334: ¿hay cupo en la pesca? Uso: node tools/agentes_pesca_diag.js [--dias 2]. Mide máximo simultáneo y sitios repetidos.
+const G = require('./_cargar.js')(), A = G.agentes, arg = process.argv.slice(2), DIAS = +(arg.includes('--dias') ? arg[arg.indexOf('--dias') + 1] : 2), DT = 0.25;
+const est = { semilla: 7, agentes: A.crear(7, A.cfg.POBLACION), avisos: [], jugadores: {}, reloj: 0 }; const mx = {}; let max = 0, rep = 0, esperan = 0, m = 0, tot = 0;
+for (let s = 0; s < DIAS * G.ciclo.AJUSTES.DIA_S / DT; s++) { A.avanzar(est, DT); est.reloj += DT; if (s % 4) continue; const v = est.agentes.pob.filter((a) => a.paso && a.paso.a === 'pescar'), u = new Set(v.map((a) => a.lug + a.paso.poi)); const pl = {}; v.forEach((a) => { pl[a.lug] = (pl[a.lug] || 0) + 1; }); max = Math.max(max, ...Object.values(pl), 0); Object.keys(pl).forEach((k) => { mx[k] = Math.max(mx[k] || 0, pl[k]); }); if (u.size < v.length) rep++; tot += v.length; m++; esperan += est.agentes.pob.filter((a) => a.plan && a.plan[0] && a.plan[0].a === 'pescar' && a.paso && a.paso.a === 'ocio').length; }
+console.log('máx. pescando a la vez:', max, '· muestras con sitio repetido:', rep, '· media pescando:', (tot / m).toFixed(2), '· esperando hueco (suma de muestras):', esperan);
+console.log('máx. por mapa:', JSON.stringify(mx));

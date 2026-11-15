@@ -1,0 +1,16 @@
+{
+ "_ayuda": "PLANTILLA de sala prefabricada de las Profundidades. Copia el objeto «sala» dentro de la lista «salas» de datos/profundidades.json y ejecuta: node tools/validar_salas.js && node tools/validar_puzles.js. Guía y leyenda de letras: docs/GUIA_PROFUNDIDADES.md",
+ "sala": {
+  "id": "mi_sala", "tipo": "puzle", "dif": 1, "pista": "Una frase corta que explique la idea.",
+  "_canales": "opcional: modo de un canal → \"and\" (todas las fuentes a la vez) o \"sec\" (palancas en orden); sin poner = cualquiera de sus fuentes",
+  "canales": {},
+  "_filas": "Máximo 10 × 8. Borde de roca (#), una entrada E y una salida S en bordes opuestos. a = placa, A = su reja…",
+  "filas": [
+   "#######",
+   "#.a.#.#",
+   "E...A.S",
+   "#...#.#",
+   "#######"
+  ]
+ }
+}

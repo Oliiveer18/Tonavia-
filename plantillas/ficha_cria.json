@@ -1,0 +1,24 @@
+{
+ "_ayuda": "PLANTILLA de ficha de cría. Cópiala a datos/crias/<fam>.json (fam = id de la fase 1 de la línea en src/lineas.js), rellénala y ejecuta: node tools/validar_crianza.js && node tools/hoja_crias.js <fam>. Guía: docs/GUIA_CRIANZA.md",
+ "linea": "ID_DE_LA_FASE_1",
+ "lista": false,
+ "_roles": "papel → color EXACTO (#rrggbb) del dibujo original. Míralos con: node tools/validar_crianza.js --colores <fam>",
+ "roles": { "cuerpo": "#000000", "sombra": "#000000", "luz": "#000000" },
+ "_cuerpo": "papeles que forman el cuerpo (su caja sirve de referencia para marcas y adornos)",
+ "cuerpo": ["cuerpo", "sombra", "luz"],
+ "genes": [
+  { "id": "color", "nombre": "Color", "alelos": [
+    { "id": "original", "nombre": "Original" },
+    { "id": "otro", "nombre": "Otro", "colores": { "cuerpo": "#000000", "sombra": "#000000", "luz": "#000000" } },
+    { "id": "especial", "nombre": "Especial", "mut": true, "colores": { "cuerpo": "#000000" } }
+  ] },
+  { "id": "marca", "nombre": "Marcas", "alelos": [
+    { "id": "lisa", "nombre": "Lisa" },
+    { "id": "motas", "nombre": "Motas", "sobre": ["cuerpo"], "color": "luz", "patron": ["....", ".x..", "....", "...x"] }
+  ] },
+  { "id": "adorno", "nombre": "Adorno", "alelos": [
+    { "id": "ninguno", "nombre": "Sin adorno" },
+    { "id": "ejemplo", "nombre": "Ejemplo", "clave": { "a": "luz" }, "capas": { "down": ["a.a"], "up": ["a.a"], "side": ["a"] }, "pos": { "down": ["arriba", 0, 0], "up": ["arriba", 0, 0], "side": ["arriba", 0, 0] } }
+  ] }
+ ]
+}

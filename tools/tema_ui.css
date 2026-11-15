@@ -1,0 +1,58 @@
+  /* v2.298 · TEMA «PIXEL CÁLIDO»: una sola identidad para HUD, menús, combate e inicio. Tipografía Pixelify, marcos de 9 cortes con esquinas recortadas, madera oscura + crema + oro. Solo estilo: no cambia estructura ni tamaños táctiles. */
+  :root { --bg: #2a1a28; --panel: #5a3845; --ink: #fff4dc; --accent: #f7c948; --tinta: #24121d; --crema: #fff4dc; --oro: #f7c948; --coral: #e4663a; --madera: #5a3845; --pa-borde: #d9a46c; --pa-sombra: #24121d; }
+  * { font-family: PixelifyNum, Pixelify, system-ui, sans-serif !important; -webkit-font-smoothing: none; }
+  #mtexto { font-family: ui-monospace, monospace !important; }
+  #who { color: var(--crema); text-shadow: 0 2px 0 var(--tinta); letter-spacing: .02em; }
+  #stage { border: 0; border-radius: 0; }
+  #stage::after { content: ""; position: absolute; inset: 0; z-index: 3; pointer-events: none; box-shadow: inset 0 0 0 2px var(--tinta), inset 0 0 0 4px var(--pa-borde), inset 0 0 0 6px var(--tinta); }
+  /* marcos grandes: paneles y botones principales */
+  #mbox, #gal-det, #pcard, .line, .pz { background: none; border: 6px solid transparent; border-image: var(--m-panel) 3 fill / 6px stretch; border-radius: 0; box-shadow: 0 4px 0 rgba(0, 0, 0, .35); image-rendering: pixelated; }
+  #gal-det { border-bottom: 0; }
+  #menu button, .lnk, #macc button, #gal-pag button, [data-act], [data-pesca] { background: none !important; border: 6px solid transparent; border-image: var(--m-oro) 3 fill / 6px stretch; border-radius: 0; color: #3a2008 !important; text-shadow: 0 1px 0 #fff0a0; box-shadow: 0 3px 0 rgba(0, 0, 0, .35); image-rendering: pixelated; transition: none; }
+  #macc button#moficiales { border-image-source: var(--m-sec); border-image-slice: 2; border-width: 4px; color: var(--crema) !important; text-shadow: 0 2px 0 var(--tinta); }
+  #menu button:active, .lnk:active, #macc button:active, #gal-pag button:active, [data-act]:active, [data-pesca]:active { transform: translateY(2px); box-shadow: none; }
+  #gal-pag button:disabled { opacity: .45; }
+  /* marcos pequeños: botones secundarios, fichas y campos */
+  #gbtn, #sbtn, #mbtn, #abtn, #pbtn, #qbtn, #bbtn, #hbtn, #zbtn, #cbtn, #hcam button, .x, #gal-close, #gal-clear, #pad button { background: none; border: 4px solid transparent; border-image: var(--m-sec) 2 fill / 4px stretch; border-radius: 0; color: var(--crema); text-shadow: 0 2px 0 var(--tinta); box-shadow: 0 3px 0 rgba(0, 0, 0, .35); image-rendering: pixelated; opacity: 1; }
+  #pad button { border-image-source: var(--m-pad); }
+  #ebtn, #mrot { background: none; border: 4px solid transparent; border-image: var(--m-orop) 2 fill / 4px stretch; border-radius: 0; color: #3a2008; text-shadow: 0 1px 0 #fff0a0; box-shadow: 0 3px 0 rgba(0, 0, 0, .35); image-rendering: pixelated; }
+  #pad [data-act], #pad [data-pesca] { background: none; border: 6px solid transparent; border-image: var(--m-oro) 3 fill / 6px stretch; color: #3a2008; text-shadow: 0 1px 0 #fff0a0; } #pad [data-act] .ic, #pad [data-pesca] .ic { filter: brightness(.28) sepia(.6); }
+  #gbtn:active, #sbtn:active, #mbtn:active, #abtn:active, #pbtn:active, #qbtn:active, #bbtn:active, #hbtn:active, #zbtn:active, #cbtn:active, #hcam button:active, .x:active, #gal-close:active, #gal-clear:active, #pad button:active, #ebtn:active { transform: translateY(2px); box-shadow: none; background: none; filter: brightness(1.18); }
+  #gal-q, #mtexto { background: none; border: 4px solid transparent; border-image: var(--m-hueco) 2 fill / 4px stretch; border-radius: 0; color: var(--crema); image-rendering: pixelated; }
+  #gal-pag, #gal-bar { background: transparent; }
+  #menu h1, .dh h2, #mbox h2, #mbox h1, #gal h1, #peces h1, #mapa h1 { letter-spacing: .06em; text-shadow: 0 3px 0 var(--tinta); color: var(--crema); }
+  .chip { background: rgba(36, 18, 29, .45); border-radius: 0; clip-path: polygon(0 3px, 3px 3px, 3px 0, calc(100% - 3px) 0, calc(100% - 3px) 3px, 100% 3px, 100% calc(100% - 3px), calc(100% - 3px) calc(100% - 3px), calc(100% - 3px) 100%, 3px 100%, 3px calc(100% - 3px), 0 calc(100% - 3px)); }
+  .card { background: #3e2430; border: 2px solid rgba(217, 164, 108, .5); border-radius: 4px; } .card:active { background: #7a4a58; }
+  .fr button { border-radius: 0; font-weight: 700; clip-path: polygon(0 4px, 4px 4px, 4px 0, calc(100% - 4px) 0, calc(100% - 4px) 4px, 100% 4px, 100% calc(100% - 4px), calc(100% - 4px) calc(100% - 4px), calc(100% - 4px) 100%, 4px 100%, 4px calc(100% - 4px), 0 calc(100% - 4px)); }
+  .views figure { background: #3e2430; border-radius: 4px; }
+  #peces { background: rgba(26, 14, 24, .94); } #mdlg { background: rgba(26, 14, 24, .88); }
+  #minib { top: 10px; right: 10px; bottom: auto; border: 3px solid var(--tinta); border-radius: 0; box-shadow: 0 0 0 2px var(--pa-borde), 0 3px 0 2px rgba(0, 0, 0, .35); }
+  .barra { height: 10px; border-radius: 0; background: #2b1824; border: 2px solid var(--tinta); box-shadow: inset 0 2px 0 #150a12; overflow: hidden; } .barra > i { display: block; height: 100%; background: repeating-linear-gradient(90deg, #f7c948 0 6px, #d99a2e 6px 8px); }
+  /* barra superior ordenada (v2.298): fila A = estado + iconos · fila B = ajustes; los controles de juego abajo */
+  #hud { position: relative; z-index: 6; width: 100%; padding: 6px 8px 0; display: flex; flex-direction: column; gap: 6px; }
+  #hud-a { display: flex; align-items: center; gap: 6px; min-height: 34px; }
+  #hud-a #who { flex: 1; min-width: 0; margin: 0; min-height: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 13px; line-height: 1.2; }
+  #hud-b { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; min-height: 28px; }
+  #hud button, #hud span { position: static; }
+  #hud-a button { font-size: 0; flex: none; width: 34px; height: 34px; min-width: 0; padding: 0; display: inline-flex; align-items: center; justify-content: center; }
+  #hud-a button .ic { margin: 0; }
+  #mrot { font-size: 12px; padding: 0 8px; }
+  #hbtn[aria-pressed=true] { border-image-source: var(--m-orop); color: #3a2008; text-shadow: 0 1px 0 #fff0a0; } #hbtn[aria-pressed=true] .ic { filter: brightness(.3) sepia(.7); } #hbtn:disabled { opacity: .75; }
+  #hcam { top: auto; right: auto; left: 10px; bottom: calc(var(--padh, 150px) + 88px); flex-direction: row; gap: 6px; }
+  #hcam button { min-width: 44px; height: 44px; padding: 0 8px; }
+  /* inicio: título grande y fondo con trama */
+  #menu { background: radial-gradient(ellipse at 50% 40%, #4a2c3a 0, #2a1a28 70%), repeating-linear-gradient(45deg, rgba(255, 244, 220, .035) 0 8px, transparent 8px 16px); gap: 16px; }
+  #menu #logo { margin: 0 0 6px; text-align: center; font-size: 34px; line-height: 1.05; font-weight: 700; letter-spacing: .04em; color: var(--oro); text-shadow: 0 3px 0 #a8641a, 0 6px 0 var(--tinta), 0 0 22px rgba(247, 201, 72, .35); }
+  #menu #logo small { display: block; margin-top: 6px; font-size: 18px; color: var(--crema); letter-spacing: .12em; text-shadow: 0 3px 0 var(--tinta); }
+  #menu h1 { font-size: 18px; margin: 4px 0 0; opacity: .9; }
+  [hidden] { display: none !important; }
+  #gbtn, #sbtn, #mbtn, #ebtn, #hbtn, #cbtn { height: 28px; padding: 0 8px; line-height: 1; display: inline-flex; align-items: center; justify-content: center; font-size: 12px; white-space: nowrap; }
+  #zbtn, #hcam button, #pad button { display: inline-flex; align-items: center; justify-content: center; line-height: 1; }
+  #menu #logo { font-weight: 500; }
+  /* iconos de píxel (9×9 escalados ×2 o ×3, sin suavizado) */
+  .ic { display: inline-block; width: 18px; height: 18px; margin-right: 5px; vertical-align: -3px; background-repeat: no-repeat; background-position: center; background-size: 100% 100%; image-rendering: pixelated; }
+  .ic.g { width: 27px; height: 27px; margin: 0; vertical-align: middle; } .ic.s { margin: 0; }
+  .i-flecha.der { transform: rotate(90deg); } .i-flecha.aba { transform: rotate(180deg); } .i-flecha.izq { transform: rotate(-90deg); } .i-girar.d { transform: scaleX(-1); }
+  #kbtn .ic { width: 27px; height: 27px; margin: 0; vertical-align: middle; } #kbtn.lista .ic { filter: brightness(.25) saturate(1.6); }
+  #abtn { font-size: 0; } #abtn::before { content: ""; display: block; width: 18px; height: 18px; margin: auto; background: center / 100% 100% no-repeat var(--ic-sonido); image-rendering: pixelated; } #abtn[aria-pressed=false]::before { background-image: var(--ic-mudo); }
+  /* noche y velo: sin cambios */

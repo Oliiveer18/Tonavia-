@@ -1,0 +1,13 @@
+{
+ "v": 1,
+ "id": "nexus",
+ "nombre": "El Cruce",
+ "entrada": {
+  "mapa": "nexus/plaza_cruce",
+  "ancla": "portal"
+ },
+ "regiones": [],
+ "reglas": {
+  "ciclo": "global"
+ }
+}

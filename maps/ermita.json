@@ -1,0 +1,112 @@
+{
+ "formato": 2,
+ "id": "ermita",
+ "nombre": "Ermita del Primer Eco (interior)",
+ "region": null,
+ "ancho": 11,
+ "alto": 10,
+ "capas": {
+  "suelo": [
+   "###########",
+   "###########",
+   "#_________#",
+   "#_________#",
+   "#_________#",
+   "#_________#",
+   "#_________#",
+   "#_________#",
+   "#_________#",
+   "#####d#####"
+  ]
+ },
+ "objetos": [
+  {
+   "tipo": "sala_ermita",
+   "x": 0,
+   "y": 0
+  },
+  {
+   "tipo": "altar_mayor",
+   "x": 4,
+   "y": 3
+  },
+  {
+   "tipo": "pedestal_eco_azul",
+   "x": 4,
+   "y": 5
+  },
+  {
+   "tipo": "pedestal_eco_rosa",
+   "x": 6,
+   "y": 5
+  },
+  {
+   "tipo": "banco_doble",
+   "x": 2,
+   "y": 7
+  },
+  {
+   "tipo": "banco_doble_e",
+   "x": 7,
+   "y": 7
+  }
+ ],
+ "animar": false,
+ "anclas": {
+  "inicio": [
+   5,
+   8
+  ],
+  "entrada": [
+   5,
+   8
+  ],
+  "npc": [
+   2,
+   3
+  ],
+  "npc_frente": [
+   3,
+   3
+  ]
+ },
+ "puertas": [
+  {
+   "id": "salida",
+   "x": 5,
+   "y": 9,
+   "destino": {
+    "mapa": "albanota",
+    "ancla": "volver"
+   }
+  },
+  {
+   "id": "portal_nexus",
+   "x": 8,
+   "y": 2,
+   "destino": {
+    "mapa": "nexus/plaza_cruce",
+    "ancla": "portal"
+   },
+   "portal": {
+    "color": "#b9a2ff",
+    "icono": "eco",
+    "nombre": "Portal del Cruce",
+    "requisitos": [
+     {
+      "t": "nivelEntrenador",
+      "n": 5
+     }
+    ]
+   }
+  }
+ ],
+ "conexiones": {
+  "norte": null,
+  "sur": null,
+  "este": null,
+  "oeste": null
+ },
+ "zonas": [],
+ "npcs": []
+}

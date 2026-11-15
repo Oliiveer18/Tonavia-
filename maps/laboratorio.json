@@ -1,0 +1,116 @@
+{
+ "formato": 2,
+ "id": "laboratorio",
+ "nombre": "Laboratorio (interior)",
+ "region": null,
+ "ancho": 13,
+ "alto": 9,
+ "capas": {
+  "suelo": [
+   "#############",
+   "#############",
+   "#___________#",
+   "#___________#",
+   "#___________#",
+   "#___________#",
+   "#___________#",
+   "#___________#",
+   "######d######"
+  ]
+ },
+ "objetos": [
+  {
+   "tipo": "sala_laboratorio",
+   "x": 0,
+   "y": 0
+  },
+  {
+   "tipo": "incubadora_lab",
+   "x": 3,
+   "y": 2
+  },
+  {
+   "tipo": "consola_lab",
+   "x": 5,
+   "y": 2
+  },
+  {
+   "tipo": "incubadora_lab",
+   "x": 9,
+   "y": 2
+  },
+  {
+   "tipo": "incubadora_lab",
+   "x": 6,
+   "y": 4
+  },
+  {
+   "tipo": "mesa_lab",
+   "x": 1,
+   "y": 4
+  },
+  {
+   "tipo": "escaner",
+   "x": 1,
+   "y": 2
+  },
+  {
+   "tipo": "estante_lab",
+   "x": 10,
+   "y": 4
+  },
+  {
+   "tipo": "estante_lab",
+   "x": 10,
+   "y": 6
+  }
+ ],
+ "animar": false,
+ "anclas": {
+  "inicio": [
+   6,
+   7
+  ],
+  "entrada": [
+   6,
+   7
+  ],
+  "npc": [
+   3,
+   4
+  ],
+  "npc_frente": [
+   4,
+   4
+  ]
+ },
+ "puertas": [
+  {
+   "id": "salida",
+   "x": 6,
+   "y": 8,
+   "destino": {
+    "mapa": "albanota",
+    "ancla": "volver"
+   }
+  }
+ ],
+ "conexiones": {
+  "norte": null,
+  "sur": null,
+  "este": null,
+  "oeste": null
+ },
+ "zonas": [],
+ "npcs": [
+  {
+   "id": "doctora",
+   "tipo": "npc",
+   "nombre": "Doctora Nora",
+   "x": 3,
+   "y": 4,
+   "dir": "down",
+   "alcance": 2.6
+  }
+ ]
+}

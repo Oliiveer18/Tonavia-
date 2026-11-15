@@ -1,0 +1,77 @@
+{
+ "formato": 2,
+ "id": "casa_de_lali",
+ "nombre": "Casa de Lali (interior)",
+ "region": null,
+ "tema": "casa",
+ "ancho": 9,
+ "alto": 7,
+ "capas": {
+  "suelo": [
+   "#########",
+   "#########",
+   "#_______#",
+   "#_______#",
+   "#_______#",
+   "#_______#",
+   "####d####"
+  ]
+ },
+ "objetos": [
+  {
+   "tipo": "sala_casa_lali",
+   "x": 0,
+   "y": 0
+  },
+  {
+   "tipo": "estante",
+   "x": 1,
+   "y": 2
+  },
+  {
+   "tipo": "cama_rosa",
+   "x": 6,
+   "y": 2
+  },
+  {
+   "tipo": "planta_interior",
+   "x": 7,
+   "y": 2
+  },
+  {
+   "tipo": "mesa_sillas_lali",
+   "x": 1,
+   "y": 4
+  }
+ ],
+ "animar": false,
+ "anclas": {
+  "inicio": [
+   4,
+   5
+  ],
+  "entrada": [
+   4,
+   5
+  ]
+ },
+ "puertas": [
+  {
+   "id": "salida",
+   "x": 4,
+   "y": 6,
+   "destino": {
+    "mapa": "albanota",
+    "ancla": "volver"
+   }
+  }
+ ],
+ "conexiones": {
+  "norte": null,
+  "sur": null,
+  "este": null,
+  "oeste": null
+ },
+ "zonas": [],
+ "npcs": []
+}

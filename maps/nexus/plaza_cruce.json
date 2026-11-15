@@ -1,0 +1,134 @@
+{
+ "formato": 2,
+ "id": "nexus/plaza_cruce",
+ "nombre": "El Cruce",
+ "region": null,
+ "ancho": 21,
+ "alto": 15,
+ "capas": {
+  "suelo": [
+   "~~~~~~~~~~~~~~~~~~~~~",
+   "~===================~",
+   "~===================~",
+   "~===================~",
+   "~===================~",
+   "~===================~",
+   "~===================~",
+   "~===================~",
+   "~===================~",
+   "~===================~",
+   "~===================~",
+   "~===================~",
+   "~===================~",
+   "~===================~",
+   "~~~~~~~~~~~~~~~~~~~~~"
+  ]
+ },
+ "objetos": [
+  {
+   "tipo": "fuente",
+   "x": 9,
+   "y": 4
+  },
+  {
+   "tipo": "farola",
+   "x": 5,
+   "y": 4
+  },
+  {
+   "tipo": "farola",
+   "x": 15,
+   "y": 4
+  },
+  {
+   "tipo": "farola",
+   "x": 5,
+   "y": 10
+  },
+  {
+   "tipo": "farola",
+   "x": 15,
+   "y": 10
+  },
+  {
+   "tipo": "banco",
+   "x": 3,
+   "y": 8
+  },
+  {
+   "tipo": "banco",
+   "x": 17,
+   "y": 8
+  }
+ ],
+ "animar": true,
+ "anclas": {
+  "inicio": [
+   10,
+   10
+  ],
+  "portal": [
+   10,
+   10
+  ],
+  "entrada": [
+   10,
+   10
+  ]
+ },
+ "puertas": [
+  {
+   "id": "portal_ermita",
+   "x": 10,
+   "y": 12,
+   "destino": {
+    "mapa": "ermita",
+    "ancla": "volver"
+   },
+   "portal": {
+    "color": "#b9a2ff",
+    "icono": "eco",
+    "nombre": "Portal a Albanota"
+   }
+  },
+  {
+   "id": "portal_santuario",
+   "x": 10,
+   "y": 1,
+   "destino": {
+    "mapa": "santuario/umbral",
+    "ancla": "portal"
+   },
+   "portal": {
+    "color": "#8fe0a8",
+    "icono": "hoja",
+    "nombre": "Portal del Santuario",
+    "requisitos": [
+     {
+      "t": "nivelEntrenador",
+      "n": 8
+     }
+    ]
+   }
+  }
+ ],
+ "conexiones": {
+  "norte": null,
+  "sur": null,
+  "este": null,
+  "oeste": null
+ },
+ "zonas": [],
+ "npcs": [
+  {
+   "id": "tablon",
+   "tipo": "npc",
+   "nombre": "Tablón de intercambios",
+   "x": 15,
+   "y": 7,
+   "dir": "down",
+   "alcance": 1.9,
+   "dy": 4
+  }
+ ]
+}

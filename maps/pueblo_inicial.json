@@ -1,0 +1,155 @@
+{
+ "formato": 2,
+ "id": "pueblo_inicial",
+ "nombre": "Pueblo Inicial (mapa v1.4)",
+ "region": "albanota",
+ "ancho": 36,
+ "alto": 26,
+ "capas": {
+  "suelo": [
+   "tttttttttttttttttttttttttttttttttttt",
+   "ttttf..fttttttttttt.tft.t.ttt.t.~ttt",
+   "t....f...ttttt............f....~~~tt",
+   "ttttf..ff.f.t..........f.......~~~~t",
+   "t.tffff.ftt.t..f..=..f...f..f..~~~tt",
+   "ttf....f...ft.....=.............~~~t",
+   "t.....f..f.tt..f..=..........=....tt",
+   "tt.ff.......t.t.f.=..........=....tt",
+   "tt....=.....tttt..=..tt......=.....t",
+   "tt....=....fttft..=.ft.......=....tt",
+   "t.f..f=....tttf...=..........=.....t",
+   "ttf...=...ttttf..f=f.f.......=.....t",
+   "t.tt..=..ttt......=.........f=f....t",
+   "tftttt==========================...t",
+   "tt.tft=ttftt...f..=f...ftt...=f..ftt",
+   "t..ttt=.tttt.t....=....tttt.f=.f...t",
+   "tttttt=.tt~t.ttf..=...ttt.t..=....tt",
+   "tttt..=..~~~.tttf.=f.ttttt.f.=....tt",
+   "t.....=...~...tt..=..f~ttt...=...ttt",
+   "tt....=....tt.....=.f~~~t.f..=.f.ftt",
+   "t.....=f....tt....=...~......=....tt",
+   "t..f..=...........=..........=....tt",
+   "tt.f.f..f.........=.......f.f.....tt",
+   "tt.f.......tt......f...ft..........t",
+   "tttt..tt..tt..tt.ttt.f..tttt.tt.tttt",
+   "tttttttttttttttttttttttttttttttttttt"
+  ]
+ },
+ "objetos": [],
+ "animar": true,
+ "anclas": {
+  "inicio": [
+   18,
+   13
+  ],
+  "claro_aire": [
+   18,
+   4
+  ],
+  "claro_agua": [
+   29,
+   6
+  ],
+  "claro_electrico": [
+   31,
+   13
+  ],
+  "claro_sombra": [
+   29,
+   21
+  ],
+  "claro_roca": [
+   18,
+   22
+  ],
+  "claro_fuego": [
+   6,
+   21
+  ],
+  "claro_hoja": [
+   6,
+   8
+  ]
+ },
+ "puertas": [],
+ "conexiones": {
+  "norte": null,
+  "sur": null,
+  "este": null,
+  "oeste": null
+ },
+ "zonas": [
+  {
+   "id": "claro_aire",
+   "x": 14,
+   "y": 1,
+   "w": 9,
+   "h": 7,
+   "elemento": "aire",
+   "nota": ""
+  },
+  {
+   "id": "claro_agua",
+   "x": 25,
+   "y": 3,
+   "w": 9,
+   "h": 7,
+   "elemento": "agua",
+   "nota": ""
+  },
+  {
+   "id": "claro_electrico",
+   "x": 27,
+   "y": 10,
+   "w": 8,
+   "h": 7,
+   "elemento": "electrico",
+   "nota": ""
+  },
+  {
+   "id": "claro_sombra",
+   "x": 25,
+   "y": 18,
+   "w": 9,
+   "h": 7,
+   "elemento": "sombra",
+   "nota": ""
+  },
+  {
+   "id": "claro_roca",
+   "x": 14,
+   "y": 19,
+   "w": 9,
+   "h": 6,
+   "elemento": "roca",
+   "nota": ""
+  },
+  {
+   "id": "claro_fuego",
+   "x": 2,
+   "y": 18,
+   "w": 9,
+   "h": 7,
+   "elemento": "fuego",
+   "nota": ""
+  },
+  {
+   "id": "claro_hoja",
+   "x": 2,
+   "y": 5,
+   "w": 9,
+   "h": 7,
+   "elemento": "hoja",
+   "nota": ""
+  }
+ ],
+ "npcs": [
+  {
+   "id": "zefirax",
+   "x": 21,
+   "y": 3,
+   "tipo": "guarida",
+   "texto": "Guarida de Zefirax (legendaria, fija y única)"
+  }
+ ]
+}

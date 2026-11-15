@@ -1,0 +1,14 @@
+{
+ "_nota": "Santuario Universal (Etapa A, v2.364). Solo el Umbral es un mapa de archivo; el hogar de cada jugador lo genera src/santuario.js a partir de su id. Contrato: docs/multiverso/19_SANTUARIO_ETAPA_A.md",
+ "v": 1,
+ "id": "santuario",
+ "nombre": "Santuario Universal",
+ "entrada": {
+  "mapa": "santuario/umbral",
+  "ancla": "portal"
+ },
+ "regiones": [],
+ "reglas": {
+  "ciclo": "global"
+ }
+}

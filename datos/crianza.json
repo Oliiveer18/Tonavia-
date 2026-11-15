@@ -1,0 +1,24 @@
+{
+ "_ayuda": [
+  "CRIANZA · todos los números se ajustan aquí, sin tocar código (los lee src/crianza.js). Las claves que empiezan por _ son comentarios.",
+  "Tras cambiar algo: node tools/validar_crianza.js && node tools/simular_crianza.js pompon 5000",
+  "Las fichas de cría de cada línea están en datos/crias/<linea>.json (plantilla: plantillas/ficha_cria.json; guía: docs/GUIA_CRIANZA.md)."
+ ],
+ "version": 1,
+ "_coste": "Brillos que cuesta cada huevo (lo paga quien habla con la Doctora Nora).",
+ "coste": 120,
+ "_pasosEclosion": "Pasos (1 paso = 1 casilla andada) para que eclosione. En cooperativo cuentan los pasos de los dos jugadores.",
+ "pasosEclosion": 400,
+ "_descansoPasos": "Pasos que descansa cada padre antes de poder criar otra vez.",
+ "descansoPasos": 300,
+ "_incubadoras": "Huevos a la vez por jugador (las 3 incubadoras del Laboratorio).",
+ "incubadoras": 3,
+ "_mutacion": "Probabilidad de mutación por huevo: normal, en cooperativo (un padre de cada jugador) y en un huevo hallado en las Profundidades.",
+ "mutacion": 0.06,
+ "mutacionCoop": 0.12,
+ "mutacionHallado": 0.15,
+ "_talento": "Multiplicador por estadística (ps, atq, def, vel): media de los padres ± variacion, siempre entre min y max. Un padre silvestre vale 1.",
+ "talento": { "min": 0.9, "max": 1.12, "variacion": 0.04 },
+ "_maxCrias": "Tope de crías guardadas por jugador.",
+ "maxCrias": 60
+}

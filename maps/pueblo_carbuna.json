@@ -1,0 +1,309 @@
+{
+ "formato": 2,
+ "id": "pueblo_carbuna",
+ "nombre": "Carbuna",
+ "region": "carbuna",
+ "ancho": 48,
+ "alto": 36,
+ "base": "c",
+ "capas": {
+  "suelo": [
+   "rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr",
+   "rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrlrrrrrrrrrrrr",
+   "rrrccccccccccccrrrrrrrrrrrrrrrrllllllllrrrrrrrrr",
+   "rrccccccccccccccccccrrrrrrrrrrrlllllllllrrrrrrrr",
+   "rrccccccccccccccccccrrrrrrrrrrrrllllllllrrrrrrrr",
+   "rrcccccccccccccccccccccccccrrrrrrrrllrllrrrrrrrr",
+   "rrcccccccccccccccccccccccccrrrrrrrrrrrllrrrrrrrr",
+   "rrcccccccccccccccccccccccccrrrrrrrrrrrrllrrrrrrr",
+   "rrrccccccccccccccccccccccccrrrrrrrrrrrrlllrrrrrr",
+   "rrrccccccccccccrrrccc==ccrrrrrrrrrrrrrrlllcccrrr",
+   "rrr.ccccc==cccrrrrrcc==cccrrrrrrrrrrrrrllllcrrrr",
+   "rrr...ccc==ccccrrrccc==ccccccccccccrrrrrlllcrrrr",
+   "rrr...ccc==cccccccccc==ccccccccccccccccccllcrrrr",
+   "rrr...ccc==cccccccccc==ccccccccccccccccclllcrrrr",
+   "rrr...ccc==cccccccccc==cccccccccccccccclllccccrr",
+   "rrr...ccc==ccccccc========ccccccccccccllllccccrr",
+   "rrr..cccc==ccccccc========cccccccccccclllcccccrr",
+   "======================================bbb=====rr",
+   "======================================bb======rr",
+   "rrccccccccccc...cc========cccc...cccclllccccccrr",
+   "rrcc...ccccc.....c========ccc......cclllcccc.crr",
+   "rr.......ccc.....cccc==cccccc.......cclllcc...rr",
+   "rr........ccc...ccccc==cccccc.....rrrclllcc...rr",
+   "rr........ccccccccccc==cccccccc.ccrrrcclllc...rr",
+   "rr........ccccccccccc==cccccccccccrrrccllll..crr",
+   "rrc......cccccccccccc==ccccccccccccccccllllcccrr",
+   "rrrc..ccccccccccccccc==cccccccccccccccccllcccrrr",
+   "rrrcccccccccccccccccc==cccccccccccccccccllcccrrr",
+   "rrrccccc========================cccllllllllccrrr",
+   "rrrrrccc========================cccllllllllllrrr",
+   "rrrrrrcccccccccccccccccccccccccccclllllllllllrrr",
+   "rrrrrrccccc.........ccccccccrrrrrccllllllllllrrr",
+   "rrrrrrcccc...........cccccccrrrrrccllllllllrrrrr",
+   "rrrrrrrcccc.....rrrrrrccccccrrrrrccrrrrrrrrrrrrr",
+   "rrrrrrrrrrrrrrrrrrrrrrrrcrrrrrrrrrrrrrrrrrrrrrrr",
+   "rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr"
+  ]
+ },
+ "objetos": [
+  {
+   "tipo": "carbuna_grieta",
+   "x": 33,
+   "y": 25
+  },
+  {
+   "tipo": "carbuna_grieta",
+   "x": 42,
+   "y": 26
+  },
+  {
+   "tipo": "carbuna_grieta",
+   "x": 38,
+   "y": 13
+  },
+  {
+   "tipo": "carbuna_grieta",
+   "x": 45,
+   "y": 24
+  },
+  {
+   "tipo": "carbuna_grieta",
+   "x": 33,
+   "y": 30
+  },
+  {
+   "tipo": "carbuna_grieta",
+   "x": 43,
+   "y": 11
+  },
+  {
+   "tipo": "carbuna_grieta",
+   "x": 38,
+   "y": 26
+  },
+  {
+   "tipo": "carbuna_grieta",
+   "x": 35,
+   "y": 14
+  },
+  {
+   "tipo": "carbuna_penasco",
+   "x": 4,
+   "y": 4
+  },
+  {
+   "tipo": "carbuna_penasco",
+   "x": 19,
+   "y": 23
+  },
+  {
+   "tipo": "carbuna_penasco",
+   "x": 28,
+   "y": 21
+  },
+  {
+   "tipo": "carbuna_penasco",
+   "x": 24,
+   "y": 32
+  },
+  {
+   "tipo": "carbuna_penasco",
+   "x": 4,
+   "y": 7
+  },
+  {
+   "tipo": "carbuna_penasco",
+   "x": 12,
+   "y": 3
+  },
+  {
+   "tipo": "carbuna_penasco",
+   "x": 42,
+   "y": 21
+  },
+  {
+   "tipo": "carbuna_penasco",
+   "x": 21,
+   "y": 31
+  },
+  {
+   "tipo": "carbuna_penasco",
+   "x": 16,
+   "y": 22
+  },
+  {
+   "tipo": "carbuna_penasco",
+   "x": 6,
+   "y": 14
+  },
+  {
+   "tipo": "carbuna_penasco",
+   "x": 7,
+   "y": 3
+  },
+  {
+   "tipo": "carbuna_penasco",
+   "x": 5,
+   "y": 27
+  },
+  {
+   "tipo": "carbuna_penasco",
+   "x": 9,
+   "y": 20
+  },
+  {
+   "tipo": "carbuna_penasco",
+   "x": 19,
+   "y": 12
+  },
+  {
+   "tipo": "carbuna_arbol_seco",
+   "x": 3,
+   "y": 20
+  },
+  {
+   "tipo": "carbuna_arbol_seco",
+   "x": 9,
+   "y": 32
+  },
+  {
+   "tipo": "carbuna_arbol_seco",
+   "x": 25,
+   "y": 12
+  },
+  {
+   "tipo": "carbuna_arbol_seco",
+   "x": 13,
+   "y": 21
+  },
+  {
+   "tipo": "carbuna_arbol_seco",
+   "x": 7,
+   "y": 24
+  },
+  {
+   "tipo": "carbuna_arbol_seco",
+   "x": 31,
+   "y": 20
+  },
+  {
+   "tipo": "carbuna_arbol_seco",
+   "x": 15,
+   "y": 6
+  },
+  {
+   "tipo": "carbuna_arbol_seco",
+   "x": 3,
+   "y": 24
+  },
+  {
+   "tipo": "carbuna_arbol_seco",
+   "x": 24,
+   "y": 22
+  },
+  {
+   "tipo": "carbuna_arbol_seco",
+   "x": 12,
+   "y": 32
+  },
+  {
+   "tipo": "carbuna_arbol_seco",
+   "x": 17,
+   "y": 31
+  },
+  {
+   "tipo": "carbuna_arbol_seco",
+   "x": 5,
+   "y": 11
+  },
+  {
+   "tipo": "carbuna_mata",
+   "x": 6,
+   "y": 21
+  },
+  {
+   "tipo": "carbuna_mata",
+   "x": 3,
+   "y": 14
+  },
+  {
+   "tipo": "carbuna_mata",
+   "x": 34,
+   "y": 21
+  },
+  {
+   "tipo": "carbuna_mata",
+   "x": 45,
+   "y": 21
+  }
+ ],
+ "animar": true,
+ "anclas": {
+  "inicio": [
+   3,
+   17
+  ],
+  "plaza": [
+   21,
+   17
+  ],
+  "gimnasio": [
+   21,
+   9
+  ],
+  "centro_pc": [
+   30,
+   17
+  ],
+  "tienda": [
+   14,
+   17
+  ],
+  "casa_1": [
+   9,
+   10
+  ],
+  "casa_2": [
+   14,
+   28
+  ],
+  "casa_3": [
+   28,
+   28
+  ],
+  "cueva": [
+   44,
+   17
+  ]
+ },
+ "puertas": [
+  {
+   "id": "albanota_prov_17",
+   "x": 0,
+   "y": 17,
+   "destino": {
+    "mapa": "albanota",
+    "ancla": "carbuna"
+   }
+  },
+  {
+   "id": "albanota_prov_18",
+   "x": 0,
+   "y": 18,
+   "destino": {
+    "mapa": "albanota",
+    "ancla": "carbuna"
+   }
+  }
+ ],
+ "conexiones": {
+  "norte": null,
+  "sur": null,
+  "este": null,
+  "oeste": null
+ },
+ "zonas": [],
+ "npcs": [],
+ "pesca": []
+}

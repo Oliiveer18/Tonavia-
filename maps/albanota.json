@@ -1,0 +1,706 @@
+{
+ "formato": 2,
+ "id": "albanota",
+ "nombre": "Albanota",
+ "region": "albanota",
+ "ancho": 48,
+ "alto": 36,
+ "base": ".",
+ "capas": {
+  "suelo": [
+   "tttttttttttttttttttttttttttttttttttttttttttttttt",
+   "tttttttttttttttttttttttttttttttttttttttttttttttt",
+   "tt............................................tt",
+   "tt............................................tt",
+   "tt............................................tt",
+   "tt............................................tt",
+   "tt............................................tt",
+   "tt.........................................=..tt",
+   "tt............................................tt",
+   "tt.......................=.......===......===.tt",
+   "tt.....................======================.tt",
+   "tt.....................======================.tt",
+   "tt.....................===................===.tt",
+   "tt.....................===................===.tt",
+   "tt.....................===................===.tt",
+   "tt.===......===.....=========.............===.tt",
+   "tt.===......===.....=========.............===.tt",
+   "==============================================tt",
+   "==============================================tt",
+   "==============================================tt",
+   "tt..................=========......===........tt",
+   "tt..................=========.................tt",
+   "tt.....................===....................tt",
+   "tt.....................===....................tt",
+   "tt.....................===....................tt",
+   "tt.....................===....................tt",
+   "tt.....................===....................tt",
+   "tt..........==============....................tt",
+   "tt..........==============....................tt",
+   "~~~~~~~~~~~~~~~~~~~~~~~bbb~~~~~~~~~~~~~~~~~~~~~~",
+   "~~~~~~~~~~~~~~~~~~~~~~~bbb~~~~~~~~~~~~~~~~~~~~~~",
+   "~~~~~~~~~~~~~~~~~~~~~~~bbb~~~~~~~~~~~~~~~~~~~~~~",
+   "tt.....................===....................tt",
+   "tt.....................===....................tt",
+   "ttttttttttttttttttttttt===tttttttttttttttttttttt",
+   "ttttttttttttttttttttttt===tttttttttttttttttttttt"
+  ]
+ },
+ "objetos": [
+  {
+   "tipo": "huerto",
+   "x": 33,
+   "y": 21
+  },
+  {
+   "tipo": "puente_albanota",
+   "x": 23,
+   "y": 29
+  },
+  {
+   "tipo": "nenufar",
+   "x": 12,
+   "y": 30
+  },
+  {
+   "tipo": "nenufar",
+   "x": 28,
+   "y": 30
+  },
+  {
+   "tipo": "nenufar",
+   "x": 6,
+   "y": 30
+  },
+  {
+   "tipo": "nenufar",
+   "x": 40,
+   "y": 30
+  },
+  {
+   "tipo": "nenufar_flor",
+   "x": 4,
+   "y": 30
+  },
+  {
+   "tipo": "nenufar_flor",
+   "x": 18,
+   "y": 30
+  },
+  {
+   "tipo": "nenufar_flor",
+   "x": 20,
+   "y": 30
+  },
+  {
+   "tipo": "nenufar_flor",
+   "x": 35,
+   "y": 30
+  },
+  {
+   "tipo": "nenufar_flor",
+   "x": 43,
+   "y": 30
+  },
+  {
+   "tipo": "juncos2",
+   "x": 2,
+   "y": 29
+  },
+  {
+   "tipo": "juncos2",
+   "x": 6,
+   "y": 29
+  },
+  {
+   "tipo": "juncos2",
+   "x": 27,
+   "y": 29
+  },
+  {
+   "tipo": "juncos2",
+   "x": 29,
+   "y": 29
+  },
+  {
+   "tipo": "juncos2",
+   "x": 40,
+   "y": 29
+  },
+  {
+   "tipo": "juncos2",
+   "x": 45,
+   "y": 29
+  },
+  {
+   "tipo": "juncos3",
+   "x": 10,
+   "y": 29
+  },
+  {
+   "tipo": "juncos3",
+   "x": 35,
+   "y": 29
+  },
+  {
+   "tipo": "casa_lali",
+   "x": 2,
+   "y": 10
+  },
+  {
+   "tipo": "casa_oli",
+   "x": 11,
+   "y": 10
+  },
+  {
+   "tipo": "laboratorio",
+   "x": 12,
+   "y": 22
+  },
+  {
+   "tipo": "centro_pc",
+   "x": 23,
+   "y": 5
+  },
+  {
+   "tipo": "tienda",
+   "x": 32,
+   "y": 5
+  },
+  {
+   "tipo": "ermita",
+   "x": 41,
+   "y": 4
+  },
+  {
+   "tipo": "fuente",
+   "x": 24,
+   "y": 18
+  },
+  {
+   "tipo": "banco",
+   "x": 20,
+   "y": 16
+  },
+  {
+   "tipo": "banco",
+   "x": 27,
+   "y": 16
+  },
+  {
+   "tipo": "banco",
+   "x": 8,
+   "y": 16
+  },
+  {
+   "tipo": "farola",
+   "x": 22,
+   "y": 14
+  },
+  {
+   "tipo": "farola",
+   "x": 26,
+   "y": 14
+  },
+  {
+   "tipo": "farola",
+   "x": 22,
+   "y": 22
+  },
+  {
+   "tipo": "farola",
+   "x": 26,
+   "y": 22
+  },
+  {
+   "tipo": "farola",
+   "x": 22,
+   "y": 26
+  },
+  {
+   "tipo": "farola",
+   "x": 26,
+   "y": 26
+  },
+  {
+   "tipo": "farola",
+   "x": 19,
+   "y": 16
+  },
+  {
+   "tipo": "farola",
+   "x": 19,
+   "y": 20
+  },
+  {
+   "tipo": "farola",
+   "x": 29,
+   "y": 16
+  },
+  {
+   "tipo": "farola",
+   "x": 29,
+   "y": 20
+  },
+  {
+   "tipo": "farola",
+   "x": 7,
+   "y": 16
+  },
+  {
+   "tipo": "farola",
+   "x": 10,
+   "y": 16
+  },
+  {
+   "tipo": "maceta",
+   "x": 20,
+   "y": 21
+  },
+  {
+   "tipo": "maceta",
+   "x": 27,
+   "y": 21
+  },
+  {
+   "tipo": "maceta",
+   "x": 6,
+   "y": 15
+  },
+  {
+   "tipo": "maceta",
+   "x": 15,
+   "y": 15
+  },
+  {
+   "tipo": "maceta_i",
+   "x": 2,
+   "y": 15
+  },
+  {
+   "tipo": "maceta_i",
+   "x": 11,
+   "y": 15
+  },
+  {
+   "tipo": "cartel",
+   "x": 20,
+   "y": 26
+  },
+  {
+   "tipo": "valla_ni",
+   "x": 32,
+   "y": 20
+  },
+  {
+   "tipo": "valla_nd",
+   "x": 38,
+   "y": 20
+  },
+  {
+   "tipo": "valla_9",
+   "x": 32,
+   "y": 27
+  },
+  {
+   "tipo": "valla_v",
+   "x": 32,
+   "y": 21
+  },
+  {
+   "tipo": "valla_v",
+   "x": 40,
+   "y": 21
+  },
+  {
+   "tipo": "espantapajaros",
+   "x": 36,
+   "y": 25
+  },
+  {
+   "tipo": "barril",
+   "x": 41,
+   "y": 21
+  },
+  {
+   "tipo": "farola",
+   "x": 41,
+   "y": 9
+  },
+  {
+   "tipo": "farola",
+   "x": 45,
+   "y": 9
+  },
+  {
+   "tipo": "hierba_alta",
+   "x": 4,
+   "y": 4
+  },
+  {
+   "tipo": "hierba_alta",
+   "x": 5,
+   "y": 4
+  },
+  {
+   "tipo": "hierba_alta",
+   "x": 4,
+   "y": 5
+  },
+  {
+   "tipo": "hierba_alta",
+   "x": 7,
+   "y": 7
+  },
+  {
+   "tipo": "hierba_alta",
+   "x": 8,
+   "y": 7
+  },
+  {
+   "tipo": "hierba_alta",
+   "x": 38,
+   "y": 6
+  },
+  {
+   "tipo": "hierba_alta",
+   "x": 39,
+   "y": 6
+  },
+  {
+   "tipo": "hierba_alta",
+   "x": 39,
+   "y": 7
+  },
+  {
+   "tipo": "hierba_alta",
+   "x": 4,
+   "y": 23
+  },
+  {
+   "tipo": "hierba_alta",
+   "x": 5,
+   "y": 23
+  },
+  {
+   "tipo": "hierba_alta",
+   "x": 5,
+   "y": 24
+  },
+  {
+   "tipo": "hierba_alta",
+   "x": 8,
+   "y": 26
+  },
+  {
+   "tipo": "hierba_alta",
+   "x": 9,
+   "y": 26
+  },
+  {
+   "tipo": "piedras",
+   "x": 9,
+   "y": 5
+  },
+  {
+   "tipo": "roca",
+   "x": 3,
+   "y": 32
+  },
+  {
+   "tipo": "roca",
+   "x": 44,
+   "y": 33
+  },
+  {
+   "tipo": "roble_hito",
+   "x": 19,
+   "y": 6
+  },
+  {
+   "tipo": "abeto",
+   "x": 13,
+   "y": 2
+  },
+  {
+   "tipo": "arbol_mediano",
+   "x": 21,
+   "y": 2
+  },
+  {
+   "tipo": "arbol_pequeno",
+   "x": 18,
+   "y": 8
+  },
+  {
+   "tipo": "abeto",
+   "x": 30,
+   "y": 2
+  },
+  {
+   "tipo": "arbol_mediano",
+   "x": 38,
+   "y": 2
+  },
+  {
+   "tipo": "arbol_pequeno",
+   "x": 40,
+   "y": 13
+  },
+  {
+   "tipo": "arbol_mediano",
+   "x": 8,
+   "y": 24
+  },
+  {
+   "tipo": "arbol_pequeno",
+   "x": 4,
+   "y": 27
+  },
+  {
+   "tipo": "arbol_pequeno",
+   "x": 32,
+   "y": 2
+  },
+  {
+   "tipo": "boca_cueva",
+   "x": 8,
+   "y": 2
+  },
+  {
+   "tipo": "cartel_carbuna",
+   "x": 45,
+   "y": 16
+  },
+  {
+   "tipo": "brasero_carbuna",
+   "x": 45,
+   "y": 20
+  }
+ ],
+ "animar": true,
+ "anclas": {
+  "inicio": [
+   24,
+   24
+  ],
+  "guarida_zefirax": [
+   4,
+   22
+  ],
+  "carbuna": [
+   44,
+   18
+  ]
+ },
+ "puertas": [
+  {
+   "id": "centro_pc",
+   "x": 26,
+   "y": 9,
+   "destino": {
+    "mapa": "centro_pc",
+    "ancla": "entrada"
+   }
+  },
+  {
+   "id": "tienda",
+   "x": 34,
+   "y": 8,
+   "destino": {
+    "mapa": "tienda",
+    "ancla": "entrada"
+   }
+  },
+  {
+   "id": "laboratorio",
+   "x": 14,
+   "y": 26,
+   "destino": {
+    "mapa": "laboratorio",
+    "ancla": "entrada"
+   }
+  },
+  {
+   "id": "casa_de_oli",
+   "x": 4,
+   "y": 14,
+   "destino": {
+    "mapa": "casa_de_oli",
+    "ancla": "entrada"
+   }
+  },
+  {
+   "id": "casa_de_lali",
+   "x": 13,
+   "y": 14,
+   "destino": {
+    "mapa": "casa_de_lali",
+    "ancla": "entrada"
+   }
+  },
+  {
+   "id": "ermita",
+   "x": 43,
+   "y": 8,
+   "destino": {
+    "mapa": "ermita",
+    "ancla": "entrada"
+   }
+  },
+  {
+   "id": "profundidades",
+   "x": 9,
+   "y": 3,
+   "destino": {
+    "mapa": "@prof",
+    "ancla": "cristal"
+   }
+  },
+  {
+   "id": "carbuna_prov_17",
+   "x": 45,
+   "y": 17,
+   "destino": {
+    "mapa": "pueblo_carbuna",
+    "ancla": "inicio"
+   }
+  },
+  {
+   "id": "carbuna_prov_18",
+   "x": 45,
+   "y": 18,
+   "destino": {
+    "mapa": "pueblo_carbuna",
+    "ancla": "inicio"
+   }
+  },
+  {
+   "id": "carbuna_prov_19",
+   "x": 45,
+   "y": 19,
+   "destino": {
+    "mapa": "pueblo_carbuna",
+    "ancla": "inicio"
+   }
+  }
+ ],
+ "conexiones": {
+  "norte": null,
+  "sur": null,
+  "este": null,
+  "oeste": null
+ },
+ "zonas": [
+  {
+   "id": "claro_hoja",
+   "x": 1,
+   "y": 2,
+   "w": 6,
+   "h": 7,
+   "elemento": "hoja",
+   "nota": "zona de prueba TEMPORAL (en el juego final Albanota no tiene criaturas salvajes)"
+  },
+  {
+   "id": "claro_aire",
+   "x": 1,
+   "y": 20,
+   "w": 6,
+   "h": 6,
+   "elemento": "aire",
+   "nota": "zona de prueba TEMPORAL (en el juego final Albanota no tiene criaturas salvajes)"
+  },
+  {
+   "id": "claro_electrico",
+   "x": 41,
+   "y": 22,
+   "w": 5,
+   "h": 5,
+   "elemento": "electrico",
+   "nota": "zona de prueba TEMPORAL (en el juego final Albanota no tiene criaturas salvajes)"
+  },
+  {
+   "id": "claro_agua",
+   "x": 41,
+   "y": 27,
+   "w": 5,
+   "h": 2,
+   "elemento": "agua",
+   "nota": "zona de prueba TEMPORAL (en el juego final Albanota no tiene criaturas salvajes)"
+  },
+  {
+   "id": "claro_sombra",
+   "x": 9,
+   "y": 3,
+   "w": 8,
+   "h": 5,
+   "elemento": "sombra",
+   "nota": "zona de prueba TEMPORAL (en el juego final Albanota no tiene criaturas salvajes)"
+  },
+  {
+   "id": "claro_roca",
+   "x": 17,
+   "y": 22,
+   "w": 5,
+   "h": 5,
+   "elemento": "roca",
+   "nota": "zona de prueba TEMPORAL (en el juego final Albanota no tiene criaturas salvajes)"
+  },
+  {
+   "id": "claro_fuego",
+   "x": 27,
+   "y": 22,
+   "w": 5,
+   "h": 6,
+   "elemento": "fuego",
+   "nota": "zona de prueba TEMPORAL (en el juego final Albanota no tiene criaturas salvajes)"
+  }
+ ],
+ "npcs": [
+  {
+   "id": "zefirax",
+   "x": 4,
+   "y": 22,
+   "tipo": "guarida",
+   "texto": "Guarida de Zefirax (prueba temporal)"
+  }
+ ],
+ "pesca": [
+  {
+   "id": "orilla_norte_1",
+   "x": 8,
+   "y": 28,
+   "mira": "down"
+  },
+  {
+   "id": "orilla_norte_2",
+   "x": 20,
+   "y": 28,
+   "mira": "down"
+  },
+  {
+   "id": "orilla_norte_3",
+   "x": 33,
+   "y": 28,
+   "mira": "down"
+  },
+  {
+   "id": "orilla_norte_4",
+   "x": 42,
+   "y": 28,
+   "mira": "down"
+  },
+  {
+   "id": "puente_oeste",
+   "x": 23,
+   "y": 30,
+   "mira": "left"
+  },
+  {
+   "id": "puente_este",
+   "x": 25,
+   "y": 30,
+   "mira": "right"
+  }
+ ]
+}

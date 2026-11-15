@@ -1,0 +1,3 @@
+Imágenes intermedias del proceso de dibujo de la fauna marina (8 nov 2026): propuestas rechazadas, revisiones y hojas de prueba de los lotes 1, 2 y 3.
+Lo aprobado y vigente está en docs/: bloque_final_8.png (lote 2), lote1_revision2_*.png (lote 1), lote3_final_6c.png (lote 3), lote3_reserva_6.png y lote_reservas_limpio.png (reservas), y los sprites en *_sprites.json.
+Se conservan por si se quiere recuperar un dibujo descartado; nada de aquí lo cita un documento vivo.

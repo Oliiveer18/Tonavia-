@@ -1,0 +1,14 @@
+{
+ "_nota": "PLANTILLA de dimensión (F8). Copia: node tools/nueva_dimension.js <id> \"<Nombre>\" [--mar]. Esquema y claves opcionales: docs/multiverso/06_ESQUEMA_DIMENSION.md y GUIA_CONTENIDO.md. Las claves que empiezan por _ son comentarios.",
+ "v": 1,
+ "id": "__ID__",
+ "nombre": "__NOMBRE__",
+ "entrada": {
+  "mapa": "__ID__/entrada",
+  "ancla": "inicio"
+ },
+ "regiones": [],
+ "reglas": {
+  "ciclo": "global"
+ }
+}

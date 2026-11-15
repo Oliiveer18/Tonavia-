@@ -1,0 +1,1048 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Editor de mapas · Criaturas de Lali y Oli</title>
+<style>
+:root{--bg:#1d1828;--panel:#272036;--panel2:#31283f;--line:#46395a;--txt:#f1e9ff;--dim:#a89bbd;--acc:#7dffe7;--acc2:#ff7df0;--warn:#f7d54a;--err:#ff6b5e;--ok:#7be08a}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--txt);font:14px/1.35 system-ui,Segoe UI,Roboto,sans-serif;display:flex;flex-direction:column;overflow:hidden}
+header{display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:8px 10px;background:var(--panel);border-bottom:1px solid var(--line)}
+header h1{font-size:15px;margin:0 8px 0 0;color:var(--acc);white-space:nowrap}
+button,select,input,textarea{font:inherit;color:var(--txt);background:var(--panel2);border:1px solid var(--line);border-radius:6px;padding:5px 9px}
+button{cursor:pointer}
+button:hover{border-color:var(--acc)}
+button.on{background:var(--acc);color:#10202a;border-color:var(--acc);font-weight:600}
+button.danger:hover{border-color:var(--err);color:var(--err)}
+button:disabled{opacity:.4;cursor:default}
+input[type=number]{width:70px}
+input[type=text],select{min-width:0}
+main{flex:1;min-height:0;display:grid;grid-template-columns:190px 1fr 290px}
+aside{background:var(--panel);overflow:auto;padding:8px}
+#left{border-right:1px solid var(--line)}
+#right{border-left:1px solid var(--line)}
+#stage{position:relative;overflow:auto;background:#120e1a;touch-action:none}
+#wrap{position:relative;display:inline-block;margin:12px;line-height:0}
+canvas{image-rendering:pixelated;display:block}
+#ov,#co{position:absolute;left:0;top:0}
+#co{pointer-events:none}
+#center{display:flex;flex-direction:column;min-height:0;min-width:0}
+#center #stage{flex:1;min-height:0}
+#acc{display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:6px 8px;background:var(--panel);border-top:1px solid var(--line)}
+#acc #accN{flex:1 1 140px;min-width:120px;font-size:13px;color:var(--dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#acc #accN b{color:var(--acc)}
+#acc .pad{display:flex;gap:4px}
+#acc button{min-width:44px;min-height:40px;font-size:15px;padding:4px 10px}
+.nudge{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:8px 0}
+.nudge button{min-height:44px;font-size:18px}
+h2{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--dim);margin:10px 0 5px}
+.tools{display:grid;grid-template-columns:repeat(2,1fr);gap:4px}
+.tools button{text-align:left;padding:5px 7px;font-size:13px}
+.tools kbd{float:right;color:var(--dim);font-size:11px}
+.on kbd{color:#10202a}
+#pal{display:grid;grid-template-columns:repeat(3,1fr);gap:5px}
+.tile{display:flex;flex-direction:column;align-items:center;gap:2px;padding:4px 2px;font-size:11px;cursor:pointer;border:2px solid transparent;border-radius:6px;background:var(--panel2);text-align:center;line-height:1.1}
+.tile canvas{width:32px;height:32px}
+.tile.on{border-color:var(--acc)}
+.tile .nuevo{color:var(--warn);font-size:9px}
+details{border-bottom:1px solid var(--line);padding:4px 0}
+summary{cursor:pointer;font-weight:600;padding:4px 0}
+label{display:block;margin:5px 0 2px;color:var(--dim);font-size:12px}
+.row{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.row>*{flex:1}
+.row>button{flex:none}
+table.st{width:100%;border-collapse:collapse;font-size:12px}
+table.st td{padding:2px 0;border-bottom:1px dotted var(--line)}
+table.st td:last-child{text-align:right;color:var(--acc)}
+#issues{margin:6px 0 0;padding:0;list-style:none;font-size:12px}
+#issues li{padding:4px 6px;margin:3px 0;border-radius:5px;background:var(--panel2);border-left:3px solid var(--dim)}
+#issues li.err{border-color:var(--err)}#issues li.warn{border-color:var(--warn)}#issues li.ok{border-color:var(--ok)}
+footer{padding:4px 10px;background:var(--panel);border-top:1px solid var(--line);color:var(--dim);font-size:12px;display:flex;gap:16px;flex-wrap:wrap}
+dialog{background:var(--panel);color:var(--txt);border:1px solid var(--acc);border-radius:10px;padding:16px;max-width:min(92vw,460px);width:100%}
+dialog::backdrop{background:#000a}
+dialog h3{margin:0 0 8px;color:var(--acc)}
+dialog menu{display:flex;gap:8px;justify-content:flex-end;padding:0;margin:14px 0 0}
+dialog input,dialog select,dialog textarea{width:100%}
+dialog textarea{height:160px;font-family:monospace;font-size:12px}
+.presets{display:flex;flex-wrap:wrap;gap:5px;margin:4px 0}
+.presets button{font-size:12px;padding:3px 7px}
+.hint{color:var(--dim);font-size:12px;margin:4px 0}
+@media (pointer:coarse){button,select{min-height:38px}}
+@media (max-width:820px){
+ body{overflow:auto;height:auto;min-height:100%}
+ header{gap:4px;padding:6px}
+ header h1{display:none}
+ header button,header select{padding:4px 7px;font-size:13px}
+ main{display:flex;flex-direction:column;overflow:visible}
+ #center{order:-1;flex:none}
+ #center #stage{height:56vh;flex:none}
+ #left,#right{border:0;border-top:1px solid var(--line);overflow:visible}
+ #pal{grid-template-columns:repeat(4,1fr)}
+}
+/* v2.60 · ED-2 */
+.pz{display:grid;grid-template-columns:repeat(2,1fr);gap:5px}
+.pz .tile canvas{width:auto;height:auto;max-width:100%;image-rendering:pixelated}
+.pz .tile{min-height:70px;justify-content:flex-end}
+.pz .tile .cv{height:52px;display:flex;align-items:center;justify-content:center}
+.cat{margin:10px 0 4px}
+.avs{margin:6px 0;padding:0;list-style:none;font-size:12px}
+.avs li{padding:4px 6px;margin:3px 0;border-radius:5px;background:var(--panel2);border-left:3px solid var(--dim)}
+.avs li.err{border-color:var(--err)}.avs li.warn{border-color:var(--warn)}
+#issues li[data-sel]{cursor:pointer}
+#issues li[data-sel]:hover{background:var(--line)}
+button.go{background:var(--acc2);color:#2a0f27;border-color:var(--acc2);font-weight:700}
+#acc button.big{min-height:44px;font-weight:600}
+#accN{flex:1 1 100%;min-height:1.3em}
+#dlgP{max-width:min(96vw,560px);max-height:88vh;overflow:auto}
+#dlgP .pz{grid-template-columns:repeat(3,1fr)}
+#prueba{position:fixed;inset:0;z-index:50;background:#000;display:flex;flex-direction:column}
+#prueba[hidden]{display:none}
+button[hidden]{display:none!important}
+#prueba iframe{flex:1;min-height:0;border:0;width:100%;background:#000}
+#pruebaBar{display:flex;gap:8px;align-items:center;padding:6px 10px;background:var(--panel);border-bottom:1px solid var(--line)}
+#pruebaMsg{flex:1;color:var(--err);font-size:12px;white-space:pre-wrap;max-height:30vh;overflow:auto}
+@media (max-width:820px){.pz{grid-template-columns:repeat(3,1fr)}}
+</style>
+</head>
+<body>
+<header>
+ <h1>Editor de mapas</h1>
+ <select id="mapSel" title="Mapa actual"></select>
+ <button id="bNuevo">Nuevo</button>
+ <button id="bDup">Duplicar</button>
+ <button id="bDel" class="danger">Borrar</button>
+ <span style="flex:1"></span>
+ <button id="bUndo" title="Ctrl+Z">Deshacer</button>
+ <button id="bRedo" title="Ctrl+Y">Rehacer</button>
+ <button id="bZm">−</button><span id="zoomL" style="min-width:34px;text-align:center">×3</span><button id="bZp">+</button>
+ <button id="bGrid" class="on">Rejilla</button>
+ <button id="bSol" title="Casillas sólidas y huella de los objetos">Sólidas</button>
+ <button id="bObj" class="on" title="Ver u ocultar los dibujos de los objetos">Objetos</button>
+ <button id="bAv" class="on" title="Marcar con «!» las piezas que tapan algo (puertas, caminos, apariciones)">Avisos</button>
+ <button id="bImp">Importar</button>
+ <button id="bExp" title="Descarga mapas_editor.json con todos tus mapas para cargarlo en el juego (botón «Mapas»)">Exportar al juego</button>
+ <button id="bJugar" class="go" hidden title="Valida tus mapas, los guarda en este navegador y reinicia el juego con ellos">✔ Guardar y jugar</button>
+ <button id="bSalir" hidden title="Volver al juego sin guardar">✕ Salir</button>
+ <button id="bProbar" class="go" title="Abre el juego con este mapa tal como lo tienes ahora (sin exportar)">▶ Probar</button>
+</header>
+<main>
+ <aside id="left">
+  <h2>Herramientas</h2>
+  <div class="tools" id="tools"></div>
+  <h2>Piezas</h2>
+  <div id="piezas"></div>
+  <p class="hint">Elige una pieza y toca el mapa para ponerla. Se coloca por los pies (en el centro de abajo de su parte sólida).</p>
+  <h2>Casillas</h2>
+  <div id="pal"></div>
+  <p class="hint">Las marcadas <span style="color:var(--warn)">nuevo</span> aún no las dibuja el juego; el motor de mapas (paso 1.3a) las incorporará. Los símbolos no se renumeran nunca.</p>
+ </aside>
+ <div id="center">
+ <section id="stage"><div id="wrap"><canvas id="cv"></canvas><canvas id="co"></canvas><canvas id="ov"></canvas></div></section>
+ <div id="acc">
+  <span id="accN">Toca un objeto para elegirlo · arrastra para moverlo</span>
+  <button id="aPieza" class="big on" title="Abrir la paleta de piezas (O)">＋ Pieza</button><button id="aListo" class="big" hidden>Listo</button><button id="aProbar" class="big go">▶ Probar</button>
+  <div class="pad"><button data-m="-1,0" title="Una casilla a la izquierda">◀</button><button data-m="0,-1" title="Una casilla arriba">▲</button><button data-m="0,1" title="Una casilla abajo">▼</button><button data-m="1,0" title="Una casilla a la derecha">▶</button></div>
+  <button id="aCopy" title="Copiar (Ctrl+D)">Copiar</button><button id="aDel" class="danger" title="Borrar (Supr)">Borrar</button>
+  <button id="aUndo">↶</button><button id="aRedo">↷</button>
+ </div>
+ </div>
+ <aside id="right">
+  <details open><summary>Mapa</summary>
+   <label>Identificador (sin espacios, minúsculas)</label><input type="text" id="mId">
+   <label>Nombre</label><input type="text" id="mNombre">
+   <label>Casilla de la goma (suelo base)</label><select id="mBase"></select>
+   <div class="row" style="margin-top:8px"><button id="bResize">Cambiar tamaño…</button><button id="bReload" title="Vuelve a la versión del archivo; se puede deshacer">Recargar del archivo</button></div>
+  </details>
+  <details open><summary>Tamaño y peso</summary><table class="st" id="stats"></table></details>
+  <details open><summary>Objeto seleccionado</summary><div id="objPanel"><p class="hint">Elige la herramienta Seleccionar (S) y pulsa un objeto.</p></div></details>
+  <details><summary>Conexiones de borde</summary>
+   <p class="hint">Al cruzar el borde se carga el mapa vecino. El desplazamiento alinea los dos bordes (en casillas).</p>
+   <div id="conn"></div>
+  </details>
+  <details open><summary>Comprobación</summary>
+   <div class="row"><button id="bCheck">Comprobar mapa</button><button id="bCheckAll">Todos</button></div>
+   <ul id="issues"></ul>
+  </details>
+ </aside>
+</main>
+<footer><span id="sPos">—</span><span id="sTool">—</span><span id="sSave">—</span></footer>
+<dialog id="dlgP"><h3 style="margin:0 0 8px;color:var(--acc)">Elige una pieza</h3><div id="hojaP"></div><menu style="display:flex;justify-content:flex-end;padding:0;margin:12px 0 0"><button type="button" id="dlgPno">Cancelar</button></menu></dialog>
+<div id="prueba" hidden><div id="pruebaBar"><b>Probando «<span id="pruebaMapa"></span>»</b><span id="pruebaMsg"></span><button id="pruebaCerrar" class="on">Volver al editor</button></div><iframe id="pruebaFrame" title="El juego con el mapa editado"></iframe></div>
+<script type="application/json" id="juegoSrc">/*__JUEGO__*/null</script>
+<dialog id="dlg"><form method="dialog" id="dlgForm"><h3 id="dlgT"></h3><div id="dlgB"></div><menu><button value="cancel" id="dlgNo">Cancelar</button><button value="ok" id="dlgOk" class="on">Aceptar</button></menu></form></dialog>
+
+<script>
+/* ===== Motor de dibujo del juego (v2.59, ED-1): chars, rampas, sombreado, capas, árboles y piezas de Albanota; lo mete tools/editor_mapas.js ===== */
+/*__MOTOR__*/
+</script>
+<script>
+'use strict';
+/* ===== Datos incluidos (mapas de ejemplo) ===== */
+const EJEMPLOS = /*__MAPAS__*/[];
+const EN_JUEGO = /*__EN_JUEGO__*/null; // v2.62: dentro del juego (botón «Editar mapa») = id del mapa que se abre; en el archivo suelto = null
+
+/* ===== Constantes del juego ===== */
+const T = 16;                       // píxeles por casilla (igual que el juego)
+const ACTUAL = { ancho: 36, alto: 26 };   // mapa v1.4 de referencia
+const PANTALLA = { ancho: 8, alto: 16 };  // casillas visibles en un móvil vertical (zoom entero)
+const ELEMENTOS = ['', 'hoja', 'fuego', 'agua', 'electrico', 'aire', 'roca', 'sombra'];
+const NPC_TIPOS = ['npc', 'entrenador', 'lider', 'cofre', 'cartel', 'guarida'];
+const C = { ink:'#2a1b30', wood1:'#c48b52', wood2:'#b27a45', wood3:'#8f5c33', woodD:'#6b4226', cream:'#f7e9cb', cream2:'#ead7ae',
+  red:'#d94a3f', red2:'#a8322f', orange:'#f09a3e', yellow:'#f7d54a', green:'#5dae5a', green2:'#3d8446', blue:'#4d7fd6', blue2:'#35559a',
+  brown:'#7a4a2b', stone1:'#8d8a99', stone2:'#797686', stone3:'#615e6f', night:'#2d2540', pink:'#f5a8bd', white:'#fff9ee' };
+
+/* Casillas. El símbolo es estable para siempre (nunca se renumera). game: ya existe en el juego. */
+const TILES = [
+ { k:'.', n:'Césped', solid:false, game:true },
+ { k:'f', n:'Flores', solid:false, game:true },
+ { k:'g', n:'Hierba alta', solid:false },
+ { k:'t', n:'Árbol', solid:true, game:true },
+ { k:'~', n:'Agua', solid:true, game:true },
+ { k:'=', n:'Camino', solid:false, game:true },
+ { k:'s', n:'Arena', solid:false },
+ { k:'r', n:'Roca', solid:true },
+ { k:'c', n:'Suelo cueva', solid:false },
+ { k:'l', n:'Lava', solid:true },
+ { k:'b', n:'Puente', solid:false },
+ { k:'#', n:'Pared', solid:true },
+ { k:'h', n:'Tejado', solid:true },
+ { k:'d', n:'Puerta', solid:false },
+ { k:'_', n:'Suelo interior', solid:false },
+ { k:'m', n:'Mueble', solid:true },
+ { k:'x', n:'Vacío', solid:true },
+];
+const TMAP = Object.fromEntries(TILES.map((t) => [t.k, t]));
+const isSolid = (k) => (TMAP[k] ? TMAP[k].solid : true);
+
+/* ===== Dibujo de casillas (16×16, 4 variantes cada una) ===== */
+const hsh = (x, y, k) => { let h = (x * 374761393 + y * 668265263 + k * 2147483647) >>> 0; h = ((h ^ (h >>> 13)) * 1274126177) >>> 0; return (h ^ (h >>> 16)) >>> 0; };
+const tileCache = {};
+function tileCanvas(k, v) {
+  const key = k + v; if (tileCache[key]) return tileCache[key];
+  const cv = document.createElement('canvas'); cv.width = cv.height = T; const c = cv.getContext('2d');
+  const r = (col, x, y, w, h) => { c.fillStyle = col; c.fillRect(x, y, w, h); };
+  const grass = () => { r(C.green, 0, 0, T, T); for (let i = 0; i < 5; i++) { const h = hsh(v, 1, i); r(C.green2, h % 15, (h >> 4) % 15, 1, 2); } };
+  const speck = (base, dark, n, w, h2) => { r(base, 0, 0, T, T); for (let i = 0; i < n; i++) { const h = hsh(v, 5, i); r(dark, h % 14, (h >> 4) % 15, w, h2); } };
+  switch (k) {
+    case '.': grass(); break;
+    case 'f': grass(); for (let i = 0; i < 3; i++) { const h = hsh(v, 2, i), col = [C.pink, C.yellow, C.white][i], fx = 2 + (h % 11), fy = 2 + ((h >> 4) % 11); r(col, fx, fy, 2, 2); r(C.orange, fx, fy, 1, 1); } break;
+    case 'g': r(C.green2, 0, 0, T, T); for (let i = 0; i < 7; i++) { const h = hsh(v, 3, i), x = h % 14, y = 2 + ((h >> 4) % 12); r(C.green, x, y - 2, 1, 4); r('#7cc972', x + 1, y - 3, 1, 3); } break;
+    case 't': grass(); r(C.woodD, 6, 10, 4, 6); r(C.brown, 6, 10, 2, 6); r(C.green2, 1, 2, 14, 10); r(C.green, 2, 1, 12, 9); r(C.green, 4, 0, 8, 2); r('#7cc972', 4, 3, 3, 2); r('#7cc972', 9, 6, 3, 2); r(C.green2, 3, 9, 10, 3); break;
+    case '~': r(C.blue, 0, 0, T, T); r(C.blue2, 0, T - 2, T, 2); for (let i = 0; i < 3; i++) { const h = hsh(v, 9, i); r('#8fb4f0', h % 11, 2 + ((h >> 5) % 10), 4, 1); } break;
+    case '=': r('#e0c48c', 0, 0, T, T); for (let i = 0; i < 5; i++) { const h = hsh(v, 3, i + 3); r('#c9a96c', h % 15, (h >> 4) % 15, 2, 1); } break;
+    case 's': speck(C.cream2, '#d3bb86', 6, 2, 1); break;
+    case 'r': r(C.stone2, 0, 0, T, T); r(C.stone1, 0, 0, T, 3); r(C.stone3, 0, T - 3, T, 3); for (let i = 0; i < 3; i++) { const h = hsh(v, 6, i); r(C.stone1, h % 11, 3 + ((h >> 4) % 8), 4, 2); r(C.stone3, (h >> 3) % 11, 5 + ((h >> 6) % 7), 3, 1); } break;
+    case 'c': speck('#4a4260', '#3a3350', 6, 3, 2); break;
+    case 'l': r(C.red, 0, 0, T, T); for (let i = 0; i < 4; i++) { const h = hsh(v, 7, i); r(C.orange, h % 11, (h >> 4) % 13, 5, 2); r(C.yellow, (h >> 2) % 11, (h >> 6) % 13, 2, 1); } r(C.red2, 0, T - 2, T, 2); break;
+    case 'b': r(C.blue, 0, 0, T, T); r(C.blue2, 0, T - 2, T, 2); r(C.wood1, 0, 2, T, 12); for (let y = 2; y < 14; y += 4) r(C.wood3, 0, y + 3, T, 1); r(C.woodD, 0, 2, T, 1); r(C.woodD, 0, 13, T, 1); break;
+    case '#': r(C.cream2, 0, 0, T, T); for (let y = 0; y < T; y += 4) { r('#c9b48a', 0, y + 3, T, 1); for (let x = (y / 4) % 2 ? 4 : 0; x < T; x += 8) r('#c9b48a', x, y, 1, 3); } r(C.wood3, 0, T - 2, T, 2); break;
+    case 'h': r(C.red2, 0, 0, T, T); for (let y = 0; y < T; y += 4) { r(C.red, 0, y, T, 3); for (let x = (y / 4) % 2 ? 3 : 0; x < T; x += 6) r(C.red2, x, y, 1, 3); } r(C.ink, 0, T - 1, T, 1); break;
+    case 'd': r(C.cream2, 0, 0, T, T); r(C.woodD, 3, 1, 10, 15); r(C.brown, 4, 2, 8, 14); r(C.wood3, 7, 2, 1, 14); r(C.yellow, 10, 9, 2, 2); break;
+    case '_': r(C.wood1, 0, 0, T, T); for (let y = 0; y < T; y += 4) { r(C.wood2, 0, y + 3, T, 1); const h = hsh(v, 8, y); r(C.wood2, h % 14, y, 1, 3); } break;
+    case 'm': r(C.wood1, 0, 0, T, T); r(C.woodD, 1, 3, 14, 11); r(C.brown, 2, 4, 12, 4); r(C.wood3, 2, 9, 12, 4); r(C.yellow, 7, 10, 2, 1); break;
+    case 'x': r(C.ink, 0, 0, T, T); break;
+    default: r('#ff00ff', 0, 0, T, T); r('#000', 0, 0, 8, 8); r('#000', 8, 8, 8, 8);
+  }
+  return (tileCache[key] = cv);
+}
+
+/* ===== Estado ===== */
+const $ = (id) => document.getElementById(id);
+const STORE = 'criaturas_editor_mapas_v1';
+let maps = {};            // id -> mapa interno (con grid)
+let cur = null;           // mapa actual
+let tool = 'sel', tile = 't', zoom = (window.innerWidth < 820 ? 2 : 3), showGrid = true, showSol = false, showObj = true;
+let sel = null;           // { kind, key }
+let pieza = null, ghost = null, showAv = true, accExtra = '';   // v2.60 (ED-2): pieza elegida en la paleta, casilla bajo el dedo/ratón, marcas de aviso
+const hist = {};          // id -> { u:[], r:[] }
+const cv = $('cv'), co = $('co'), ov = $('ov'), cx = cv.getContext('2d'), cox = co.getContext('2d'), ox = ov.getContext('2d');
+const OBJD = (window.G && window.G.OBJETOS) || {};   // catálogo de piezas del juego (G.capas)
+const STAMP = (() => { let h = 5381; const t = JSON.stringify(EJEMPLOS); for (let i = 0; i < t.length; i++) h = ((h * 33) ^ t.charCodeAt(i)) >>> 0; return h.toString(16) + ':' + t.length; })(); // huella de los mapas que trae el archivo
+
+const idMapa = (s) => { s = String(s); const i = s.indexOf('/'); return i > 0 ? slug(s.slice(0, i)) + '/' + slug(s.slice(i + 1)) : slug(s); };   // F8: un mapa de otra dimensión conserva su prefijo («pirata/mar_1_1»); sin «/», id de Tonavia
+const slug = (s) => String(s).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9_]+/g, '_').replace(/^_+|_+$/g, '') || 'mapa';
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+
+/* --- modelo --- */
+function fromJSON(j) {
+  const m = { formato: 2, id: idMapa(j.id || 'mapa'), nombre: j.nombre || j.id || 'Mapa', ancho: 0, alto: 0, base: j.base || '.',
+    anclas: {}, puertas: [], conexiones: { norte: null, sur: null, este: null, oeste: null }, zonas: [], npcs: [],
+    objetos: Array.isArray(j.objetos) ? j.objetos : [], colision: Array.isArray(j.colision) ? j.colision : null, animar: !!j.animar, region: j.region || null }; // v2.46: también conserva la región (luz); v2.33 (formato 2): el editor abre el formato 1 y el 2 y los guarda en el 2; los objetos, la colisión y animar se conservan tal cual (aún no se editan aquí)
+  const rows = j.formato === 2 && j.capas ? j.capas.suelo : j.suelo; if (!Array.isArray(rows) || !rows.length) throw new Error('El mapa «' + m.id + '» no tiene «suelo».');
+  m.alto = rows.length; m.ancho = rows[0].length;
+  rows.forEach((r, i) => { if (typeof r !== 'string' || r.length !== m.ancho) throw new Error('Fila ' + (i + 1) + ' de «' + m.id + '» con ancho distinto.'); });
+  m.grid = rows.map((r) => r.split(''));
+  Object.entries(j.anclas || {}).forEach(([k, v]) => { m.anclas[k] = [v[0] | 0, v[1] | 0]; });
+  m.puertas = (j.puertas || []).map((p) => Object.assign({ id: String(p.id), x: p.x | 0, y: p.y | 0, destino: Object.assign({}, p.destino, { mapa: (p.destino && p.destino.mapa) || '', ancla: (p.destino && p.destino.ancla) || '' }) }, p.portal ? { portal: JSON.parse(JSON.stringify(p.portal)) } : {}));   // F5: un portal entre dimensiones (campo «portal», «dim» del destino) se conserva tal cual; el editor no lo crea ni lo cambia
+  ['norte', 'sur', 'este', 'oeste'].forEach((s) => { const c = j.conexiones && j.conexiones[s]; m.conexiones[s] = c && c.mapa ? { mapa: c.mapa, desplazamiento: c.desplazamiento | 0 } : null; });
+  m.zonas = (j.zonas || []).map((z) => ({ id: String(z.id), x: z.x | 0, y: z.y | 0, w: z.w | 0, h: z.h | 0, elemento: z.elemento || '', nota: z.nota || '' }));
+  if (j.mar === true) m.mar = true;   // F8: un mapa de MAR (otra dimensión) conserva su marca; sin ella el editor lo guardaría como tierra
+  m.ext = { regionNula: 'region' in j && j.region === null, sinBase: !('base' in j), pescaVacia: Array.isArray(j.pesca) && !j.pesca.length };   // F8: la forma de las claves de un mapa de otra dimensión (sin tocar nada, se exporta idéntico)
+  if (j.tema) m.tema = String(j.tema); // v2.186: tema de música compartido; el editor lo conserva al exportar
+  m.pesca = Array.isArray(j.pesca) ? j.pesca : []; // v2.180: puntos de pesca; el editor aún no los muestra, pero los conserva al exportar
+  m.npcs = (j.npcs || []).map((n) => { const r = { id: String(n.id), x: n.x | 0, y: n.y | 0, tipo: n.tipo || 'npc', texto: n.texto || '' }; if (Object.keys(n).some((k) => !(k in r))) Object.defineProperty(r, 'raw', { value: JSON.parse(JSON.stringify(n)), enumerable: false, writable: true }); return r; });   // F8: un personaje con más campos (nombre, dir, alcance…) los conserva al guardar
+  return m;
+}
+function toJSON(m) {
+  // v2.59: mismo orden de claves que maps/albanota.json (así un mapa sin tocar se exporta idéntico y los cambios se ven limpios en un diff)
+  const o = { formato: 2, id: m.id, nombre: m.nombre }, ex = m.ext || {}; if (m.region) o.region = m.region; else if (ex.regionNula) o.region = null; if (m.mar) o.mar = true; if (m.tema) o.tema = m.tema;
+  Object.assign(o, { ancho: m.ancho, alto: m.alto }, ex.sinBase ? {} : { base: m.base }, { capas: { suelo: m.grid.map((r) => r.join('')) } });
+  if (m.colision) o.colision = m.colision; o.objetos = m.objetos || []; if (m.animar) o.animar = true;
+  return Object.assign(o, { anclas: m.anclas, puertas: m.puertas, conexiones: m.conexiones, zonas: m.zonas, npcs: m.npcs.map((n) => (n.raw ? Object.assign({}, n.raw, { id: n.id, x: n.x, y: n.y }, 'tipo' in n.raw ? { tipo: n.tipo } : {}, 'texto' in n.raw || n.texto ? { texto: n.texto } : {}) : n)) }, m.pesca && m.pesca.length ? { pesca: m.pesca } : ex.pescaVacia ? { pesca: [] } : {});
+}
+function newGrid(w, h, k) { return Array.from({ length: h }, () => Array(w).fill(k)); }
+
+/* --- guardado --- */
+let saveT = 0;
+function persist() {
+  if (EN_JUEGO) return; // dentro del juego no se guarda aparte: solo «Guardar y jugar» lo guarda
+  clearTimeout(saveT);
+  saveT = setTimeout(() => {
+    try { localStorage.setItem(STORE, JSON.stringify({ cur: cur && cur.id, stamp: STAMP, maps: Object.values(maps).map(toJSON) })); $('sSave').textContent = 'Guardado en este navegador ' + new Date().toLocaleTimeString(); }
+    catch (e) { $('sSave').textContent = 'No se pudo guardar en el navegador: exporta tus mapas a mano'; }
+  }, 300);
+}
+let distintoArchivo = false;
+function loadStore() {
+  let data = null;
+  if (!EN_JUEGO) try { data = JSON.parse(localStorage.getItem(STORE) || 'null'); } catch (e) { data = null; }
+  const list = data && data.maps && data.maps.length ? data.maps : EJEMPLOS;
+  distintoArchivo = !!(data && data.maps && data.maps.length && data.stamp !== STAMP);   // el navegador guardó otra versión de los mapas que la del archivo
+  list.forEach((j) => { try { const m = fromJSON(j); maps[m.id] = m; } catch (e) { console.warn(e); } });
+  const first = EN_JUEGO && maps[EN_JUEGO] ? EN_JUEGO : (data && data.cur && maps[data.cur]) ? data.cur : Object.keys(maps)[0];
+  if (first) cur = maps[first];
+}
+
+/* --- historial --- */
+const H = () => (hist[cur.id] = hist[cur.id] || { u: [], r: [] });
+function snap() { return JSON.stringify(toJSON(cur)); }
+function pushUndo() { const h = H(); h.u.push(snap()); if (h.u.length > 150) h.u.shift(); h.r = []; syncUndo(); }
+function restore(s) { const keep = sel, m = fromJSON(JSON.parse(s)); delete maps[cur.id]; maps[m.id] = m; cur = m; sel = keep; if (!selObj()) sel = null; refreshAll(); persist(); }
+function undo() { const h = H(); if (!h.u.length) return; h.r.push(snap()); restore(h.u.pop()); syncUndo(); }
+function redo() { const h = H(); if (!h.r.length) return; h.u.push(snap()); restore(h.r.pop()); syncUndo(); }
+function syncUndo() { const h = cur ? H() : { u: [], r: [] }; $('bUndo').disabled = $('aUndo').disabled = !h.u.length; $('bRedo').disabled = $('aRedo').disabled = !h.r.length; }
+
+/* ===== Dibujo del mapa ===== */
+function sizeCanvases() {
+  const w = cur.ancho * T * zoom, h = cur.alto * T * zoom;
+  [cv, co, ov].forEach((c) => { c.width = w; c.height = h; c.style.width = w + 'px'; c.style.height = h + 'px'; });
+  cx.imageSmoothingEnabled = false;
+}
+function drawCell(x, y) {
+  const k = cur.grid[y][x]; cx.imageSmoothingEnabled = false;
+  cx.drawImage(tileCanvas(k, hsh(x, y, 11) % 4), x * T * zoom, y * T * zoom, T * zoom, T * zoom);
+}
+function drawBase() { for (let y = 0; y < cur.alto; y++) for (let x = 0; x < cur.ancho; x++) drawCell(x, y); }
+
+/* ===== Objetos con su dibujo real (v2.59, ED-1) ===== */
+// Mismo orden que el juego (src/capas.js): 1) piezas de capa «bajo» (planas), 2) piezas normales ordenadas por la Y de sus pies, 3) «encima» de todas (copas, tejados).
+const objCache = {};   // tipo → { base, encima, alfa } (alfa = dónde hay dibujo, para saber si se toca la pieza)
+function objDib(tipo) {
+  if (tipo in objCache) return objCache[tipo];
+  const d = OBJD[tipo]; if (!d) return (objCache[tipo] = null);
+  const mk = () => { const c = document.createElement('canvas'); c.width = d.w; c.height = d.h; const x = c.getContext('2d'); x.imageSmoothingEnabled = false; return [c, x]; };
+  const [base, cb] = mk(), [encima, ce] = mk(), [union, cu] = mk();
+  try { d.dibujar(cb, ce, T); } catch (e) { console.warn('No se pudo dibujar «' + tipo + '»', e); }
+  cu.drawImage(base, 0, 0); if (d.encima !== false) cu.drawImage(encima, 0, 0);
+  const px = cu.getImageData(0, 0, d.w, d.h).data, alfa = new Uint8Array(d.w * d.h); for (let i = 0; i < alfa.length; i++) alfa[i] = px[i * 4 + 3] > 20 ? 1 : 0;
+  return (objCache[tipo] = { base, encima, alfa });
+}
+// medidas de una pieza (si el tipo no existe en el juego: un cuadro de 16×16 para poder verla y borrarla)
+function objInfo(o) { const d = OBJD[o.tipo]; return d ? { w: d.w, h: d.h, ox: d.ox, oy: d.oy, pieY: d.pieY, huella: d.huella, capa: d.capa, encima: d.encima, falta: false } : { w: T, h: T, ox: 0, oy: 0, pieY: T, huella: [], capa: 'normal', encima: false, falta: true }; }
+function ordenObjetos(m) { // de abajo arriba, como se dibuja
+  const l = (m.objetos || []).map((o, i) => ({ o, i, d: objInfo(o) }));
+  const bajo = l.filter((q) => q.d.capa === 'bajo'), norm = l.filter((q) => q.d.capa !== 'bajo').map((q) => Object.assign(q, { y: q.o.y * T + q.d.pieY }));
+  norm.sort((a, b) => a.y - b.y || a.i - b.i);
+  return bajo.concat(norm);
+}
+let objCv = document.createElement('canvas');
+function renderObjetos() {
+  objCv.width = cur.ancho * T; objCv.height = cur.alto * T;
+  const c = objCv.getContext('2d'); c.imageSmoothingEnabled = false;
+  const lista = ordenObjetos(cur);
+  lista.forEach((q) => { const dib = objDib(q.o.tipo), px = q.o.x * T + q.d.ox, py = q.o.y * T + q.d.oy; if (dib) c.drawImage(dib.base, px, py); else { c.fillStyle = '#ff00ff'; c.fillRect(q.o.x * T, q.o.y * T, T, T); c.fillStyle = '#000'; c.fillRect(q.o.x * T, q.o.y * T, 8, 8); c.fillRect(q.o.x * T + 8, q.o.y * T + 8, 8, 8); } });
+  lista.forEach((q) => { const dib = objDib(q.o.tipo); if (dib && q.d.capa !== 'bajo' && q.d.encima !== false) c.drawImage(dib.encima, q.o.x * T + q.d.ox, q.o.y * T + q.d.oy); });
+}
+function refreshObjetos() { // vuelve a dibujar solo la capa de objetos (el suelo no se toca)
+  renderObjetos(); cox.clearRect(0, 0, co.width, co.height); cox.imageSmoothingEnabled = false;
+  if (showObj) cox.drawImage(objCv, 0, 0, objCv.width * zoom, objCv.height * zoom);
+}
+// casillas sólidas de una pieza colocada, y límites en los que puede estar su esquina (la huella debe quedar dentro del mapa)
+function huellaCeldas(o) { const r = []; objInfo(o).huella.forEach(([dx, dy, w, h]) => { for (let b = 0; b < h; b++) for (let a = 0; a < w; a++) r.push([o.x + dx + a, o.y + dy + b]); }); return r; }
+function limObj(o, W, H2) {
+  W = W || cur.ancho; H2 = H2 || cur.alto; let x0 = 0, y0 = 0, x1 = W - 1, y1 = H2 - 1;
+  objInfo(o).huella.forEach(([dx, dy, w, h]) => { x0 = Math.max(x0, -dx); y0 = Math.max(y0, -dy); x1 = Math.min(x1, W - dx - w); y1 = Math.min(y1, H2 - dy - h); });
+  return { x0, y0, x1: Math.max(x0, x1), y1: Math.max(y0, y1) };
+}
+function huellaDentro(o, W, H2) { const L = limObj(o, W, H2); return o.x >= L.x0 && o.x <= L.x1 && o.y >= L.y0 && o.y <= L.y1; }
+// ¿se toca la pieza en el punto (fx, fy) del mundo, en píxeles del juego? r = margen en píxeles (para dedos)
+function tocaPieza(q, fx, fy, r) {
+  const lx = Math.floor(fx - (q.o.x * T + q.d.ox)), ly = Math.floor(fy - (q.o.y * T + q.d.oy)), dib = objDib(q.o.tipo);
+  if (!dib) return lx >= -r && ly >= -r && lx < T + r && ly < T + r;
+  for (let b = ly - r; b <= ly + r; b++) for (let a = lx - r; a <= lx + r; a++) if (a >= 0 && b >= 0 && a < q.d.w && b < q.d.h && dib.alfa[b * q.d.w + a]) return true;
+  return false;
+}
+function hitObjeto(fx, fy) { // índice del objeto más arriba bajo el punto, o -1
+  const arriba = ordenObjetos(cur).reverse(), rd = Math.max(1, Math.ceil(6 / zoom));
+  let q = arriba.find((k) => tocaPieza(k, fx, fy, 0)) || arriba.find((k) => tocaPieza(k, fx, fy, rd));
+  if (!q) { const cx2 = Math.floor(fx / T), cy2 = Math.floor(fy / T); q = arriba.find((k) => huellaCeldas(k.o).some(([a, b]) => a === cx2 && b === cy2)); }
+  return q ? q.i : -1;
+}
+const ELCOL = { '': '#ffffff', hoja: '#5dae5a', fuego: '#f09a3e', agua: '#4d7fd6', electrico: '#f7d54a', aire: '#9fe3f2', roca: '#b9b4c4', sombra: '#8e5bc4' };
+let preview = null; // { x0,y0,x1,y1 } para rectángulo / zona
+function drawOverlay() {
+  const z = T * zoom; ox.clearRect(0, 0, ov.width, ov.height); ox.lineWidth = 1; const AV = analisis(cur), OBJS = cur.objetos || [];
+  if (showSol) { ox.fillStyle = 'rgba(255,60,60,.38)'; for (let y = 0; y < cur.alto; y++) for (let x = 0; x < cur.ancho; x++) if (isSolid(cur.grid[y][x])) ox.fillRect(x * z, y * z, z, z);
+    (cur.objetos || []).forEach((o) => huellaCeldas(o).forEach(([a, b]) => ox.fillRect(a * z, b * z, z, z))); }
+  if (showGrid && zoom >= 2) {
+    ox.strokeStyle = 'rgba(255,255,255,.13)'; ox.beginPath();
+    for (let x = 0; x <= cur.ancho; x++) { ox.moveTo(x * z + .5, 0); ox.lineTo(x * z + .5, cur.alto * z); }
+    for (let y = 0; y <= cur.alto; y++) { ox.moveTo(0, y * z + .5); ox.lineTo(cur.ancho * z, y * z + .5); }
+    ox.stroke();
+    ox.strokeStyle = 'rgba(255,255,255,.28)'; ox.beginPath();
+    for (let x = 0; x <= cur.ancho; x += 8) { ox.moveTo(x * z + .5, 0); ox.lineTo(x * z + .5, cur.alto * z); }
+    for (let y = 0; y <= cur.alto; y += 16) { ox.moveTo(0, y * z + .5); ox.lineTo(cur.ancho * z, y * z + .5); }
+    ox.stroke();
+  }
+  const isSel = (kind, key) => sel && sel.kind === kind && sel.key === key;
+  const celda = (a, b, lv) => { const col = lv === 'err' ? [255, 107, 94] : lv === 'warn' ? [247, 213, 74] : [125, 255, 231]; ox.fillStyle = 'rgba(' + col + ',.38)'; ox.fillRect(a * z, b * z, z, z); ox.strokeStyle = 'rgb(' + col + ')'; ox.lineWidth = 1.5; ox.strokeRect(a * z + .5, b * z + .5, z - 1, z - 1); };
+  const insignia = (a, b, lv) => { const r = Math.max(6, z * .3); ox.fillStyle = lv === 'err' ? '#ff6b5e' : '#f7d54a'; ox.strokeStyle = '#2a1b30'; ox.lineWidth = 2; ox.beginPath(); ox.arc(a * z + z - r * .6, b * z + r * .6, r, 0, 7); ox.fill(); ox.stroke(); ox.fillStyle = '#2a1b30'; ox.font = '700 ' + Math.round(r * 1.5) + 'px system-ui'; ox.textAlign = 'center'; ox.textBaseline = 'middle'; ox.fillText('!', a * z + z - r * .6, b * z + r * .6 + 1); ox.textAlign = 'start'; };
+  const marcas = (cs) => { const mk = new Map(); cs.forEach((c) => { const k = c.x + ',' + c.y; if (mk.get(k) !== 'err') mk.set(k, c.lv); }); return mk; };
+  const entradaMarca = (o) => { const e = entradaDe(o); if (!e) return; ox.strokeStyle = '#f09a3e'; ox.lineWidth = 2; ox.setLineDash([4, 3]); ox.strokeRect(e.delante[0] * z + 2, e.delante[1] * z + 2, z - 4, z - 4); ox.setLineDash([]); }; // naranja: delante de la puerta debe quedar libre
+  if (sel && sel.kind === 'objeto' && OBJS[sel.key]) { // contorno del dibujo y casillas sólidas (azul = bien; rojo = error; amarillo = aviso, ver conflictos)
+    const o = OBJS[sel.key], d = objInfo(o), mk = marcas(conflictos(cur, o, sel.key, AV));
+    ox.strokeStyle = '#fff'; ox.lineWidth = 2; ox.setLineDash([6, 4]); ox.strokeRect((o.x * T + d.ox) * zoom + 1, (o.y * T + d.oy) * zoom + 1, d.w * zoom - 2, d.h * zoom - 2); ox.setLineDash([]);
+    const hc = huellaCeldas(o); hc.forEach(([a, b]) => celda(a, b, mk.get(a + ',' + b) || 'ok'));
+    mk.forEach((lv, k) => { const [a, b] = k.split(',').map(Number); if (!hc.some(([c, e]) => c === a && e === b)) celda(a, b, lv); });
+    entradaMarca(o);
+    ox.strokeStyle = '#f7d54a'; ox.lineWidth = 2; ox.strokeRect(o.x * z + 1, o.y * z + 1, z - 2, z - 2); // casilla (x, y) de la pieza
+  }
+  if (showAv) OBJS.forEach((o, i) => { // «!» en las piezas con problemas (la elegida ya los muestra con sus casillas)
+    if (sel && sel.kind === 'objeto' && sel.key === i) return; const cs = conflictos(cur, o, i, AV); if (!cs.length) return;
+    const mk = marcas(cs); mk.forEach((lv, k) => { const [a, b] = k.split(',').map(Number); ox.fillStyle = lv === 'err' ? 'rgba(255,107,94,.35)' : 'rgba(247,213,74,.3)'; ox.fillRect(a * z, b * z, z, z); });
+    const c0 = cs.find((c) => c.lv === 'err') || cs[0]; insignia(c0.x, c0.y, c0.lv);
+  });
+  const label = (txt, x, y, col) => { ox.font = '600 ' + Math.max(10, zoom * 4) + 'px system-ui'; ox.textBaseline = 'top'; const w = ox.measureText(txt).width + 6; ox.fillStyle = 'rgba(20,14,30,.85)'; ox.fillRect(x, y, w, Math.max(14, zoom * 5)); ox.fillStyle = col; ox.fillText(txt, x + 3, y + 2); };
+  cur.zonas.forEach((q) => {
+    const col = ELCOL[q.elemento] || '#fff'; ox.fillStyle = col + '44'; ox.fillRect(q.x * z, q.y * z, q.w * z, q.h * z);
+    ox.strokeStyle = col; ox.lineWidth = isSel('zona', q.id) ? 3 : 1.5; ox.setLineDash([6, 4]); ox.strokeRect(q.x * z + 1, q.y * z + 1, q.w * z - 2, q.h * z - 2); ox.setLineDash([]);
+    label(q.id + (q.elemento ? ' · ' + q.elemento : ''), q.x * z + 2, q.y * z + 2, col);
+  });
+  Object.entries(cur.anclas).forEach(([n, [x, y]]) => {
+    ox.fillStyle = '#7dffe7'; ox.strokeStyle = '#10202a'; ox.lineWidth = 2; ox.beginPath();
+    ox.moveTo(x * z + z / 2, y * z + z * .1); ox.lineTo(x * z + z * .9, y * z + z / 2); ox.lineTo(x * z + z / 2, y * z + z * .9); ox.lineTo(x * z + z * .1, y * z + z / 2); ox.closePath(); ox.fill(); ox.stroke();
+    if (isSel('ancla', n)) { ox.strokeStyle = '#fff'; ox.lineWidth = 3; ox.strokeRect(x * z + 1, y * z + 1, z - 2, z - 2); }
+    label(n, x * z + z, y * z, '#7dffe7');
+  });
+  cur.puertas.forEach((p) => {
+    ox.fillStyle = 'rgba(240,154,62,.5)'; ox.fillRect(p.x * z, p.y * z, z, z); ox.strokeStyle = isSel('puerta', p.id) ? '#fff' : '#f09a3e'; ox.lineWidth = isSel('puerta', p.id) ? 3 : 2; ox.strokeRect(p.x * z + 1, p.y * z + 1, z - 2, z - 2);
+    label('→ ' + (p.destino.mapa || '?'), p.x * z + z, p.y * z, '#f09a3e');
+  });
+  cur.npcs.forEach((n) => {
+    ox.fillStyle = '#ff7df0'; ox.strokeStyle = isSel('npc', n.id) ? '#fff' : '#2a1b30'; ox.lineWidth = isSel('npc', n.id) ? 3 : 2; ox.beginPath(); ox.arc(n.x * z + z / 2, n.y * z + z / 2, z * .36, 0, 7); ox.fill(); ox.stroke();
+    label(n.id, n.x * z + z, n.y * z, '#ff7df0');
+  });
+  // marcas de conexión de borde
+  ox.fillStyle = '#7dffe7'; const e = Math.max(3, zoom * 2);
+  if (cur.conexiones.norte) ox.fillRect(0, 0, cur.ancho * z, e); if (cur.conexiones.sur) ox.fillRect(0, cur.alto * z - e, cur.ancho * z, e);
+  if (cur.conexiones.oeste) ox.fillRect(0, 0, e, cur.alto * z); if (cur.conexiones.este) ox.fillRect(cur.ancho * z - e, 0, e, cur.alto * z);
+  const gh = fantasma(); // la pieza que se está poniendo (transparente) con sus avisos
+  if (gh) {
+    const d = objInfo(gh), dib = objDib(gh.tipo), mk = marcas(conflictos(cur, gh, -1, AV));
+    if (dib) { ox.save(); ox.globalAlpha = .62; ox.imageSmoothingEnabled = false; const px = (gh.x * T + d.ox) * zoom, py = (gh.y * T + d.oy) * zoom; ox.drawImage(dib.base, px, py, d.w * zoom, d.h * zoom); if (d.encima !== false) ox.drawImage(dib.encima, px, py, d.w * zoom, d.h * zoom); ox.restore(); }
+    const hc = huellaCeldas(gh); hc.forEach(([a, b]) => celda(a, b, mk.get(a + ',' + b) || 'ok'));
+    mk.forEach((lv, k) => { const [a, b] = k.split(',').map(Number); if (!hc.some(([c, e]) => c === a && e === b)) celda(a, b, lv); });
+    entradaMarca(gh); ox.strokeStyle = '#fff'; ox.lineWidth = 2; ox.strokeRect(ghost.x * z + 1, ghost.y * z + 1, z - 2, z - 2);
+  }
+  if (preview) {
+    const x0 = Math.min(preview.x0, preview.x1), x1 = Math.max(preview.x0, preview.x1), y0 = Math.min(preview.y0, preview.y1), y1 = Math.max(preview.y0, preview.y1);
+    ox.strokeStyle = '#fff'; ox.lineWidth = 2; ox.setLineDash([5, 3]); ox.strokeRect(x0 * z + 1, y0 * z + 1, (x1 - x0 + 1) * z - 2, (y1 - y0 + 1) * z - 2); ox.setLineDash([]);
+  }
+}
+
+/* ===== Piezas, avisos y paleta (v2.60, ED-2) ===== */
+// Nombre amable y grupo de cada pieza del catálogo del juego (G.OBJETOS). Una pieza nueva del juego sale sola, en «Otras», con su nombre interno.
+const PIEZAS = {
+  casa: ['Casa', 'Edificios'], casa_lali: ['Casa de Oli (fachada azul)', 'Edificios'], casa_oli: ['Casa de Lali (fachada rosa)', 'Edificios'], laboratorio: ['Laboratorio', 'Edificios'], centro_pc: ['Centro PC', 'Edificios'], tienda: ['Tienda', 'Edificios'], ermita: ['Ermita', 'Edificios'],
+  fuente: ['Fuente', 'Plaza'], banco: ['Banco', 'Plaza'], farola: ['Farola', 'Plaza'], maceta: ['Maceta', 'Plaza'], maceta_i: ['Maceta (borde izq.)', 'Plaza'], cartel: ['Cartel', 'Plaza'], cartel_carbuna: ['Cartel de Carbuna', 'Plaza'], brasero_carbuna: ['Brasero de Carbuna', 'Plaza'], barril: ['Barril', 'Plaza'],
+  valla_ni: ['Valla corta (izq.)', 'Huerto y vallas'], valla_nd: ['Valla corta (der.)', 'Huerto y vallas'], valla_9: ['Valla larga (9)', 'Huerto y vallas'], valla_v: ['Valla vertical (6)', 'Huerto y vallas'], huerto: ['Huerto', 'Huerto y vallas'], espantapajaros: ['Espantapájaros', 'Huerto y vallas'],
+  boca_cueva: ['Boca de cueva (Profundidades)', 'Naturaleza'], roca: ['Roca', 'Naturaleza'], piedras: ['Piedras', 'Naturaleza'], hierba_alta: ['Hierba alta', 'Naturaleza'],
+  carbuna_penasco: ['Peñasco de basalto', 'Carbuna'], carbuna_arbol_seco: ['Árbol calcinado', 'Carbuna'], carbuna_grieta: ['Grieta con brasas', 'Carbuna'], carbuna_mata: ['Mata seca', 'Carbuna'],
+  juncos2: ['Juncos (2)', 'Agua'], juncos3: ['Juncos (3)', 'Agua'], nenufar: ['Nenúfar', 'Agua'], nenufar_flor: ['Nenúfar con flor', 'Agua'], puente_albanota: ['Puente', 'Agua'],
+  sala_centro_pc: ['Sala del Centro PC (suelo y paredes)', 'Interiores'], sala_tienda: ['Sala de la Tienda (suelo y paredes)', 'Interiores'], sala_laboratorio: ['Sala del Laboratorio (suelo y paredes)', 'Interiores'], sala_casa_oli: ['Sala de la Casa de Oli (suelo y paredes)', 'Interiores'], sala_casa_lali: ['Sala de la Casa de Lali (suelo y paredes)', 'Interiores'], sala_ermita: ['Sala de la Ermita (suelo y paredes)', 'Interiores'], sala_cabana: ['Sala de la Cabaña del Santuario (suelo y paredes)', 'Interiores'], altar_mayor: ['Altar mayor de la Ermita', 'Interiores'], pedestal_eco_azul: ['Pedestal del eco (azul)', 'Interiores'], pedestal_eco_rosa: ['Pedestal del eco (rosa)', 'Interiores'], mesa_sillas_lali: ['Mesa con dos sillas (rosa)', 'Interiores'], estante_oli: ['Estante de aventurero', 'Interiores'], mesa_sillas: ['Mesa con dos sillas', 'Interiores'], consola_lab: ['Consola de cristales (violeta)', 'Interiores'], incubadora_lab: ['Incubadora (violeta)', 'Interiores'], mesa_lab: ['Mesa de estudio', 'Interiores'], estante_lab: ['Estante del laboratorio', 'Interiores'], escaner: ['Escáner de criaturas', 'Interiores'], mostrador_centro: ['Mostrador del Centro PC (con máquina)', 'Interiores'], mostrador_madera: ['Mostrador de madera', 'Interiores'], terminal_pc: ['Terminal de ordenador', 'Interiores'], banco_doble: ['Banco doble (azul-rosa)', 'Interiores'], banco_doble_e: ['Banco doble (rosa-azul)', 'Interiores'], planta_interior: ['Planta', 'Interiores'], estante: ['Estante de madera', 'Interiores'], estante_clinico: ['Estante clínico', 'Interiores'], cama_azul: ['Cama azul (Casa de Oli)', 'Interiores'], cama_rosa: ['Cama rosa (Casa de Lali)', 'Interiores'], mesa: ['Mesa', 'Interiores'], incubadora: ['Incubadora', 'Interiores'], consola_cristales: ['Consola de los 7 cristales', 'Interiores'], vitrina: ['Vitrina de tienda (gema)', 'Interiores'], vitrina_frasco: ['Vitrina de tienda (frasco)', 'Interiores'], estante_tienda: ['Estante de tienda (productos)', 'Interiores'], mostrador_tienda: ['Mostrador de tienda (verde)', 'Interiores'], mesa_exhibicion: ['Mesa de exhibición (cestas)', 'Interiores'], barril_frutas: ['Barril con frutas', 'Interiores'], sacos_cajas: ['Sacos y cajas', 'Interiores'], altar: ['Altar de la ermita', 'Interiores'],
+  arbol_pequeno: ['Árbol pequeño', 'Árboles'], arbol_mediano: ['Árbol mediano', 'Árboles'], abeto: ['Abeto', 'Árboles'], roble_hito: ['Roble grande', 'Árboles'],
+};
+const CATS = ['Edificios', 'Plaza', 'Huerto y vallas', 'Agua', 'Árboles', 'Interiores', 'Otras'];
+// Edificios: casilla de su puerta (el hueco de la fachada) respecto a (x, y); la casilla de DELANTE (y + 1) debe poder pisarse.
+const PUERTA_PIEZA = { casa: [2, 4], casa_lali: [2, 4], casa_oli: [2, 4], laboratorio: [2, 4], centro_pc: [3, 4], tienda: [2, 3], ermita: [2, 4] };
+function piezaInfo(t) { const n = PIEZAS[t]; return { nombre: n ? n[0] : t, cat: n ? n[1] : 'Otras' }; }
+// Al tocar el mapa, la pieza se pone «por los pies»: la casilla tocada es el centro de abajo de su parte sólida (en las piezas sin parte sólida, el centro del dibujo). Devuelve [dx, dy] desde (x, y) de la pieza.
+function anclaPieza(tipo) {
+  const d = OBJD[tipo]; if (!d) return [0, 0];
+  if (d.huella.length) { let x0 = 1e9, x1 = -1e9, y1 = -1e9; d.huella.forEach(([dx, dy, w, h]) => { x0 = Math.min(x0, dx); x1 = Math.max(x1, dx + w - 1); y1 = Math.max(y1, dy + h - 1); }); return [Math.floor((x0 + x1) / 2), y1]; }
+  return [Math.floor((d.ox + d.w / 2) / T), Math.floor((d.oy + d.h / 2) / T)];
+}
+function entradaDe(o) { const p = PUERTA_PIEZA[o.tipo]; return p ? { puerta: [o.x + p[0], o.y + p[1]], delante: [o.x + p[0], o.y + p[1] + 1] } : null; }
+// casilla → índices de las piezas cuya parte sólida la ocupa
+function analisis(m) { const oc = new Map(); (m.objetos || []).forEach((q, i) => huellaCeldas(q).forEach(([a, b]) => { const k = a + ',' + b; if (!oc.has(k)) oc.set(k, []); oc.get(k).push(i); })); return oc; }
+function agrupa(cs) { // junta los avisos iguales de varias casillas en uno
+  const g = new Map(); cs.forEach((c) => { const k = c.lv + '|' + c.t; if (!g.has(k)) g.set(k, { lv: c.lv, t: c.t, n: 0, x: c.x, y: c.y }); g.get(k).n++; });
+  return [...g.values()].sort((a, b) => (a.lv === 'err' ? 0 : 1) - (b.lv === 'err' ? 0 : 1));
+}
+// «Sitios de aparición» de una zona: las mismas reglas que G.aparicion.libre (casilla libre con sus 4 vecinas libres y sin puerta); sol(x, y) dice si una casilla es sólida.
+function libresZona(m, z, sol) { let n = 0; const pu = new Set(m.puertas.map((p) => p.x + ',' + p.y)); for (let y = z.y; y < z.y + z.h; y++) for (let x = z.x; x < z.x + z.w; x++) if (!sol(x, y) && !sol(x - 1, y) && !sol(x + 1, y) && !sol(x, y - 1) && !sol(x, y + 1) && !pu.has(x + ',' + y)) n++; return n; }
+// Problemas de UNA pieza (índice i en m.objetos; -1 = una pieza que aún no está puesta): [{x, y, lv: 'err' | 'warn', t}]. oc = analisis(m).
+// Error = el juego lo rechaza o deja algo sin poder usarse (puerta, ancla, guarida, entrada de un edificio, zona sin sitio); aviso = probablemente no es lo que quieres.
+function conflictos(m, o, i, oc) {
+  const out = [], add = (x, y, lv, t) => out.push({ x, y, lv, t }), cel = huellaCeldas(o), propias = new Set(cel.map(([a, b]) => a + ',' + b));
+  const otros = (k) => (oc.get(k) || []).filter((j) => j !== i), solT = (a, b) => a < 0 || b < 0 || a >= m.ancho || b >= m.alto || isSolid(m.grid[b][a]);
+  const pu = new Map(m.puertas.map((p) => [p.x + ',' + p.y, p])), an = new Map(Object.entries(m.anclas).map(([n, v]) => [v[0] + ',' + v[1], n])), np = new Map(m.npcs.map((n) => [n.x + ',' + n.y, n]));
+  cel.forEach(([a, b]) => {
+    const k = a + ',' + b; if (a < 0 || b < 0 || a >= m.ancho || b >= m.alto) { add(a, b, 'err', 'su parte sólida se sale del mapa'); return; }
+    const t = m.grid[b][a];
+    if (t === '~') add(a, b, 'warn', 'su parte sólida pisa el agua'); else if (isSolid(t)) add(a, b, 'warn', 'su parte sólida pisa una casilla sólida (' + TMAP[t].n.toLowerCase() + ')');
+    otros(k).forEach((j) => add(a, b, 'warn', 'se solapa con «' + m.objetos[j].tipo + '»'));
+    if (pu.has(k)) add(a, b, 'err', 'tapa la puerta «' + pu.get(k).id + '»');
+    if (an.has(k)) add(a, b, 'err', 'tapa el ancla «' + an.get(k) + '»');
+    if (np.has(k)) add(a, b, np.get(k).tipo === 'guarida' ? 'err' : 'warn', 'tapa ' + (np.get(k).tipo === 'guarida' ? 'la guarida «' : 'al personaje «') + np.get(k).id + '»');
+  });
+  (m.objetos || []).forEach((q, j) => { // entrada de OTROS edificios
+    if (j === i) return; const e = entradaDe(q); if (!e) return;
+    if (propias.has(e.puerta.join(','))) add(e.puerta[0], e.puerta[1], 'err', 'tapa la puerta de «' + q.tipo + '» (' + q.x + ', ' + q.y + ')');
+    else if (propias.has(e.delante.join(','))) add(e.delante[0], e.delante[1], 'err', 'tapa la entrada de «' + q.tipo + '» (' + q.x + ', ' + q.y + '): delante de su puerta no se puede pasar');
+  });
+  const e = entradaDe(o); // la entrada de ESTA pieza, si es un edificio
+  if (e) [e.puerta, e.delante].forEach(([a, b], n) => {
+    const k = a + ',' + b, ot = otros(k);
+    if (solT(a, b)) add(a, b, 'err', n ? 'delante de su puerta hay una casilla sólida (o el borde del mapa)' : 'su puerta cae sobre una casilla sólida'); else if (ot.length) add(a, b, 'err', (n ? 'delante de su puerta' : 'en su puerta') + ' hay «' + m.objetos[ot[0]].tipo + '»');
+  });
+  (m.zonas || []).forEach((z) => { // sitios de aparición de las zonas que toca
+    if (!cel.some(([a, b]) => a >= z.x - 1 && a <= z.x + z.w && b >= z.y - 1 && b <= z.y + z.h)) return;
+    const n1 = libresZona(m, z, (a, b) => solT(a, b) || (oc.get(a + ',' + b) || []).length > 0 || propias.has(a + ',' + b)), n0 = libresZona(m, z, (a, b) => solT(a, b) || otros(a + ',' + b).length > 0);
+    if (n0 > 0 && n1 === 0) add(o.x, o.y, 'err', 'deja sin ningún sitio de aparición la zona «' + z.id + '»');
+    else if (n0 > 0 && n1 < n0 / 2) add(o.x, o.y, 'warn', 'quita más de la mitad de los sitios de aparición de la zona «' + z.id + '» (' + n0 + ' → ' + n1 + ')');
+  });
+  perdidas(m, o, i, oc).forEach((q) => out.push(q));
+  return out;
+}
+// Lo que deja de poder alcanzarse a pie desde «inicio» (o la primera ancla) por culpa de ESTA pieza: tramos de camino (aviso) y puertas, anclas y entradas de edificios (error).
+function perdidas(m, o, i, oc) {
+  const st = m.anclas.inicio || Object.values(m.anclas)[0], cel = huellaCeldas(o); if (!st || !cel.length) return [];
+  const propias = new Set(cel.map(([a, b]) => a + ',' + b)), libre = (x, y, con) => x >= 0 && y >= 0 && x < m.ancho && y < m.alto && !isSolid(m.grid[y][x]) && !(oc.get(x + ',' + y) || []).some((j) => j !== i) && !(con && propias.has(x + ',' + y));
+  if (!libre(st[0], st[1], true)) return []; // la pieza tapa el ancla: eso ya se avisa aparte
+  const bfs = (con) => { const vis = new Set([st[0] + ',' + st[1]]), pila = [[st[0], st[1]]]; while (pila.length) { const [a, b] = pila.pop(); [[1, 0], [-1, 0], [0, 1], [0, -1]].forEach(([dx, dy]) => { const nx = a + dx, ny = b + dy, k = nx + ',' + ny; if (!vis.has(k) && libre(nx, ny, con)) { vis.add(k); pila.push([nx, ny]); } }); } return vis; };
+  const sin = bfs(false), con = bfs(true), perdida = (x, y) => sin.has(x + ',' + y) && !con.has(x + ',' + y) && !propias.has(x + ',' + y), out = [];
+  let n = 0, p0 = null; sin.forEach((k) => { if (con.has(k) || propias.has(k)) return; const [a, b] = k.split(',').map(Number), c = m.grid[b][a]; if (c === '=' || c === 'b') { n++; if (!p0) p0 = [a, b]; } });
+  if (n) out.push({ x: p0[0], y: p0[1], lv: 'warn', t: 'corta el camino: ' + n + ' casilla(s) de camino quedan sin poder alcanzarse a pie' });
+  m.puertas.forEach((q) => { if (perdida(q.x, q.y)) out.push({ x: q.x, y: q.y, lv: 'err', t: 'deja sin acceso la puerta «' + q.id + '»' }); });
+  Object.entries(m.anclas).forEach(([nom, v]) => { if (perdida(v[0], v[1])) out.push({ x: v[0], y: v[1], lv: 'err', t: 'deja sin acceso el ancla «' + nom + '»' }); });
+  (m.objetos || []).forEach((q, j) => { if (j === i) return; const e = entradaDe(q); if (e && perdida(e.delante[0], e.delante[1])) out.push({ x: e.delante[0], y: e.delante[1], lv: 'err', t: 'deja sin acceso la entrada de «' + q.tipo + '» (' + q.x + ', ' + q.y + ')' }); });
+  return out;
+}
+function fantasma() { // la pieza que se pondría ahora (según la casilla bajo el dedo o el ratón), ya encajada dentro del mapa
+  if (tool !== 'pieza' || !pieza || !ghost || !OBJD[pieza]) return null;
+  const a = anclaPieza(pieza), g = { tipo: pieza, x: ghost.x - a[0], y: ghost.y - a[1] }, L = limObj(g);
+  g.x = clamp(g.x, L.x0, L.x1); g.y = clamp(g.y, L.y0, L.y1); return g;
+}
+function ponerPieza(cx, cy) {
+  if (!pieza || !OBJD[pieza]) return; ghost = { x: cx, y: cy }; const g = fantasma(); if (!g) return;
+  pushUndo(); cur.objetos.push(g); const i = cur.objetos.length - 1; sel = { kind: 'objeto', key: i };
+  const cs = agrupa(conflictos(cur, g, i, analisis(cur)));
+  accExtra = 'Puesta en (' + g.x + ', ' + g.y + ')' + (cs.length ? ' <span style="color:' + (cs[0].lv === 'err' ? 'var(--err)' : 'var(--warn)') + '">⚠ ' + esc(cs[0].t) + (cs.length > 1 ? ' (+' + (cs.length - 1) + ')' : '') + '</span>' : ' ✓');
+  ghost = null; refreshObjetos(); drawOverlay(); refreshObjPanel(); refreshStats(); persist();
+}
+function miniatura(tipo) { // dibujo de la pieza en pequeño para la paleta
+  const d = OBJD[tipo], dib = objDib(tipo), c = document.createElement('canvas'), mx = Math.max(d.w, d.h), s = mx <= 26 ? 2 : mx <= 52 ? 1 : 52 / mx;
+  c.width = Math.max(1, Math.round(d.w * s)); c.height = Math.max(1, Math.round(d.h * s));
+  const x = c.getContext('2d'); x.imageSmoothingEnabled = s < 1; if (s < 1) x.imageSmoothingQuality = 'high';
+  if (dib) { x.drawImage(dib.base, 0, 0, c.width, c.height); if (d.encima !== false) x.drawImage(dib.encima, 0, 0, c.width, c.height); }
+  return c;
+}
+function elegirPieza(t) { pieza = t; if ($('dlgP').open) $('dlgP').close(); setTool('pieza'); }
+function buildPiezas(host, enDialogo) {
+  host.innerHTML = ''; const g = {};
+  Object.keys(OBJD).forEach((t) => { const c = piezaInfo(t).cat; (g[c] = g[c] || []).push(t); });
+  CATS.concat(Object.keys(g).filter((c) => !CATS.includes(c))).forEach((c) => {
+    if (!g[c]) return; const h = document.createElement('h2'); h.className = 'cat'; h.textContent = c; host.appendChild(h);
+    const box = document.createElement('div'); box.className = 'pz'; host.appendChild(box);
+    g[c].forEach((t) => {
+      const d = OBJD[t], el = document.createElement('div'), cv = document.createElement('div'), sp = document.createElement('span'); el.className = 'tile'; el.dataset.p = t;
+      el.title = piezaInfo(t).nombre + ' · dibujo de ' + d.w + '×' + d.h + ' px · ' + (d.huella.length ? 'tiene parte sólida' : 'no estorba al pasar');
+      cv.className = 'cv'; cv.appendChild(miniatura(t)); sp.textContent = piezaInfo(t).nombre; el.append(cv, sp); el.onclick = () => elegirPieza(t); box.appendChild(el);
+    });
+  });
+}
+function abrirPaleta() { const d = $('dlgP'); if (!d.open) d.showModal(); syncUI(); }
+function irA(x, y) { const st = $('stage'), z = T * zoom; st.scrollTo({ left: Math.max(0, x * z - st.clientWidth / 2 + 12), top: Math.max(0, y * z - st.clientHeight / 2 + 12) }); }
+
+/* ===== Interfaz: herramientas y paleta ===== */
+const TOOLS = [
+ ['lapiz', 'Lápiz', 'P'], ['goma', 'Goma', 'G'], ['rect', 'Rectángulo', 'R'], ['relleno', 'Rellenar', 'F'], ['gota', 'Cuentagotas', 'I'],
+ ['sel', 'Seleccionar', 'S'], ['pieza', 'Añadir pieza', 'O'], ['ancla', 'Ancla', 'A'], ['puerta', 'Puerta', 'D'], ['zona', 'Zona', 'Z'], ['npc', 'Personaje', 'N'], ['mano', 'Mover vista', 'H'],
+];
+function buildTools() {
+  $('tools').innerHTML = '';
+  TOOLS.forEach(([id, n, kk]) => { const b = document.createElement('button'); b.dataset.t = id; b.innerHTML = n + '<kbd>' + kk + '</kbd>'; b.onclick = () => setTool(id); $('tools').appendChild(b); });
+  const pal = $('pal'); pal.innerHTML = '';
+  TILES.forEach((t) => {
+    const d = document.createElement('div'); d.className = 'tile'; d.dataset.k = t.k; d.title = t.n + (t.solid ? ' (sólida)' : '');
+    const c = document.createElement('canvas'); c.width = c.height = T; c.getContext('2d').drawImage(tileCanvas(t.k, 0), 0, 0);
+    const s = document.createElement('span'); s.textContent = t.n; d.append(c, s);
+    if (!t.game) { const n = document.createElement('span'); n.className = 'nuevo'; n.textContent = 'nuevo'; d.appendChild(n); }
+    d.onclick = () => { tile = t.k; if (!['lapiz', 'rect', 'relleno'].includes(tool)) setTool('lapiz'); syncUI(); };
+    pal.appendChild(d);
+  });
+  buildPiezas($('piezas'), false); buildPiezas($('hojaP'), true);
+  const sb = $('mBase'); sb.innerHTML = TILES.map((t) => '<option value="' + t.k + '">' + t.n + '</option>').join('');
+}
+function setTool(t) { tool = t; preview = null; ghost = null; accExtra = ''; syncUI(); drawOverlay(); if (t === 'pieza' && !pieza) abrirPaleta(); }
+function syncUI() {
+  document.querySelectorAll('#tools button').forEach((b) => b.classList.toggle('on', b.dataset.t === tool));
+  document.querySelectorAll('#pal .tile').forEach((d) => d.classList.toggle('on', d.dataset.k === tile));
+  $('bGrid').classList.toggle('on', showGrid); $('bSol').classList.toggle('on', showSol); $('bAv').classList.toggle('on', showAv); $('zoomL').textContent = '×' + zoom;
+  document.querySelectorAll('.tile[data-p]').forEach((d) => d.classList.toggle('on', tool === 'pieza' && d.dataset.p === pieza));
+  $('aListo').hidden = tool !== 'pieza'; $('aPieza').classList.toggle('on', tool === 'pieza'); syncAcc();
+  const tn = (TOOLS.find((x) => x[0] === tool) || [])[1];
+  $('sTool').textContent = 'Herramienta: ' + tn + (['lapiz', 'rect', 'relleno'].includes(tool) ? ' · casilla «' + (TMAP[tile] ? TMAP[tile].n : tile) + '»' : '') + (tool === 'pieza' && pieza ? ' · pieza «' + piezaInfo(pieza).nombre + '»' : '');
+}
+function mapList() { return Object.keys(maps).sort(); }
+function refreshSelect() { $('mapSel').innerHTML = mapList().map((id) => '<option value="' + id + '"' + (cur && cur.id === id ? ' selected' : '') + '>' + id + ' (' + maps[id].ancho + '×' + maps[id].alto + ')</option>').join(''); }
+
+/* --- panel de mapa / conexiones / estadísticas --- */
+function refreshMapPanel() {
+  $('mId').value = cur.id; $('mNombre').value = cur.nombre; $('mBase').value = cur.base;
+  const rows = [['norte', 'Norte'], ['sur', 'Sur'], ['este', 'Este'], ['oeste', 'Oeste']];
+  const opts = ['<option value="">— sin conexión —</option>'].concat(mapList().filter((i) => i !== cur.id).map((i) => '<option value="' + i + '">' + i + '</option>')).join('');
+  $('conn').innerHTML = rows.map(([s, n]) => '<label>' + n + '</label><div class="row"><select data-s="' + s + '">' + opts + '</select><input type="number" data-d="' + s + '" title="Desplazamiento" value="' + (cur.conexiones[s] ? cur.conexiones[s].desplazamiento : 0) + '"></div>').join('');
+  rows.forEach(([s]) => {
+    const sel2 = $('conn').querySelector('select[data-s=' + s + ']'), num = $('conn').querySelector('input[data-d=' + s + ']');
+    sel2.value = cur.conexiones[s] ? cur.conexiones[s].mapa : '';
+    const upd = () => { pushUndo(); cur.conexiones[s] = sel2.value ? { mapa: sel2.value, desplazamiento: num.valueAsNumber | 0 } : null; drawOverlay(); persist(); };
+    sel2.onchange = upd; num.onchange = upd;
+  });
+}
+function refreshStats() {
+  const casillas = cur.ancho * cur.alto, ref = ACTUAL.ancho * ACTUAL.alto, json = JSON.stringify(toJSON(cur)).length, ascii = casillas + cur.alto;
+  const px = cur.ancho * T, py = cur.alto * T, mem = px * py * 4;
+  const f = (n, d = 1) => n.toLocaleString('es-ES', { maximumFractionDigits: d });
+  $('stats').innerHTML = [
+    ['Casillas', cur.ancho + ' × ' + cur.alto + ' = ' + f(casillas, 0)],
+    ['Píxeles del juego', px + ' × ' + py],
+    ['Frente al mapa actual (36×26)', '×' + f(casillas / ref, 2)],
+    ['Pantallas de móvil', f(cur.ancho / PANTALLA.ancho, 1) + ' × ' + f(cur.alto / PANTALLA.alto, 1)],
+    ['Peso en texto (suelo)', f(ascii / 1024, 1) + ' KB'],
+    ['Peso del archivo JSON', f(json / 1024, 1) + ' KB'],
+    ['Memoria al dibujarlo', f(mem / 1048576, 2) + ' MB'],
+  ].map(([a, b]) => '<tr><td>' + a + '</td><td>' + b + '</td></tr>').join('');
+}
+
+/* --- panel de objeto seleccionado --- */
+function selObj() {
+  if (!sel) return null;
+  if (sel.kind === 'ancla') return cur.anclas[sel.key] ? { kind: 'ancla', name: sel.key, pos: cur.anclas[sel.key] } : null;
+  if (sel.kind === 'objeto') { const q = (cur.objetos || [])[sel.key]; return q ? { kind: 'objeto', o: q, i: sel.key } : null; }
+  const list = sel.kind === 'puerta' ? cur.puertas : sel.kind === 'zona' ? cur.zonas : cur.npcs;
+  const o = list.find((q) => q.id === sel.key); return o ? { kind: sel.kind, o } : null;
+}
+const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+function refreshObjPanel() {
+  const p = $('objPanel'), s = selObj();
+  if (!s) { p.innerHTML = '<p class="hint">Elige la herramienta Seleccionar (S) y pulsa un objeto.</p>'; syncAcc(); return; }
+  const field = (lab, id, val, type) => '<label>' + lab + '</label><input id="' + id + '" type="' + (type || 'text') + '" value="' + esc(val) + '">';
+  let h = '<p class="hint"><b>' + { ancla: 'Ancla', puerta: 'Puerta', zona: 'Zona de aparición', npc: 'Personaje', objeto: 'Objeto · ' + esc(s.kind === 'objeto' ? s.o.tipo : '') }[s.kind] + '</b>' + (s.kind === 'objeto' && objInfo(s.o).falta ? ' <span style="color:var(--err)">(ese tipo no existe en el juego)</span>' : '') + '</p>';
+  if (s.kind === 'objeto') { const o = s.o, inf = objInfo(o), n = huellaCeldas(o).length;
+    h += '<div class="row">' + field('X', 'oX', o.x, 'number') + field('Y', 'oY', o.y, 'number') + '</div><div class="nudge"><button data-m="-1,0">◀</button><button data-m="0,-1">▲</button><button data-m="0,1">▼</button><button data-m="1,0">▶</button></div>' +
+      '<p class="hint">Dibujo de ' + inf.w + '×' + inf.h + ' px · ' + (n ? n + ' casilla(s) sólida(s) (en el mapa: azul = bien, amarillo = aviso, rojo = error)' : 'sin casillas sólidas (no estorba)') + ' · capa «' + (inf.capa === 'bajo' ? 'suelo' : 'normal') + '». Amarillo = casilla (x, y) de la pieza.</p>' +
+      (() => { const g = agrupa(conflictos(cur, o, s.i, analisis(cur))); return g.length ? '<ul class="avs">' + g.map((q) => '<li class="' + q.lv + '">' + esc(q.t) + (q.n > 1 ? ' <b>(' + q.n + ' casillas)</b>' : '') + '</li>').join('') + '</ul>' : '<p class="hint" style="color:var(--ok)">✓ No tapa ninguna puerta, camino ni sitio de aparición.</p>'; })() +
+      '<div class="row"><button id="oCopy">Copiar</button></div>'; }
+  if (s.kind === 'ancla') h += field('Nombre', 'oId', s.name) + '<div class="row">' + field('X', 'oX', s.pos[0], 'number') + field('Y', 'oY', s.pos[1], 'number') + '</div><p class="hint">Un ancla es un punto con nombre: sitio de llegada de puertas y de otros mapas. Nunca se cita por coordenadas.</p>';
+  if (s.kind === 'puerta') {
+    const o = s.o; const others = mapList();
+    h += field('Identificador', 'oId', o.id) + '<div class="row">' + field('X', 'oX', o.x, 'number') + field('Y', 'oY', o.y, 'number') + '</div>' +
+      '<label>Mapa de destino</label><select id="oDm"><option value="">—</option>' + others.map((i) => '<option value="' + i + '">' + i + '</option>').join('') + '<option value="@prof">@prof · boca de las Profundidades</option></select>' +
+      '<label>Ancla de llegada</label><input id="oDa" list="anclasDest" value="' + esc(o.destino.ancla) + '"><datalist id="anclasDest">' + (maps[o.destino.mapa] ? Object.keys(maps[o.destino.mapa].anclas).map((a) => '<option value="' + esc(a) + '">').join('') : '') + '</datalist>' +
+      '<p class="hint">Con «@prof» (v2.320) la puerta es una boca de las Profundidades y el ancla es el bioma de entrada: cristal, mina, hongos, inundada o hielo.</p><p class="hint">Usa «volver» como ancla para regresar a la puerta de la que se vino (Centro PC compartido).</p>';
+  }
+  if (s.kind === 'zona') {
+    const o = s.o; h += field('Identificador', 'oId', o.id) + '<div class="row">' + field('X', 'oX', o.x, 'number') + field('Y', 'oY', o.y, 'number') + '</div><div class="row">' + field('Ancho', 'oW', o.w, 'number') + field('Alto', 'oH', o.h, 'number') + '</div>' +
+      '<label>Elemento</label><select id="oEl">' + ELEMENTOS.map((e) => '<option value="' + e + '">' + (e || '(general)') + '</option>').join('') + '</select>' + field('Nota (pesos, guarida…)', 'oNota', o.nota);
+  }
+  if (s.kind === 'npc') {
+    const o = s.o; h += field('Identificador', 'oId', o.id) + '<div class="row">' + field('X', 'oX', o.x, 'number') + field('Y', 'oY', o.y, 'number') + '</div><label>Tipo</label><select id="oTipo">' + NPC_TIPOS.map((e) => '<option>' + e + '</option>').join('') + '</select><label>Texto / diálogo</label><textarea id="oTxt" style="width:100%;height:70px">' + esc(o.texto) + '</textarea>';
+  }
+  h += '<div class="row" style="margin-top:8px"><button id="oDel" class="danger">Borrar objeto</button></div>';
+  p.innerHTML = h;
+  const bind = (id, fn) => { const e = $(id); if (e) e.onchange = () => { pushUndo(); fn(e); drawOverlay(); refreshObjPanel(); persist(); }; };
+  const num = (e) => e.valueAsNumber | 0;
+  const uniq = (list, id, self) => { let n = slug(id), b = n, i = 2; while (list.some((q) => q !== self && q.id === n)) n = b + '_' + i++; return n; };
+  if (s.kind === 'objeto') {
+    const o = s.o; bind('oX', (e) => { const L = limObj(o); o.x = clamp(num(e), L.x0, L.x1); refreshObjetos(); }); bind('oY', (e) => { const L = limObj(o); o.y = clamp(num(e), L.y0, L.y1); refreshObjetos(); });
+    $('oCopy').onclick = copySel; $('objPanel').querySelectorAll('.nudge button').forEach((b) => b.onclick = () => nudge(b.dataset.m));
+  } else if (s.kind === 'ancla') {
+    bind('oId', (e) => { const n = slug(e.value); if (n !== s.name && !cur.anclas[n]) { cur.anclas[n] = cur.anclas[s.name]; delete cur.anclas[s.name]; sel.key = n; } });
+    bind('oX', (e) => { cur.anclas[sel.key][0] = clamp(num(e), 0, cur.ancho - 1); }); bind('oY', (e) => { cur.anclas[sel.key][1] = clamp(num(e), 0, cur.alto - 1); });
+  } else {
+    const o = s.o, list = s.kind === 'puerta' ? cur.puertas : s.kind === 'zona' ? cur.zonas : cur.npcs;
+    bind('oId', (e) => { o.id = uniq(list, e.value, o); sel.key = o.id; });
+    bind('oX', (e) => { o.x = clamp(num(e), 0, cur.ancho - 1); }); bind('oY', (e) => { o.y = clamp(num(e), 0, cur.alto - 1); });
+    if (s.kind === 'puerta') { $('oDm').value = o.destino.mapa; bind('oDm', (e) => { o.destino.mapa = e.value; }); bind('oDa', (e) => { o.destino.ancla = e.value.trim(); }); }
+    if (s.kind === 'zona') { $('oEl').value = o.elemento; bind('oW', (e) => { o.w = clamp(num(e), 1, cur.ancho - o.x); }); bind('oH', (e) => { o.h = clamp(num(e), 1, cur.alto - o.y); }); bind('oEl', (e) => { o.elemento = e.value; }); bind('oNota', (e) => { o.nota = e.value; }); }
+    if (s.kind === 'npc') { $('oTipo').value = o.tipo; bind('oTipo', (e) => { o.tipo = e.value; }); bind('oTxt', (e) => { o.texto = e.value; }); }
+  }
+  $('oDel').onclick = deleteSel;
+  syncAcc();
+}
+// barra de acciones bajo el mapa (botones grandes para el móvil)
+function syncAcc() {
+  const s = selObj(), n = $('accN'); document.querySelectorAll('#acc .pad button, #aDel').forEach((b) => b.disabled = !s); $('aCopy').disabled = !(s && s.kind === 'objeto');
+  const nombre = !s ? '' : s.kind === 'objeto' ? s.o.tipo + ' (' + s.o.x + ', ' + s.o.y + ')' : s.kind === 'ancla' ? 'ancla ' + s.name + ' (' + s.pos[0] + ', ' + s.pos[1] + ')' : s.kind + ' ' + s.o.id + ' (' + s.o.x + ', ' + s.o.y + ')';
+  const cs = s && s.kind === 'objeto' ? agrupa(conflictos(cur, s.o, s.i, analisis(cur))) : [], av = cs.length ? ' <span style="color:' + (cs[0].lv === 'err' ? 'var(--err)' : 'var(--warn)') + '">⚠ ' + esc(cs[0].t) + (cs.length > 1 ? ' (+' + (cs.length - 1) + ')' : '') + '</span>' : (s && s.kind === 'objeto' ? ' <span style="color:var(--ok)">✓</span>' : '');
+  n.innerHTML = tool === 'pieza' && pieza ? 'Poniendo <b>' + esc(piezaInfo(pieza).nombre) + '</b> · toca el mapa · arrastra para desplazar la vista' + (accExtra ? ' · ' + accExtra : '') : s ? 'Elegido: <b>' + esc(nombre) + '</b>' + av : 'Toca un objeto para elegirlo · arrastra para moverlo · arrastra el fondo para desplazar';
+}
+// mover lo elegido (flechas, panel o arrastre): devuelve lo que se movió de verdad [dx, dy]
+function moveSel(s, dx, dy) {
+  if (s.kind === 'ancla') { const p = s.pos, a = clamp(p[0] + dx, 0, cur.ancho - 1), b = clamp(p[1] + dy, 0, cur.alto - 1), r = [a - p[0], b - p[1]]; p[0] = a; p[1] = b; return r; }
+  const o = s.o; let a, b;
+  if (s.kind === 'objeto') { const L = limObj(o); a = clamp(o.x + dx, L.x0, L.x1); b = clamp(o.y + dy, L.y0, L.y1); } else { a = clamp(o.x + dx, 0, cur.ancho - (o.w || 1)); b = clamp(o.y + dy, 0, cur.alto - (o.h || 1)); }
+  const r = [a - o.x, b - o.y]; o.x = a; o.y = b; return r;
+}
+function nudge(m) {
+  const s = selObj(); if (!s) return; const [dx, dy] = m.split(',').map(Number); pushUndo();
+  const r = moveSel(s, dx, dy); if (!r[0] && !r[1]) { const h = H(); h.u.pop(); syncUndo(); return; }
+  if (s.kind === 'objeto') refreshObjetos(); drawOverlay(); refreshObjPanel(); persist();
+}
+function copySel() {
+  const s = selObj(); if (!s || s.kind !== 'objeto') return; pushUndo();
+  const o = s.o, L = limObj(o); let nx = clamp(o.x + 1, L.x0, L.x1), ny = clamp(o.y + 1, L.y0, L.y1); if (nx === o.x && ny === o.y) { nx = clamp(o.x - 1, L.x0, L.x1); ny = clamp(o.y - 1, L.y0, L.y1); }
+  cur.objetos.push(Object.assign({}, o, { x: nx, y: ny })); sel = { kind: 'objeto', key: cur.objetos.length - 1 };
+  refreshObjetos(); drawOverlay(); refreshObjPanel(); refreshStats(); persist();
+}
+function deleteSel() {
+  const s = selObj(); if (!s) return; pushUndo();
+  if (s.kind === 'objeto') { cur.objetos.splice(s.i, 1); refreshObjetos(); } else if (s.kind === 'ancla') delete cur.anclas[s.name]; else if (s.kind === 'puerta') cur.puertas = cur.puertas.filter((q) => q !== s.o); else if (s.kind === 'zona') cur.zonas = cur.zonas.filter((q) => q !== s.o); else cur.npcs = cur.npcs.filter((q) => q !== s.o);
+  sel = null; refreshObjPanel(); drawOverlay(); refreshStats(); persist();
+}
+
+/* ===== Edición con puntero ===== */
+let drag = null;
+function pixAt(e) { const r = ov.getBoundingClientRect(); return [(e.clientX - r.left) / zoom, (e.clientY - r.top) / zoom]; } // punto del mundo en píxeles del juego
+function cellAt(e) { const r = ov.getBoundingClientRect(), z = T * zoom; return [clamp(Math.floor((e.clientX - r.left) / z), 0, cur.ancho - 1), clamp(Math.floor((e.clientY - r.top) / z), 0, cur.alto - 1)]; }
+function objectAt(x, y, fx, fy) {
+  const n = cur.npcs.find((q) => q.x === x && q.y === y); if (n) return { kind: 'npc', key: n.id };
+  const p = cur.puertas.find((q) => q.x === x && q.y === y); if (p) return { kind: 'puerta', key: p.id };
+  const a = Object.entries(cur.anclas).find(([, v]) => v[0] === x && v[1] === y); if (a) return { kind: 'ancla', key: a[0] };
+  if (fx !== undefined) { const i = hitObjeto(fx, fy); if (i >= 0) return { kind: 'objeto', key: i }; } // v2.59: los objetos con dibujo, por encima de las zonas
+  const zs = cur.zonas.filter((q) => x >= q.x && x < q.x + q.w && y >= q.y && y < q.y + q.h).sort((a2, b) => a2.w * a2.h - b.w * b.h)[0]; if (zs) return { kind: 'zona', key: zs.id };
+  return null;
+}
+function paint(x, y, k) { if (cur.grid[y][x] === k) return false; cur.grid[y][x] = k; drawCell(x, y); return true; }
+function line(x0, y0, x1, y1, fn) { let dx = Math.abs(x1 - x0), dy = -Math.abs(y1 - y0), sx = x0 < x1 ? 1 : -1, sy = y0 < y1 ? 1 : -1, er = dx + dy; for (;;) { fn(x0, y0); if (x0 === x1 && y0 === y1) break; const e2 = 2 * er; if (e2 >= dy) { er += dy; x0 += sx; } if (e2 <= dx) { er += dx; y0 += sy; } } }
+function flood(x, y, k) {
+  const from = cur.grid[y][x]; if (from === k) return; const st = [[x, y]];
+  while (st.length) { const [a, b] = st.pop(); if (a < 0 || b < 0 || a >= cur.ancho || b >= cur.alto || cur.grid[b][a] !== from) continue; cur.grid[b][a] = k; st.push([a + 1, b], [a - 1, b], [a, b + 1], [a, b - 1]); }
+  drawBase();
+}
+function nextId(prefix, list) { let i = 1; const ids = new Set(list); while (ids.has(prefix + '_' + i)) i++; return prefix + '_' + i; }
+
+ov.addEventListener('pointerdown', (e) => {
+  if (!cur || e.button === 2) return; e.preventDefault();
+  if (tool === 'mano' || e.button === 1) { const st = $('stage'); drag = { pan: true, sx: e.clientX, sy: e.clientY, l: st.scrollLeft, t: st.scrollTop }; ov.setPointerCapture(e.pointerId); return; }
+  ov.setPointerCapture(e.pointerId);
+  const [x, y] = cellAt(e);
+  if (tool === 'lapiz' || tool === 'goma') { pushUndo(); const k = tool === 'goma' ? cur.base : tile; drag = { paint: true, k, lx: x, ly: y, changed: false }; if (paint(x, y, k)) drag.changed = true; }
+  else if (tool === 'rect') { pushUndo(); drag = { rect: true, x0: x, y0: y }; preview = { x0: x, y0: y, x1: x, y1: y }; drawOverlay(); }
+  else if (tool === 'zona') { pushUndo(); drag = { zona: true, x0: x, y0: y }; preview = { x0: x, y0: y, x1: x, y1: y }; drawOverlay(); }
+  else if (tool === 'relleno') { pushUndo(); flood(x, y, tile); drawOverlay(); refreshStats(); persist(); }
+  else if (tool === 'gota') { tile = cur.grid[y][x]; setTool('lapiz'); }
+  else if (tool === 'ancla') { pushUndo(); const n = nextId('ancla', Object.keys(cur.anclas)); cur.anclas[n] = [x, y]; sel = { kind: 'ancla', key: n }; refreshObjPanel(); drawOverlay(); persist(); }
+  else if (tool === 'puerta') { pushUndo(); const id = nextId('puerta', cur.puertas.map((q) => q.id)); cur.puertas.push({ id, x, y, destino: { mapa: '', ancla: '' } }); sel = { kind: 'puerta', key: id }; refreshObjPanel(); drawOverlay(); persist(); }
+  else if (tool === 'npc') { pushUndo(); const id = nextId('npc', cur.npcs.map((q) => q.id)); cur.npcs.push({ id, x, y, tipo: 'npc', texto: '' }); sel = { kind: 'npc', key: id }; refreshObjPanel(); drawOverlay(); persist(); }
+  else if (tool === 'pieza') { // v2.60: un toque pone la pieza; arrastrar (más de 8 px) desplaza la vista
+    if (!pieza) { abrirPaleta(); return; }
+    const st = $('stage'); drag = { pon: true, sx: e.clientX, sy: e.clientY, l: st.scrollLeft, t: st.scrollTop, moved: false, cx: x, cy: y }; ghost = { x, y }; drawOverlay();
+  }
+  else if (tool === 'sel') {
+    const [fx, fy] = pixAt(e), o = objectAt(x, y, fx, fy); sel = o; refreshObjPanel(); drawOverlay();
+    if (o) drag = { move: true, x0: x, y0: y, sucio: false };                                  // v2.59: el deshacer solo se guarda si de verdad se mueve
+    else { const st = $('stage'); drag = { pan: true, sx: e.clientX, sy: e.clientY, l: st.scrollLeft, t: st.scrollTop }; } // arrastrar el fondo desplaza la vista
+  }
+});
+ov.addEventListener('pointermove', (e) => {
+  if (!cur) return;
+  if (drag && drag.pan) { const st = $('stage'); st.scrollLeft = drag.l - (e.clientX - drag.sx); st.scrollTop = drag.t - (e.clientY - drag.sy); return; }
+  if (drag && drag.pon && (drag.moved || Math.hypot(e.clientX - drag.sx, e.clientY - drag.sy) > 8)) { drag.moved = true; if (ghost) { ghost = null; drawOverlay(); } const st = $('stage'); st.scrollLeft = drag.l - (e.clientX - drag.sx); st.scrollTop = drag.t - (e.clientY - drag.sy); return; }
+  const [x, y] = cellAt(e); $('sPos').textContent = 'Casilla ' + x + ', ' + y + ' · «' + (TMAP[cur.grid[y][x]] ? TMAP[cur.grid[y][x]].n : cur.grid[y][x]) + '»';
+  if (!drag) { if (tool === 'pieza' && pieza && e.pointerType === 'mouse') { ghost = { x, y }; drawOverlay(); } return; }
+  if (drag.pon) { ghost = { x, y }; drawOverlay(); return; }
+  if (drag.paint) { line(drag.lx, drag.ly, x, y, (a, b) => { if (paint(a, b, drag.k)) drag.changed = true; }); drag.lx = x; drag.ly = y; }
+  else if (drag.rect || drag.zona) { preview.x1 = x; preview.y1 = y; drawOverlay(); }
+  else if (drag.move) {
+    const dx = x - drag.x0, dy = y - drag.y0; if (!dx && !dy) return; const s = selObj(); if (!s) return;
+    if (!drag.sucio) { pushUndo(); drag.sucio = true; }
+    const r = moveSel(s, dx, dy); drag.x0 += r[0]; drag.y0 += r[1]; // si choca con el borde, la pieza espera y sigue al dedo cuando vuelve
+    if (s.kind === 'objeto') refreshObjetos(); drawOverlay(); syncAcc();
+  }
+});
+function endDrag(e) {
+  if (!drag) return; const d = drag; drag = null;
+  if (d.pan) return;
+  if (d.pon) { if (!d.moved && e.type === 'pointerup') { const g = ghost || { x: d.cx, y: d.cy }; ponerPieza(g.x, g.y); } else { ghost = null; drawOverlay(); } return; }
+  if (d.rect && preview) { const x0 = Math.min(preview.x0, preview.x1), x1 = Math.max(preview.x0, preview.x1), y0 = Math.min(preview.y0, preview.y1), y1 = Math.max(preview.y0, preview.y1); for (let y = y0; y <= y1; y++) for (let x = x0; x <= x1; x++) cur.grid[y][x] = tile; drawBase(); }
+  if (d.zona && preview) { const x0 = Math.min(preview.x0, preview.x1), y0 = Math.min(preview.y0, preview.y1), w = Math.abs(preview.x1 - preview.x0) + 1, h = Math.abs(preview.y1 - preview.y0) + 1; const id = nextId('zona', cur.zonas.map((q) => q.id)); cur.zonas.push({ id, x: x0, y: y0, w, h, elemento: '', nota: '' }); sel = { kind: 'zona', key: id }; refreshObjPanel(); }
+  if (d.paint && !d.changed) { const h = H(); h.u.pop(); syncUndo(); }
+  preview = null; drawOverlay(); refreshObjPanel(); refreshStats(); persist();
+}
+ov.addEventListener('pointerleave', () => { if (ghost && !drag) { ghost = null; drawOverlay(); } });
+ov.addEventListener('pointerup', endDrag); ov.addEventListener('pointercancel', endDrag);
+ov.addEventListener('contextmenu', (e) => e.preventDefault());
+
+/* ===== Comprobaciones ===== */
+let CHK = null;   // casillas sólidas de los objetos de cada mapa, durante una comprobación
+function bloq(m) {
+  if (!CHK) CHK = new Map(); let st = CHK.get(m);
+  if (!st) { st = new Set(); (m.objetos || []).forEach((o) => huellaCeldas(o).forEach(([a, b]) => st.add(a + ',' + b))); CHK.set(m, st); }
+  return st;
+}
+function passable(m, x, y) { return x >= 0 && y >= 0 && x < m.ancho && y < m.alto && !isSolid(m.grid[y][x]) && !bloq(m).has(x + ',' + y); }
+function alcanza(m, start, piezas) { // casillas alcanzables a pie desde start, con las piezas (true) o solo con el suelo (false)
+  const ok = (x, y) => x >= 0 && y >= 0 && x < m.ancho && y < m.alto && !isSolid(m.grid[y][x]) && (!piezas || !bloq(m).has(x + ',' + y)), seen = newGrid(m.ancho, m.alto, false), st = [[start[0], start[1]]];
+  if (!ok(start[0], start[1])) return seen; seen[start[1]][start[0]] = true;
+  while (st.length) { const [a, b] = st.pop(); [[1, 0], [-1, 0], [0, 1], [0, -1]].forEach(([dx, dy]) => { const nx = a + dx, ny = b + dy; if (ok(nx, ny) && !seen[ny][nx]) { seen[ny][nx] = true; st.push([nx, ny]); } }); }
+  return seen;
+}
+function check(m) {
+  CHK = new Map(); const out = []; const add = (lv, t, s) => out.push({ lv, t, sel: s });
+  const AVm = analisis(m);
+  (m.objetos || []).forEach((o, i) => { // v2.59: objetos; v2.60 (ED-2): + puertas, caminos, entradas de edificios y sitios de aparición tapados (conflictos)
+    const nom = '«' + o.tipo + '» (' + o.x + ', ' + o.y + ')', S = { kind: 'objeto', key: i };
+    if (!OBJD[o.tipo]) { add('err', 'Objeto ' + nom + ': ese tipo no existe en el juego.', S); return; }
+    if (!huellaDentro(o, m.ancho, m.alto)) { add('err', 'Objeto ' + nom + ' fuera del mapa (o con su parte sólida fuera).', S); return; }
+    agrupa(conflictos(m, o, i, AVm)).forEach((g) => add(g.lv, 'Objeto ' + nom + ': ' + g.t + (g.n > 1 ? ' (' + g.n + ' casillas, p. ej. ' + g.x + ', ' + g.y + ')' : ''), S));
+  });
+  const unk = new Set(); m.grid.forEach((r) => r.forEach((k) => { if (!TMAP[k]) unk.add(k); })); if (unk.size) add('err', 'Símbolos de casilla desconocidos: ' + [...unk].join(' '));
+  if (m.ancho < 8 || m.alto < 8) add('warn', 'Mapa muy pequeño (menos de 8 casillas de lado).');
+  const ancl = Object.entries(m.anclas);
+  ancl.forEach(([n, [x, y]]) => { if (x < 0 || y < 0 || x >= m.ancho || y >= m.alto) add('err', 'Ancla «' + n + '» fuera del mapa.'); else if (isSolid(m.grid[y][x])) add('err', 'Ancla «' + n + '» sobre una casilla sólida (' + x + ',' + y + ').'); });
+  m.npcs.forEach((n) => { if (isSolid(m.grid[n.y][n.x])) add('warn', 'Personaje «' + n.id + '» sobre una casilla sólida.'); });
+  m.puertas.forEach((p) => {
+    if (!p.destino.mapa) { add('err', 'Puerta «' + p.id + '» sin mapa de destino.'); return; }
+    if (!p.destino.ancla) { add('err', 'Puerta «' + p.id + '» sin ancla de llegada.'); return; }
+    if (p.destino.mapa === '@prof') { if (['cristal', 'mina', 'hongos', 'inundada', 'hielo'].indexOf(p.destino.ancla) < 0) add('warn', 'Puerta «' + p.id + '»: con «@prof» el ancla debe ser un bioma (cristal, mina, hongos, inundada o hielo).'); return; }
+    const d = maps[p.destino.mapa]; if (!d) { add('warn', 'Puerta «' + p.id + '»: el mapa «' + p.destino.mapa + '» aún no existe aquí.'); return; }
+    if (p.destino.ancla !== 'volver' && !d.anclas[p.destino.ancla]) add('err', 'Puerta «' + p.id + '»: «' + p.destino.mapa + '» no tiene el ancla «' + p.destino.ancla + '».');
+  });
+  m.zonas.forEach((z) => { let n = 0, g = 0; for (let y = z.y; y < z.y + z.h; y++) for (let x = z.x; x < z.x + z.w; x++) { if (passable(m, x, y)) n++; if (m.grid[y] && m.grid[y][x] === 'g') g++; } if (!n) add('err', 'Zona «' + z.id + '» sin ninguna casilla transitable.'); else if (!g && !z.nota) add('warn', 'Zona «' + z.id + '» sin hierba alta; las criaturas saldrán paseando.'); if (!z.elemento) add('warn', 'Zona «' + z.id + '» sin elemento.'); });
+  // alcanzabilidad desde el inicio
+  const start = m.anclas.inicio || (ancl[0] && ancl[0][1]) || (m.puertas[0] && [m.puertas[0].x, m.puertas[0].y]);
+  if (!start) add('warn', 'No hay ancla «inicio» ni puertas: no se puede comprobar el recorrido.');
+  else if (passable(m, start[0], start[1])) {
+    const seen = newGrid(m.ancho, m.alto, false), st = [[start[0], start[1]]]; seen[start[1]][start[0]] = true;
+    while (st.length) { const [a, b] = st.pop(); [[1, 0], [-1, 0], [0, 1], [0, -1]].forEach(([dx, dy]) => { const nx = a + dx, ny = b + dy; if (passable(m, nx, ny) && !seen[ny][nx]) { seen[ny][nx] = true; st.push([nx, ny]); } }); }
+    const bad = [];
+    ancl.forEach(([n, [x, y]]) => { if (passable(m, x, y) && !seen[y][x]) bad.push('ancla «' + n + '»'); });
+    m.puertas.forEach((p) => { if (!seen[p.y][p.x]) bad.push('puerta «' + p.id + '»'); });
+    m.npcs.forEach((n) => { if (!seen[n.y][n.x] && n.tipo !== 'cartel') bad.push('personaje «' + n.id + '»'); });
+    if (bad.length) add('err', 'No se llega a pie desde «inicio»: ' + bad.join(', ') + '.');
+    let tot = 0, ok = 0; m.grid.forEach((r, y) => r.forEach((k, x) => { if (passable(m, x, y)) { tot++; if (seen[y][x]) ok++; } })); if (tot && ok / tot < .9) add('warn', 'Solo el ' + Math.round(100 * ok / tot) + ' % del suelo transitable es alcanzable (casillas aisladas).');
+    const libre0 = alcanza(m, start, false), cortado = []; // v2.60: ¿alguna pieza corta un camino que sin piezas se podía recorrer?
+    m.grid.forEach((r, y) => r.forEach((k, x) => { if ((k === '=' || k === 'b') && libre0[y][x] && passable(m, x, y) && !seen[y][x]) cortado.push([x, y]); }));
+    if (cortado.length) add('warn', 'Las piezas cortan el camino: ' + cortado.length + ' casilla(s) de camino quedan aisladas desde «inicio» (p. ej. ' + cortado[0][0] + ', ' + cortado[0][1] + ').');
+  }
+  // conexiones
+  const sides = { norte: [0, 'h', 'sur'], sur: [1, 'h', 'norte'], oeste: [2, 'v', 'este'], este: [3, 'v', 'oeste'] };
+  Object.entries(m.conexiones).forEach(([s, c]) => {
+    if (!c) return; const nb = maps[c.mapa]; const horiz = s === 'norte' || s === 'sur';
+    let own = 0; for (let i = 0; i < (horiz ? m.ancho : m.alto); i++) { const x = horiz ? i : (s === 'este' ? m.ancho - 1 : 0), y = horiz ? (s === 'sur' ? m.alto - 1 : 0) : i; if (passable(m, x, y)) own++; }
+    if (!own) { add('err', 'Borde ' + s + ': no hay ninguna casilla transitable para cruzar.'); return; }
+    if (!nb) { add('warn', 'Borde ' + s + ': el mapa «' + c.mapa + '» aún no existe aquí.'); return; }
+    let pair = 0; const len = horiz ? m.ancho : m.alto;
+    for (let i = 0; i < len; i++) { const j = i + c.desplazamiento; let ax, ay, bx, by;
+      if (s === 'norte') { ax = i; ay = 0; bx = j; by = nb.alto - 1; } else if (s === 'sur') { ax = i; ay = m.alto - 1; bx = j; by = 0; } else if (s === 'oeste') { ax = 0; ay = i; bx = nb.ancho - 1; by = j; } else { ax = m.ancho - 1; ay = i; bx = 0; by = j; }
+      if (passable(m, ax, ay) && passable(nb, bx, by)) pair++; }
+    if (!pair) add('err', 'Borde ' + s + ' → «' + c.mapa + '»: ninguna casilla transitable coincide con el desplazamiento actual.');
+    const back = nb.conexiones[sides[s][2]]; if (!back || back.mapa !== m.id) add('warn', '«' + c.mapa + '» no apunta de vuelta a «' + m.id + '» por su borde ' + sides[s][2] + '.');
+  });
+  if (!out.some((o) => o.lv === 'err' || o.lv === 'warn')) add('ok', 'Todo en orden.');
+  return out;
+}
+const liAviso = (o, id) => '<li class="' + o.lv + '"' + (o.sel ? ' data-sel="' + esc(JSON.stringify(o.sel)) + '" data-map="' + esc(id) + '" title="Toca para ir a la pieza"' : '') + '>' + (id ? '<b>' + esc(id) + '</b> · ' : '') + esc(o.t) + '</li>';
+function showIssues(list, prefix) { $('issues').innerHTML = list.map((o) => liAviso(o, prefix || cur.id).replace('<b>' + esc(prefix || cur.id) + '</b> · ', prefix ? '<b>' + esc(prefix) + '</b> · ' : '')).join(''); }
+$('issues').addEventListener('click', (e) => { // tocar un aviso lleva a la pieza
+  const li = e.target.closest('li[data-sel]'); if (!li) return; if (li.dataset.map !== cur.id) openMap(li.dataset.map);
+  sel = JSON.parse(li.dataset.sel); if (tool === 'pieza') setTool('sel'); const o = selObj(); refreshObjPanel(); drawOverlay(); if (o && o.o) irA(o.o.x, o.o.y);
+});
+
+/* ===== Diálogo genérico ===== */
+function ask(title, body, okText) {
+  return new Promise((res) => {
+    const d = $('dlg'); $('dlgT').textContent = title; $('dlgB').innerHTML = body; $('dlgOk').textContent = okText || 'Aceptar'; $('dlgNo').style.display = okText === null ? 'none' : '';
+    const done = () => { d.removeEventListener('close', done); res(d.returnValue === 'ok'); };
+    d.addEventListener('close', done); d.returnValue = 'cancel'; d.showModal();
+  });
+}
+const PRESETS = [
+ ['Pueblo', 48, 36, '.', 'trees'], ['Ruta vertical', 32, 64, '.', 'trees'], ['Ruta horizontal', 64, 32, '.', 'trees'], ['Ruta grande', 64, 64, '.', 'trees'],
+ ['Cueva', 40, 40, 'c', 'rock'], ['Gimnasio', 24, 30, '_', 'walls'], ['Centro PC', 14, 12, '_', 'walls'], ['Tienda', 10, 8, '_', 'walls'], ['Casa', 10, 8, '_', 'walls'],
+];
+async function dlgNuevo() {
+  const ok = await ask('Mapa nuevo', '<div class="presets">' + PRESETS.map((p, i) => '<button type="button" data-p="' + i + '">' + p[0] + ' ' + p[1] + '×' + p[2] + '</button>').join('') + '</div>' +
+    '<label>Identificador</label><input id="nId" type="text" value="mapa_nuevo"><label>Nombre</label><input id="nNom" type="text" value="Mapa nuevo">' +
+    '<div class="row"><div><label>Ancho</label><input id="nW" type="number" min="4" max="256" value="48"></div><div><label>Alto</label><input id="nH" type="number" min="4" max="256" value="36"></div></div>' +
+    '<label>Relleno</label><select id="nFill">' + TILES.map((t) => '<option value="' + t.k + '">' + t.n + '</option>').join('') + '</select>' +
+    '<label>Borde</label><select id="nBorde"><option value="trees">Árboles</option><option value="rock">Roca</option><option value="walls">Paredes</option><option value="none">Sin borde</option></select>', 'Crear');
+  return ok;
+}
+function wirePresets() {
+  document.querySelectorAll('#dlgB .presets button').forEach((b) => b.onclick = () => { const p = PRESETS[b.dataset.p]; $('nW').value = p[1]; $('nH').value = p[2]; $('nFill').value = p[3]; $('nBorde').value = p[4]; if ($('nId').value === 'mapa_nuevo') $('nId').value = slug(p[0]); });
+}
+async function actNuevo() {
+  const pr = dlgNuevo(); wirePresets(); if (!await pr) return;
+  const w = clamp($('nW').valueAsNumber | 0, 4, 256), h = clamp($('nH').valueAsNumber | 0, 4, 256), fill = $('nFill').value, borde = $('nBorde').value;
+  let id = slug($('nId').value), b = id, i = 2; while (maps[id]) id = b + '_' + i++;
+  const g = newGrid(w, h, fill), bk = { trees: 't', rock: 'r', walls: '#' }[borde];
+  if (bk) for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) if (x === 0 || y === 0 || x === w - 1 || y === h - 1) g[y][x] = bk;
+  const m = { formato: 2, id, nombre: $('nNom').value || id, ancho: w, alto: h, base: fill, grid: g, anclas: {}, puertas: [], conexiones: { norte: null, sur: null, este: null, oeste: null }, zonas: [], npcs: [], objetos: [], colision: null, animar: false };
+  if (borde === 'walls') { const cxm = w >> 1; g[h - 1][cxm] = 'd'; m.anclas.entrada = [cxm, h - 2]; m.anclas.inicio = [cxm, h - 2]; m.puertas.push({ id: 'salida', x: cxm, y: h - 1, destino: { mapa: '', ancla: 'volver' } }); }
+  else { m.anclas.inicio = [w >> 1, h >> 1]; g[h >> 1][w >> 1] = '='; }
+  maps[id] = m; openMap(id); persist();
+}
+function openMap(id) { cur = maps[id]; sel = null; preview = null; refreshAll(); persist(); }
+function refreshAll() { refreshSelect(); sizeCanvases(); drawBase(); refreshObjetos(); drawOverlay(); refreshMapPanel(); refreshStats(); refreshObjPanel(); syncUI(); syncUndo(); $('issues').innerHTML = ''; }
+
+/* ===== Acciones de cabecera ===== */
+$('mapSel').onchange = (e) => openMap(e.target.value);
+$('bNuevo').onclick = actNuevo;
+$('bDup').onclick = () => { const j = JSON.parse(snap()); let id = cur.id + '_copia', i = 2; while (maps[id]) id = cur.id + '_copia' + i++; j.id = id; j.nombre = cur.nombre + ' (copia)'; maps[id] = fromJSON(j); openMap(id); };
+$('bDel').onclick = async () => {
+  if (Object.keys(maps).length <= 1) { await ask('No se puede borrar', '<p>Debe quedar al menos un mapa.</p>', null); return; }
+  if (!await ask('Borrar «' + cur.id + '»', '<p>Se borra este mapa de tu navegador. Si no lo exportaste, no se puede recuperar.</p>', 'Borrar')) return;
+  delete maps[cur.id]; delete hist[cur.id]; openMap(Object.keys(maps).sort()[0]);
+};
+$('bUndo').onclick = undo; $('bRedo').onclick = redo;
+$('bZp').onclick = () => setZoom(zoom + 1); $('bZm').onclick = () => setZoom(zoom - 1);
+function setZoom(z) { zoom = clamp(z, 1, 6); sizeCanvases(); drawBase(); refreshObjetos(); drawOverlay(); syncUI(); }
+$('bGrid').onclick = () => { showGrid = !showGrid; syncUI(); drawOverlay(); };
+$('bSol').onclick = () => { showSol = !showSol; syncUI(); drawOverlay(); };
+$('bObj').onclick = () => { showObj = !showObj; $('bObj').classList.toggle('on', showObj); refreshObjetos(); };
+$('aUndo').onclick = undo; $('aRedo').onclick = redo; $('aCopy').onclick = copySel; $('aDel').onclick = deleteSel;
+document.querySelectorAll('#acc .pad button').forEach((b) => b.onclick = () => nudge(b.dataset.m));
+$('bReload').onclick = async () => { // vuelve a la versión del archivo (se puede deshacer)
+  const j = EJEMPLOS.find((q) => idMapa(q.id) === cur.id); if (!j) { await ask('No hay versión del archivo', '<p>«' + esc(cur.id) + '» no viene en el archivo del editor (es un mapa tuyo).</p>', null); return; }
+  if (!await ask('Recargar «' + cur.id + '» del archivo', '<p>Se sustituye por la versión que trae este archivo. Lo que no hayas exportado se pierde, pero puedes pulsar «Deshacer».</p>', 'Recargar')) return;
+  pushUndo(); const m = fromJSON(JSON.parse(JSON.stringify(j))); maps[m.id] = m; cur = m; sel = null; refreshAll(); persist();
+};
+$('mId').onchange = (e) => { const n = idMapa(e.target.value); if (n !== cur.id && !maps[n]) { pushUndo(); const old = cur.id; delete maps[old]; hist[n] = hist[old]; delete hist[old]; cur.id = n; maps[n] = cur; } refreshAll(); persist(); };
+$('mNombre').onchange = (e) => { pushUndo(); cur.nombre = e.target.value; persist(); };
+$('mBase').onchange = (e) => { cur.base = e.target.value; persist(); };
+$('bResize').onclick = async () => {
+  const pr = ask('Cambiar tamaño', '<p class="hint">Se conserva la esquina superior izquierda (o la indicada). Lo nuevo se rellena con la casilla base.</p><div class="row"><div><label>Ancho</label><input id="rW" type="number" min="4" max="256" value="' + cur.ancho + '"></div><div><label>Alto</label><input id="rH" type="number" min="4" max="256" value="' + cur.alto + '"></div></div><label>Anclar</label><select id="rA"><option value="nw">Arriba izquierda</option><option value="c">Centro</option><option value="se">Abajo derecha</option></select>', 'Aplicar');
+  if (!await pr) return; const w = clamp($('rW').valueAsNumber | 0, 4, 256), h = clamp($('rH').valueAsNumber | 0, 4, 256), a = $('rA').value;
+  const offx = a === 'nw' ? 0 : a === 'c' ? (w - cur.ancho) >> 1 : w - cur.ancho, offy = a === 'nw' ? 0 : a === 'c' ? (h - cur.alto) >> 1 : h - cur.alto;
+  pushUndo(); const g = newGrid(w, h, cur.base); for (let y = 0; y < cur.alto; y++) for (let x = 0; x < cur.ancho; x++) { const nx = x + offx, ny = y + offy; if (nx >= 0 && ny >= 0 && nx < w && ny < h) g[ny][nx] = cur.grid[y][x]; }
+  const mv = (o) => { o.x += offx; o.y += offy; return o.x >= 0 && o.y >= 0 && o.x < w && o.y < h; };
+  Object.keys(cur.anclas).forEach((k) => { const p = cur.anclas[k]; p[0] += offx; p[1] += offy; if (p[0] < 0 || p[1] < 0 || p[0] >= w || p[1] >= h) delete cur.anclas[k]; });
+  cur.objetos = (cur.objetos || []).filter((o) => { o.x += offx; o.y += offy; return o.x >= 0 && o.y >= 0 && o.x < w && o.y < h && huellaDentro(o, w, h); });
+  cur.puertas = cur.puertas.filter(mv); cur.npcs = cur.npcs.filter(mv); cur.zonas = cur.zonas.filter((z) => { z.x += offx; z.y += offy; z.x = Math.max(0, z.x); z.y = Math.max(0, z.y); z.w = Math.min(z.w, w - z.x); z.h = Math.min(z.h, h - z.y); return z.w > 0 && z.h > 0; });
+  cur.grid = g; cur.ancho = w; cur.alto = h; refreshAll(); persist();
+};
+$('bCheck').onclick = () => showIssues(check(cur));
+$('bCheckAll').onclick = () => { const all = []; mapList().forEach((id) => check(maps[id]).forEach((o) => { if (o.lv !== 'ok') all.push([id, o]); })); $('issues').innerHTML = all.length ? all.map(([id, o]) => liAviso(o, id)).join('') : '<li class="ok">Todos los mapas en orden.</li>'; };
+
+/* --- importar / exportar --- */
+const PAQUETE = { paquete: 'mapas_editor', version: 1 }; // marcador del archivo para el juego (src/mapas.js, G.mundo.paquete): si cambia el formato, sube la versión en los dos sitios
+// F8: «Exportar al juego» es el paquete de Tonavia (el que el juego importa, src/mapas.js); los mapas de otra dimensión («dim/id») se guardan en maps/<dim>/ y el juego no los importa.
+const idsTonavia = () => mapList().filter((i) => i.indexOf('/') < 0);
+function paqueteJuego() { return JSON.stringify(Object.assign({}, PAQUETE, { formato: 2, maps: idsTonavia().map((i) => toJSON(maps[i])) }), null, 1) + '\n'; }
+function download(name, text, type) { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([text], { type: type || 'application/json' })); a.download = name; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 500); }
+function importText(txt) {
+  const j = JSON.parse(txt); const arr = Array.isArray(j) ? j : (j.maps ? j.maps : [j]); let last = null, n = 0;
+  arr.forEach((x) => { const m = fromJSON(x); maps[m.id] = m; last = m.id; n++; }); if (last) openMap(last); return n;
+}
+$('bImp').onclick = async () => {
+  const pr = ask('Importar mapas', '<p class="hint">Elige un archivo .json (un mapa o un paquete) o pega el contenido. Si el identificador ya existe, se sustituye.</p><input id="iFile" type="file" accept=".json,application/json"><label>O pega aquí</label><textarea id="iTxt"></textarea>', 'Importar');
+  const ok = await pr; if (!ok) return;
+  try { let txt = $('iTxt').value.trim(); const f = $('iFile').files[0]; if (f) txt = await f.text(); if (!txt) return; const n = importText(txt); $('sSave').textContent = n + ' mapa(s) importado(s)'; }
+  catch (e) { await ask('No se pudo importar', '<p>' + esc(e.message) + '</p>', null); }
+};
+$('bExp').onclick = async () => {
+  const errs = []; mapList().forEach((id) => check(maps[id]).forEach((o) => { if (o.lv === 'err') errs.push(id + ': ' + o.t); }));
+  const aviso = errs.length ? '<p class="hint" style="color:#ff9c9c"><b>Ojo:</b> el editor ve ' + errs.length + (errs.length === 1 ? ' error' : ' errores') + ' en tus mapas (mira «Comprobar mapa»). El juego rechazará el archivo si el fallo es de los graves (puerta a un mapa que no existe, ancla en casilla sólida…).</p>' : '<p class="hint">Todos tus mapas (' + mapList().length + ') pasan la comprobación del editor.</p>';
+  const pr = ask('Exportar', '<p class="hint">En el juego pulsa «Mapas», elige este archivo y arrancará con tus mapas.</p>' + aviso + '<div class="row" style="flex-direction:column;align-items:stretch"><button type="button" id="eJuego" class="go">Exportar al juego (mapas_editor.json)</button><button type="button" id="eUno">Descargar solo este mapa (' + esc(cur.id) + '.json, para maps/)</button><button type="button" id="eCopia">Copiar este mapa (texto JSON)</button><button type="button" id="eAscii">Copiar el suelo como texto</button></div>', null);
+  $('eJuego').onclick = () => { download('mapas_editor.json', paqueteJuego()); const ex = mapList().length - idsTonavia().length; $('sSave').textContent = 'mapas_editor.json descargado (' + idsTonavia().length + ' mapas' + (ex ? '; ' + ex + ' de otras dimensiones NO incluidos: viven en maps/<dim>/' : '') + ')'; };
+  $('eUno').onclick = () => { download(cur.id + '.json', JSON.stringify(toJSON(cur), null, 1) + '\n'); };
+  $('eCopia').onclick = async () => { const t = JSON.stringify(toJSON(cur), null, 1) + '\n'; try { await navigator.clipboard.writeText(t); $('sSave').textContent = 'Mapa copiado (' + t.length + ' caracteres)'; } catch (e) { $('dlgB').insertAdjacentHTML('beforeend', '<textarea>' + esc(t) + '</textarea>'); } };
+  $('eAscii').onclick = async () => { const t = cur.grid.map((r) => r.join('')).join('\n'); try { await navigator.clipboard.writeText(t); $('sSave').textContent = 'Suelo copiado'; } catch (e) { $('dlgB').insertAdjacentHTML('beforeend', '<textarea>' + esc(t) + '</textarea>'); } };
+  await pr;
+};
+
+/* --- teclado --- */
+addEventListener('keydown', (e) => {
+  if (/INPUT|TEXTAREA|SELECT/.test((e.target.tagName || '')) || $('dlg').open) return;
+  const k = e.key.toLowerCase();
+  if ((e.ctrlKey || e.metaKey) && k === 'z') { e.preventDefault(); e.shiftKey ? redo() : undo(); return; }
+  if ((e.ctrlKey || e.metaKey) && k === 'y') { e.preventDefault(); redo(); return; }
+  if ((e.ctrlKey || e.metaKey) && k === 'd') { e.preventDefault(); copySel(); return; }
+  if (e.ctrlKey || e.metaKey) return;
+  if (k === 'escape' && tool === 'pieza') { setTool('sel'); return; }
+  if (k === 'delete' || k === 'backspace') { deleteSel(); return; }
+  if (k.startsWith('arrow') && selObj()) { e.preventDefault(); nudge({ arrowleft: '-1,0', arrowright: '1,0', arrowup: '0,-1', arrowdown: '0,1' }[k]); return; }
+  const t = TOOLS.find((x) => x[2].toLowerCase() === k); if (t) setTool(t[0]);
+  if (k === '+' || k === '=') setZoom(zoom + 1); if (k === '-') setZoom(zoom - 1);
+});
+
+/* ===== Probar en el juego (v2.60, ED-2) ===== */
+// El editor lleva el juego entero (tools/editor_mapas.js). «Probar» lo abre aquí dentro con TODOS los mapas del editor tal como están ahora (sin exportar) y empieza en el mapa abierto, en su ancla «inicio».
+let juegoCache = null;
+function probar() {
+  if (!cur.anclas.inicio) { ask('No se puede probar', '<p>Este mapa no tiene un ancla llamada «inicio» (el sitio donde aparece el jugador). Ponla con la herramienta Ancla (A) y llámala <b>inicio</b>.</p>', null); return; }
+  if (!juegoCache) { try { juegoCache = JSON.parse($('juegoSrc').textContent); } catch (e) { juegoCache = null; } }
+  if (!juegoCache) { ask('No se puede probar', '<p>Este archivo del editor no trae el juego dentro. Vuelve a crearlo con <code>node tools/editor_mapas.js</code>.</p>', null); return; }
+  const mp = {}, pq = {}; mapList().forEach((id) => { const k = id.indexOf('/'); if (k < 0) mp[id] = toJSON(maps[id]); else { const d = id.slice(0, k); (pq[d] = pq[d] || {})[id] = toJSON(maps[id]); } });   // F8: los de otra dimensión van a G.PAQUETES[dim], no a G.MAPAS
+  const gancho = '<script>window.addEventListener("error",function(e){parent.postMessage({pruebaError:String(e.message||e)},"*")});<\/script>';
+  const html = juegoCache.antes + gancho + '<script>\n' + juegoCache.datos + '\nObject.keys(' + JSON.stringify(pq).replace(/</g, '\\u003c') + ').forEach(function(d){ window.G.PAQUETES[d] = JSON.stringify(' + JSON.stringify(pq).replace(/</g, '\\u003c') + '[d]); });\nwindow.G.MAPAS = ' + JSON.stringify(mp).replace(/</g, '\\u003c') + ';\nwindow.__MAPA_PRUEBA = ' + JSON.stringify(cur.id) + ';\n' + juegoCache.juego + '\n<\/script>' + juegoCache.despues;
+  $('pruebaMapa').textContent = cur.id; $('pruebaMsg').textContent = ''; $('prueba').hidden = false;
+  const fr = $('pruebaFrame'); fr.onload = () => { try { fr.contentWindow.focus(); } catch (e) { /* sin foco: se pulsa dentro */ } }; fr.srcdoc = html;
+}
+function cerrarPrueba() { $('prueba').hidden = true; $('pruebaFrame').srcdoc = ''; }
+addEventListener('message', (e) => { if (e.data && e.data.pruebaError && !$('prueba').hidden) $('pruebaMsg').textContent = 'El juego no pudo abrir este mapa:\n' + String(e.data.pruebaError).replace(/^Uncaught (Error: )?/, ''); });
+/* ===== Dentro del juego (v2.62) ===== */
+// El juego abre este editor en una ventana (src/mapas_ui.js) con sus mapas. «Guardar y jugar» manda el paquete al juego; él lo valida con SUS reglas, lo guarda y se reinicia. Si algo falla, lo dice aquí y no cambia nada.
+if (EN_JUEGO) {
+  $('bProbar').hidden = true; $('aProbar').hidden = true; $('bExp').hidden = true; $('bJugar').hidden = false; $('bSalir').hidden = false; // (la exportación vive en «🗺 Mapas» del juego: copiar o descargar)
+  const aJuego = (m) => { try { parent.postMessage(m, '*'); } catch (e) { /* sin ventana madre */ } };
+  $('bJugar').onclick = () => { $('bJugar').disabled = true; $('sSave').textContent = 'Guardando…'; aJuego({ editorMapas: 'guardar', texto: paqueteJuego() }); };
+  $('bSalir').onclick = async () => {
+    const sucio = Object.keys(hist).some((k) => hist[k].u.length);
+    if (sucio && !(await ask('Salir sin guardar', '<p>Tienes cambios sin guardar. Si sales, se pierden.</p>', 'Salir sin guardar'))) return;
+    aJuego({ editorMapas: 'salir' });
+  };
+  addEventListener('message', (e) => {
+    const d = e.data; if (!d || !d.editorMapasResp) return;
+    $('bJugar').disabled = false;
+    const r = d.editorMapasResp; if (r.ok) { $('sSave').textContent = 'Guardado. Reiniciando el juego…'; return; }
+    $('sSave').textContent = 'No se guardó nada';
+    ask('No se pudo guardar', '<p>El juego rechazó los mapas. Corrige esto y vuelve a probar:</p><ul>' + (r.errores || []).slice(0, 10).map((t) => '<li>' + esc(t) + '</li>').join('') + '</ul>', null);
+  });
+}
+$('bProbar').onclick = probar; $('aProbar').onclick = probar; $('pruebaCerrar').onclick = cerrarPrueba;
+$('bAv').onclick = () => { showAv = !showAv; syncUI(); drawOverlay(); };
+$('aPieza').onclick = () => { if (tool === 'pieza') abrirPaleta(); else if (pieza) setTool('pieza'); else abrirPaleta(); };
+$('aListo').onclick = () => setTool('sel'); $('dlgPno').onclick = () => $('dlgP').close();
+$('dlgP').addEventListener('close', () => { if (tool === 'pieza' && !pieza) setTool('sel'); });
+
+/* ===== Arranque ===== */
+buildTools(); loadStore();
+if (!cur) { cur = fromJSON({ id: 'mapa', suelo: Array(20).fill('.'.repeat(20)) }); maps[cur.id] = cur; }
+refreshAll();
+if (distintoArchivo) setTimeout(async () => { // el archivo del editor trae mapas distintos a los que el navegador guardó (p. ej. una versión nueva del proyecto)
+  if (await ask('Mapas nuevos en el archivo', '<p>Este archivo del editor trae <b>otra versión de los mapas</b> que la guardada en tu navegador.</p><p class="hint">«Usar los del archivo» carga los del archivo (lo que no hayas exportado se pierde). «Conservar los míos» deja tu trabajo del navegador como está.</p>', 'Usar los del archivo')) {
+    Object.keys(maps).forEach((k) => delete maps[k]); EJEMPLOS.forEach((j) => { try { const m = fromJSON(JSON.parse(JSON.stringify(j))); maps[m.id] = m; } catch (e) { console.warn(e); } });
+    Object.keys(hist).forEach((k) => delete hist[k]); cur = maps[Object.keys(maps)[0]]; if (maps.albanota) cur = maps.albanota; sel = null; refreshAll(); persist();
+  } else persist();
+}, 50);
+window.__editor = { get cur() { return cur; }, maps, toJSON, paqueteJuego, check, importText, setTool, setZoom, get sel() { return sel; }, set sel(v) { sel = v; refreshObjPanel(); drawOverlay(); }, hitObjeto, objInfo, ordenObjetos, nudge, copySel, deleteSel, undo, redo, limObj, huellaCeldas, STAMP, conflictos, analisis, agrupa, probar, cerrarPrueba, ponerPieza, elegirPieza, anclaPieza, piezaInfo, entradaDe, get pieza() { return pieza; }, get tool() { return tool; }, set ghost(v) { ghost = v; drawOverlay(); } };
+</script>
+</body>
+</html>

@@ -1,0 +1,8 @@
+tools/historico/ — herramientas que ya no forman parte del trabajo diario
+==========================================================================
+maps/albanota.json es la FUENTE ÚNICA del mapa de Albanota. Se edita dentro del juego («✏️ Editar mapa») o con tools/editor_mapas.html.
+
+crear_albanota.js   Reconstruye el plano ORIGINAL (v2.53) en un archivo aparte (--salida). Nunca escribe en maps/.
+plano_albanota.py   Dibuja docs/plano_albanota_48x36.png y mide huecos y reparto del plano ORIGINAL (no refleja las ediciones posteriores).
+
+Sirven para consultar o comparar el diseño de partida. No para «volver» al mapa: para eso, las copias del ZIP de cada versión.

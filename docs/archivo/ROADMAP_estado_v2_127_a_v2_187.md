@@ -1,0 +1,38 @@
+# ROADMAP · estado de las versiones v2.127 a v2.187 (archivado el 8 nov 2026 desde docs/ROADMAP.md, sección «Dónde estamos»)
+
+- **v2.127-v2.132 (LALI 3D, TERMINADO):** Lali y Oli son malla 3D en el HD-2D (`G.personaje3d.de(id)`, `E.p3d`, interruptores `PERSONAJES3D` y `PERSONAJES3D_LALI`); ver `docs/PLAN_LALI_3D.md` y `docs/FICHA_LALI_3D.md`. **Siguiente:** `docs/PLAN_MOVIMIENTO_PERSONAJES.md` (giro hacia la esquina en diagonal, Lali y Oli a la vez), solo con «hazlo»; pendiente probar en un móvil real.
+- **v2.133-v2.135 (HECHO):** botón «Cambiar personaje»; Lali sin contorno negro; movimiento profesional (giro a la esquina con `ang`, histéresis y paso suave) para Lali y Oli; ver `docs/PLAN_MOVIMIENTO_PERSONAJES.md`. **Pendiente de ti:** probar en móvil real (GPU).
+- **v2.186:** ID-5m hecho como UN tema genérico `casa` para todas las casas (campo `tema` en el JSON del mapa).
+- **v2.184:** caña desde la mano real (2D y 3D) y marca de pesca nueva (corcho con flecha sobre la casilla, sin ondas).
+- **v2.183:** anillo marcador de los puntos de pesca también en HD-2D; Playwright instalado (pruebas Python OK salvo `prueba_editor.py`, desactualizada).
+- **v2.182:** Pesca cerrada: puntos reubicados (4 en la orilla norte + 2 en el puente), revisión a 390×844, documentos al día. Pendiente: anillo marcador en HD-2D y captura real (Fase 7).
+- **v2.181:** Pesca 2-4 hecha (caña, hilo, corcho, pose, pique con semilla, salto; 2D y HD-2D). Captura real → Fase 7; revisar orillas sur (cruceta).
+- **v2.180:** Pesca 1 (puntos de pesca, botón 🎣, anillo 2D). Siguen Pesca 2 (corcho e hilo), 3 (pose) y 4 (pique); captura real enlazada a la Fase 7.
+- **v2.168:** Zefirax 3D, paso 1 de 7 (ficha y hoja de vistas; `docs/FICHA_ZEFIRAX_3D.md`). Siguen los pasos 2-7.
+- **v2.167:** sombra de contacto de la fuente en HD-2D (dos bandas concéntricas).
+- **v2.166:** maceta en 3D (HD-2D) completa: volumen, texturas, tests y capturas (v2.164-v2.166).
+- **v2.163:** exterior definitivo de la Ermita (puerta con arco, espadaña, escamas, farolas).
+- **v2.161:** ID-5h interior de la Ermita (capilla, altar mayor, pedestales, 7 hornacinas).
+- **v2.158:** ID-5g-3 interior de la Casa de Lali (rosa pastel y madera clara).
+- **v2.157:** ventana simétrica de la Casa de Oli.
+- **v2.156:** cortinas de la Casa de Oli.
+- **v2.155:** retoques de la Casa de Oli (alfombra, sillas, percha).
+- **v2.154:** ID-5g-2 interior de la Casa de Oli (paleta azul mar y madera).
+- **v2.153:** casas: la azul es de Oli y la rosa de Lali (solo nombres).
+- **v2.152:** vista de juego a pantalla completa con cruceta flotante.
+- **v2.151:** controles siempre visibles (vista recalculada sola; huella 2D reescrita a propósito).
+- **v2.150:** escáner del Laboratorio a la esquina.
+- **v2.149:** NPC del Laboratorio junto a la mesa de estudio.
+- **v2.148:** Laboratorio reordenado y casilla del NPC en los 3 interiores de servicio (norma nueva).
+- **v2.147:** ID-5f Laboratorio interior hecho (paleta violeta).
+- **v2.146:** Tienda sin mesa de exhibición (más espacio).
+- **v2.145:** Tienda en paleta A (verde mercado), pizarra y piezas de identidad.
+- **v2.144:** Tienda con ambiente de comercio (piezas de productos).
+- **v2.143:** ID-5e Tienda interior hecho (ver `SESION.md`).
+- **v2.142:** puerta de salida del Centro PC rediseñada (solo dibujo).
+- **v2.141:** ID-5d Centro PC definitivo (mapa 13×10, sala y mobiliario de la biblia; ver `SESION.md`).
+- **v2.140:** ID-5c mobiliario de interiores (`src/interiores_objetos.js`, 15 piezas) y norma permanente de diseño espacial (principio 4, `BIBLIA_VISUAL.md` §13).
+- **v2.139:** Centro PC en dirección B con composición simétrica (sala 13×10, eje central; `BIBLIA_INTERIORES.md` §1b).
+- **v2.138 (PROPUESTA):** ID-5b biblia visual de interiores (`docs/BIBLIA_INTERIORES.md`); pendiente de tu aprobación.
+- **v2.137 (HECHO):** ID-5a, interior provisional del Centro PC (`maps/centro_pc.json`, puerta en Albanota).
+- **v2.136 (HECHO):** ID-4 música y sonido por código (`src/audio.js`, `G.audio`): 8 temas por zona, efectos, botón 🔊/🔇, `?sonido=0`; ver `docs/SESION.md`. Siguiente: ID-5a (estructura del Centro PC), luego biblia de interiores ID-5b (Fase 5 del ROADMAP).

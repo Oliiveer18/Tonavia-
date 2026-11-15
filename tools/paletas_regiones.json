@@ -1,0 +1,140 @@
+{
+ "regiones": [
+  {
+   "id": "albanota",
+   "nombre": "Albanota",
+   "rol": "Pueblo inicial",
+   "elemento": null,
+   "luz": "alba cálida",
+   "tono_luz": 52,
+   "colores": {
+    "suelo": "#5dae5a",
+    "camino": "#e8cf98",
+    "muro": "#f7e9cb",
+    "tejado": "#d94a3f",
+    "madera": "#c48b52",
+    "agua": "#4580d4",
+    "acento": "#f7d54a"
+   }
+  },
+  {
+   "id": "silvara",
+   "nombre": "Silvara",
+   "rol": "Hoja",
+   "elemento": "hoja",
+   "luz": "sol filtrado entre hojas",
+   "tono_luz": 70,
+   "colores": {
+    "suelo": "#3d8446",
+    "camino": "#b58f58",
+    "muro": "#c48b52",
+    "tejado": "#2a8187",
+    "madera": "#7a4a2b",
+    "agua": "#3fb5b0",
+    "acento": "#f5a8bd"
+   }
+  },
+  {
+   "id": "carbuna",
+   "nombre": "Carbuna",
+   "rol": "Fuego",
+   "elemento": "fuego",
+   "luz": "tarde de brasa",
+   "tono_luz": 28,
+   "colores": {
+    "suelo": "#8a5a44",
+    "camino": "#4a3a44",
+    "muro": "#6b4226",
+    "tejado": "#a8322f",
+    "madera": "#8f5c33",
+    "agua": "#f0603e",
+    "acento": "#f09a3e"
+   }
+  },
+  {
+   "id": "marenda",
+   "nombre": "Marenda",
+   "rol": "Agua",
+   "elemento": "agua",
+   "luz": "mañana de mar",
+   "tono_luz": 48,
+   "colores": {
+    "suelo": "#ead7ae",
+    "camino": "#cfe0e6",
+    "muro": "#f7e9cb",
+    "tejado": "#3f9bd6",
+    "madera": "#b27a45",
+    "agua": "#2a8187",
+    "acento": "#3fb5b0"
+   }
+  },
+  {
+   "id": "fulgoria",
+   "nombre": "Fulgoria",
+   "rol": "Eléctrico",
+   "elemento": "electrico",
+   "luz": "cielo de tormenta clara",
+   "tono_luz": 58,
+   "colores": {
+    "suelo": "#797686",
+    "camino": "#5d576b",
+    "muro": "#b9b4c4",
+    "tejado": "#f7d54a",
+    "madera": "#8a8498",
+    "agua": "#35559a",
+    "acento": "#7dffe7"
+   }
+  },
+  {
+   "id": "cirrena",
+   "nombre": "Cirrena",
+   "rol": "Aire",
+   "elemento": "aire",
+   "luz": "altura despejada",
+   "tono_luz": 50,
+   "colores": {
+    "suelo": "#a8d8c0",
+    "camino": "#ece6d6",
+    "muro": "#e4e8f4",
+    "tejado": "#8e5bc4",
+    "madera": "#d9d4e6",
+    "agua": "#bfe3f5",
+    "acento": "#f5a8bd"
+   }
+  },
+  {
+   "id": "obsidra",
+   "nombre": "Obsidra",
+   "rol": "Roca",
+   "elemento": "roca",
+   "luz": "mediodía seco",
+   "tono_luz": 44,
+   "colores": {
+    "suelo": "#8a7f72",
+    "camino": "#615e6f",
+    "muro": "#797686",
+    "tejado": "#5d576b",
+    "madera": "#7a4a2b",
+    "agua": "#35629f",
+    "acento": "#e8c47a"
+   }
+  },
+  {
+   "id": "umbrada",
+   "nombre": "Umbrada",
+   "rol": "Sombra",
+   "elemento": "sombra",
+   "luz": "crepúsculo",
+   "tono_luz": 285,
+   "colores": {
+    "suelo": "#3d3560",
+    "camino": "#5f3b8e",
+    "muro": "#40294a",
+    "tejado": "#2d2540",
+    "madera": "#6b4226",
+    "agua": "#35559a",
+    "acento": "#f7d54a"
+   }
+  }
+ ]
+}

@@ -1,0 +1,37 @@
+{
+ "_ayuda": "Ficha de cría de la línea de Ondel (piloto, v2.320). Cómo se hace una ficha: docs/GUIA_CRIANZA.md. «lista»: true = la línea puede criar; ponlo en false para apagarla.",
+ "linea": "pompon",
+ "lista": true,
+ "_roles": "Cada color del dibujo original de la fase 1 (src/formas_agua.js) recibe un papel. Los genes cambian el color de los papeles; lo que no tenga papel se queda como está (ojos, boca).",
+ "roles": { "cuerpo": "#3fb5b0", "sombra": "#2a8187", "luz": "#7fe0db", "hoja": "#5dae5a", "tallo": "#3d8446", "patas": "#f09a3e", "patas2": "#a8322f", "mejilla": "#e47a9a" },
+ "cuerpo": ["cuerpo", "sombra", "luz"],
+ "genes": [
+  { "id": "color", "nombre": "Color", "alelos": [
+    { "id": "turquesa", "nombre": "Turquesa" },
+    { "id": "celeste", "nombre": "Celeste", "colores": { "cuerpo": "#6fb7f0", "sombra": "#3f7fd6", "luz": "#b7dcff" } },
+    { "id": "lima", "nombre": "Lima", "colores": { "cuerpo": "#9bd45a", "sombra": "#5f9e3a", "luz": "#d4f29a" } },
+    { "id": "coral", "nombre": "Coral", "colores": { "cuerpo": "#f58a6e", "sombra": "#c9543f", "luz": "#ffc2ae", "mejilla": "#ffe08a" } },
+    { "id": "lila", "nombre": "Lila", "colores": { "cuerpo": "#b08be8", "sombra": "#7a56b8", "luz": "#dcc8ff" } },
+    { "id": "aurora", "nombre": "Aurora", "mut": true, "colores": { "cuerpo": "#ffb3d9", "sombra": "#8f7fe0", "luz": "#fff0b8", "mejilla": "#ff7eb6" } }
+  ] },
+  { "id": "hoja", "nombre": "Hoja", "alelos": [
+    { "id": "verde", "nombre": "Verde" },
+    { "id": "otono", "nombre": "De otoño", "colores": { "hoja": "#e8a93a", "tallo": "#b5564a" } },
+    { "id": "flor", "nombre": "En flor", "colores": { "hoja": "#f08cae" } },
+    { "id": "dorada", "nombre": "Dorada", "mut": true, "colores": { "hoja": "#ffe066", "tallo": "#e8a93a" } }
+  ] },
+  { "id": "marca", "nombre": "Marcas", "_": "patron = baldosa que se repite sobre los papeles de «sobre», contada desde la esquina del cuerpo; x = píxel pintado con «color» (un papel o #rrggbb).", "alelos": [
+    { "id": "lisa", "nombre": "Lisa" },
+    { "id": "motas", "nombre": "Motas", "sobre": ["cuerpo"], "color": "luz", "patron": ["....", ".x..", "....", "...x"] },
+    { "id": "rayas", "nombre": "Rayas", "sobre": ["cuerpo", "luz"], "color": "sombra", "patron": ["...", "xxx", "...", "..."] },
+    { "id": "panza", "nombre": "Panza clara", "sobre": ["sombra"], "color": "luz", "patron": ["x"] },
+    { "id": "estrellas", "nombre": "Estrellas", "mut": true, "sobre": ["cuerpo", "sombra"], "color": "#fff4b0", "patron": ["......x", "..x....", ".xxx...", "..x....", ".......", "....x.."] }
+  ] },
+  { "id": "cresta", "nombre": "Adorno", "_": "capas = dibujo por vista (down = de frente, up = de espaldas, side = de lado mirando a la izquierda); cada letra es un papel o color de «clave». pos = [ancla, dx, dy]: ancla arriba | abajo | detras (respecto al cuerpo).", "alelos": [
+    { "id": "ninguno", "nombre": "Sin adorno" },
+    { "id": "antenas", "nombre": "Antenitas", "clave": { "l": "#fff9ee", "a": "luz", "t": "sombra" }, "capas": { "down": ["l.........l", "a.........a", ".t.......t."], "up": ["l.........l", "a.........a", ".t.......t."], "side": ["l....", "a....", ".t..."] }, "pos": { "down": ["arriba", 0, 2], "up": ["arriba", 0, 2], "side": ["arriba", -3, 2] } },
+    { "id": "rabito", "nombre": "Rabito rizado", "clave": { "a": "cuerpo", "t": "sombra" }, "capas": { "side": [".aa", "a.t", ".tt"], "up": ["a.a", ".t."] }, "pos": { "side": ["detras", 1, -2], "up": ["abajo", 0, 0] } },
+    { "id": "corona", "nombre": "Coronita", "mut": true, "clave": { "o": "#ffd24d", "r": "#e4663a" }, "capas": { "down": ["o.o.o", "ooroo"], "up": ["o.o.o", "ooooo"], "side": ["o.o.o", "ooroo"] }, "pos": { "down": ["arriba", 0, -3], "up": ["arriba", 0, -3], "side": ["arriba", 0, -3] } }
+  ] }
+ ]
+}

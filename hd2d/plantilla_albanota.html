@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Albanota · terreno HD-2D (prueba HD-B1)</title>
+<style>
+:root{color-scheme:dark}
+html,body{margin:0;height:100%;background:#1b1424;color:#f3e9ff;font:14px/1.3 system-ui,sans-serif;overflow:hidden}
+#stage{position:fixed;inset:0}
+canvas{display:block;width:100%;height:100%;touch-action:none}
+#tag{position:fixed;left:0;right:0;top:0;padding:calc(env(safe-area-inset-top,0px) + 8px) 12px 6px;font-size:12px;opacity:.85;pointer-events:none;text-shadow:0 1px 3px #0008}
+footer{position:fixed;left:0;right:0;bottom:0;display:flex;gap:8px;align-items:center;justify-content:center;flex-wrap:wrap;padding:8px 12px calc(env(safe-area-inset-bottom,0px) + 10px);background:linear-gradient(#1b142400,#1b1424e6 40%)}
+button{min-height:44px;min-width:44px;border:0;border-radius:12px;padding:0 14px;background:#ffd36e;color:#2a1b30;font:700 14px/1 system-ui,sans-serif}
+button:focus-visible{outline:3px solid #fff}
+#fallo{position:fixed;inset:0;display:none;align-items:center;justify-content:center;text-align:center;padding:24px}
+@media (prefers-reduced-motion:reduce){*{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+<div id="stage"><canvas id="c" aria-label="Terreno de Albanota en 3D"></canvas></div>
+<div id="tag">Albanota · terreno en 3D (HD-B1, 1.ª mitad: sin edificios ni objetos todavía). Arrastra para moverte, pellizca para acercar.</div>
+<footer><button id="gi" type="button" aria-label="Girar a la izquierda">⟲</button><button id="gd" type="button" aria-label="Girar a la derecha">⟳</button><button id="zm" type="button">Cámara: media</button></footer>
+<div id="fallo"><p>No se pudo cargar Three.js (hace falta internet la primera vez).<br>Vuelve a abrir esta página con conexión.</p></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+// Terreno de Albanota en 3D. El SUELO es el mismo píxel-art que pinta el 2D (lo hornea tools/hd2d_albanota.js con el drawTile del juego); aquí solo se le da relieve.
+// Casilla → relieve: agua «~» más baja (arroyo), bosque de borde «t» más alto (los árboles llegarán con los objetos, 2.ª mitad), el resto a nivel; el puente «b» queda a nivel sobre el agua.
+const D=/*ALBANOTA*/null;
+const $=id=>document.getElementById(id);
+if(typeof THREE==='undefined'){$('fallo').style.display='flex'}else main();
+function main(){
+const T=THREE,W=D.W,H=D.H,S=D.suelo,cv=$('c');
+const R=new T.WebGLRenderer({canvas:cv,antialias:true});R.setPixelRatio(Math.min(devicePixelRatio||1,2));R.setClearColor(0x1b1424);
+const scene=new T.Scene(),cam=new T.PerspectiveCamera(30,1,.5,300);
+scene.add(new T.AmbientLight(0xffffff,.52));const sun=new T.DirectionalLight(0xfff3dc,.58);sun.position.set(-6,10,4);scene.add(sun);
+const ALT={'~':-.3,'t':.6},BAJO=-1.2;
+const ch=(x,z)=>S[z][x];
+const alt=(x,z)=>x<0||z<0||x>=W||z>=H?null:(ALT[ch(x,z)]??0);
+// ── geometría: caras de arriba (texturizadas) y paredes donde un vecino es más bajo ──
+function Buf(){return{p:[],n:[],u:[],c:[],i:[]}}
+function quad(b,P,N,U,C,inv){const o=b.p.length/3;P.forEach(v=>b.p.push(...v));for(let k=0;k<4;k++){b.n.push(...N);if(U)b.u.push(...U[k]);b.c.push(...C)}b.i.push(...(inv?[o,o+2,o+1,o,o+3,o+2]:[o,o+1,o+2,o,o+2,o+3]))} // inv: las caras de arriba miran hacia +Y
+function geo(b,uv){const g=new T.BufferGeometry();g.setAttribute('position',new T.Float32BufferAttribute(b.p,3));g.setAttribute('normal',new T.Float32BufferAttribute(b.n,3));g.setAttribute('color',new T.Float32BufferAttribute(b.c,3));if(uv)g.setAttribute('uv',new T.Float32BufferAttribute(b.u,2));g.setIndex(b.i);return g}
+const col=h=>[parseInt(h.slice(1,3),16)/255,parseInt(h.slice(3,5),16)/255,parseInt(h.slice(5,7),16)/255];
+const TIERRA=col('#8a6a4a'),BOSQUE=col('#3f5f38'),MADERA=col('#a8793e'),BLANCO=[1,1,1],TINTE=col('#a9c2a0');
+const top={real:Buf(),bosque:Buf()},walls=Buf(),st={arriba:0,agua:0,bosque:0,puente:0,paredes:0};
+for(let z=0;z<H;z++)for(let x=0;x<W;x++){
+  const c=ch(x,z),h=alt(x,z),u0=x/W,u1=(x+1)/W,v0=1-z/H,v1=1-(z+1)/H,bos=c==='t';
+  quad(bos?top.bosque:top.real,[[x,h,z],[x+1,h,z],[x+1,h,z+1],[x,h,z+1]],[0,1,0],[[u0,v0],[u1,v0],[u1,v1],[u0,v1]],bos?TINTE:BLANCO,true);
+  st.arriba++;if(c==='~')st.agua++;if(bos)st.bosque++;if(c==='b')st.puente++;
+  // vecinos: [dx,dz, esquinas de la arista, normal]
+  [[0,-1,[[x+1,z],[x,z]],[0,0,-1]],[1,0,[[x+1,z+1],[x+1,z]],[1,0,0]],[0,1,[[x,z+1],[x+1,z+1]],[0,0,1]],[-1,0,[[x,z],[x,z+1]],[-1,0,0]]].forEach(([dx,dz,e,n])=>{
+    let hn=alt(x+dx,z+dz);if(hn===null)hn=BAJO;if(h<=hn+.001)return;
+    const color=c==='t'?BOSQUE:c==='b'?MADERA:TIERRA;
+    quad(walls,[[e[0][0],hn,e[0][1]],[e[1][0],hn,e[1][1]],[e[1][0],h,e[1][1]],[e[0][0],h,e[0][1]]],n,null,color);st.paredes++;
+  });
+}
+// ── texturas: los dos PNG del suelo (con árboles / hierba donde irán los árboles) ──
+function carga(src){return new Promise((ok,ko)=>{const im=new Image();im.onload=()=>{const t=new T.Texture(im);t.magFilter=T.NearestFilter;t.minFilter=T.NearestFilter;t.generateMipmaps=false;t.needsUpdate=true;ok(t)};im.onerror=ko;im.src='data:image/png;base64,'+src})}
+let dirty=true;const view={yaw:0,yawT:0,dist:42,distT:42,tx:W/2,tz:H*.58},PITCH=.98,ZOOMS=[['cerca',22],['media',42],['lejos',70]];let zi=1;
+Promise.all([carga(D.png),carga(D.pngSinArboles)]).then(([tReal,tSin])=>{
+  const m1=new T.MeshLambertMaterial({map:tReal,vertexColors:true}),m2=new T.MeshLambertMaterial({map:tSin,vertexColors:true}),m3=new T.MeshLambertMaterial({vertexColors:true});
+  scene.add(new T.Mesh(geo(top.real,true),m1),new T.Mesh(geo(top.bosque,true),m2),new T.Mesh(geo(walls,false),m3));
+  window.__hd.listo=true;dirty=true;
+});
+// ── cámara: gira alrededor de un punto, se mueve arrastrando, se acerca pellizcando ──
+function pon(){const k=view.dist,cp=Math.cos(PITCH);cam.position.set(view.tx+Math.sin(view.yaw)*cp*k,Math.sin(PITCH)*k,view.tz+Math.cos(view.yaw)*cp*k);cam.lookAt(view.tx,0,view.tz)}
+function tam(){const w=cv.clientWidth,h=cv.clientHeight;if(cv.width!==Math.round(w*R.getPixelRatio())||cv.height!==Math.round(h*R.getPixelRatio())){R.setSize(w,h,false);cam.aspect=w/h;cam.updateProjectionMatrix();dirty=true}}
+const lim=()=>{view.tx=Math.max(2,Math.min(W-2,view.tx));view.tz=Math.max(2,Math.min(H-2,view.tz));view.distT=Math.max(8,Math.min(70,view.distT))};
+function bucle(){tam();const dy=view.yawT-view.yaw,dd=view.distT-view.dist;if(Math.abs(dy)>.001||Math.abs(dd)>.01){view.yaw+=dy*.2;view.dist+=dd*.2;dirty=true}else if(dy||dd){view.yaw=view.yawT;view.dist=view.distT;dirty=true}
+  if(dirty){pon();R.render(scene,cam);dirty=false}requestAnimationFrame(bucle)}
+const ptr=new Map();let pinch=0;
+const k=()=>2*view.dist*Math.tan(T.MathUtils.degToRad(15))/Math.max(1,cv.clientHeight);
+cv.addEventListener('pointerdown',e=>{cv.setPointerCapture(e.pointerId);ptr.set(e.pointerId,[e.clientX,e.clientY]);if(ptr.size===2){const [a,b]=[...ptr.values()];pinch=Math.hypot(a[0]-b[0],a[1]-b[1])}});
+cv.addEventListener('pointermove',e=>{const p=ptr.get(e.pointerId);if(!p)return;const dx=e.clientX-p[0],dy=e.clientY-p[1];ptr.set(e.pointerId,[e.clientX,e.clientY]);
+  if(ptr.size===1){const s=k(),cy=Math.cos(view.yaw),sy=Math.sin(view.yaw),sp=Math.sin(PITCH);view.tx+=s*(-cy*dx-sy*dy/sp);view.tz+=s*(sy*dx-cy*dy/sp);lim();dirty=true} // el mapa sigue al dedo
+  else if(ptr.size===2){const [a,b]=[...ptr.values()],d=Math.hypot(a[0]-b[0],a[1]-b[1]);if(pinch>0&&d>0){view.distT=view.dist=view.dist*pinch/d;lim();dirty=true}pinch=d}});
+const fin=e=>{ptr.delete(e.pointerId);pinch=0};cv.addEventListener('pointerup',fin);cv.addEventListener('pointercancel',fin);
+cv.addEventListener('wheel',e=>{e.preventDefault();view.distT=view.dist*Math.exp(e.deltaY*.001);lim()},{passive:false});
+const gira=s=>{view.yawT+=s*Math.PI/4;dirty=true};$('gi').onclick=()=>gira(-1);$('gd').onclick=()=>gira(1);
+$('zm').onclick=()=>{zi=(zi+1)%ZOOMS.length;view.distT=ZOOMS[zi][1];$('zm').textContent='Cámara: '+ZOOMS[zi][0]};
+addEventListener('keydown',e=>{if(e.metaKey||e.ctrlKey)return;if(e.code==='KeyQ')gira(-1);if(e.code==='KeyE')gira(1)});
+addEventListener('resize',()=>{dirty=true});
+window.__hd={listo:false,W,H,stats:st,view,THREE:T,scene,cam,render(){dirty=true}};
+requestAnimationFrame(bucle);
+}
+</script>
+</body>
+</html>
