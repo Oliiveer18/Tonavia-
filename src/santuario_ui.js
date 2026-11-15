@@ -31,6 +31,7 @@
           ['Cruza la puerta del norte: cada entrenador llega a SU claro, no al de otro.', 'Dentro, habla con Brezo, el cuidador. Él instala en un hábitat a las criaturas que tengas en la caja.'],
           ['Una criatura del Santuario sigue siendo tuya y sigue en tu caja: puedes volver a llevártela al equipo cuando quieras.', 'Si se va de la caja, deja el claro sin que tengas que hacer nada.'],
           ['Aquí no se combate ni se captura. Cada una pasea, mira o descansa según su carácter… y de noche duermen.', 'Las de sombra, al revés: duermen de día.'] ] },
+        { id: 'visita', txt: 'Visitar el otro Santuario', sub: 'Solo para mirar', panel: 'visita', di: ['Cada claro es privado, pero puedes pasar a mirar el del otro entrenador si está conectado contigo.', 'Solo se mira: nada se toca, nada se gana, y al salir vuelves a tu claro.'] },
         { id: 'prisa', txt: '¿Tengo que venir a menudo?', sub: 'Sin obligaciones', frases: [['No. Aquí nada caduca ni se pierde por no venir.', 'El Santuario te espera tal como lo dejaste.']] },
       ],
     };
@@ -151,8 +152,8 @@
     if (!v.caja.length) l.appendChild(el('p', 'v', v.total ? 'Todas las criaturas de tu caja viven ya aquí.' : 'Tu caja está vacía. Las criaturas que captures irán a ella; las de tu equipo viajan contigo.'));
     v.caja.forEach((f) => l.appendChild(tarjeta(f, [['Acoger', '', () => pedir({ t: 'santuario.acoger', id: f.id }), lleno]])));
   }
-  function leer(est, j, lec) {   // B5: el libro y la vitrina de la cabaña. Solo lectura: el motor ya trae el texto (G.santuario.lectura); aquí solo se pinta
-    const r = raiz(), l = r.querySelector('#santu-l'); P.est = est; P.j = j; P.api = null; P.alCerrar = null; r.querySelector('h1').textContent = lec.titulo.toUpperCase(); r.querySelector('.sub').textContent = lec.sub; l.textContent = '';
+  function leer(est, j, lec, alCerrar) {   // B5: el libro y la vitrina de la cabaña. Solo lectura: el motor ya trae el texto (G.santuario.lectura); aquí solo se pinta
+    const r = raiz(), l = r.querySelector('#santu-l'); P.est = est; P.j = j; P.api = null; P.alCerrar = alCerrar || null; r.querySelector('h1').textContent = lec.titulo.toUpperCase(); r.querySelector('.sub').textContent = lec.sub; l.textContent = '';
     lec.secciones.forEach((q) => { const t = el('h2'); t.appendChild(d.createTextNode(q.h)); l.appendChild(t); q.filas.forEach((f) => { const a = el('div', 'sa-a'); a.appendChild(el('b', null, f.x)); if (f.e === 'ok') a.appendChild(el('small', null, 'Hecho')); else if (f.e === 'falta') a.appendChild(el('small', null, 'Aún no')); l.appendChild(a); }); });
     l.scrollTop = 0; r.hidden = false; return true;
   }

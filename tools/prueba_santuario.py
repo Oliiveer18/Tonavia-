@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
-# tools/prueba_santuario.py — prueba en Chromium móvil (390×844) el SANTUARIO UNIVERSAL · Etapas A, B1, B2 y B3 (v2.367): portal del Nexus con nivel 8, Umbral y Guardiana, hogar propio, Cuidador y panel de residentes,
+# tools/prueba_santuario.py — prueba en Chromium móvil (390×844) el SANTUARIO UNIVERSAL · Etapas A y B1-B6 (v2.370): portal del Nexus con nivel 8, Umbral y Guardiana, hogar propio, Cuidador y panel de residentes,
 # criaturas reales de la caja moviéndose, noche (duermen), guardado y recarga DENTRO del hogar, salida hasta el Nexus y pintado en 2D clásico y 2D.
-# Uso: node build.js && python3 tools/prueba_santuario.py   Última línea: «OK» o «FALLA: n». Capturas: docs/santuario_v2369_*_390x844.png
+# Uso: node build.js && python3 tools/prueba_santuario.py   Última línea: «OK» o «FALLA: n». Capturas: docs/santuario_v2370_*_390x844.png
 import os
 from playwright.sync_api import sync_playwright
 raiz = os.path.dirname(os.path.dirname(os.path.abspath(__file__))); html = os.path.join(raiz, 'dist', 'criaturas.html'); err = []; fallos = []
 def ok(c, m):
     print(('  ok  ' if c else ' FALLO ') + m)
     if not c: fallos.append(m)
-def foto(pg, n): pg.screenshot(path=os.path.join(raiz, 'docs', 'santuario_v2369_%s_390x844.png' % n))
+def foto(pg, n): pg.screenshot(path=os.path.join(raiz, 'docs', 'santuario_v2370_%s_390x844.png' % n))
 CRUZA = "(id) => { const e = __juego.est, j = e.jugadores.oli, m = __juego.mundo.mapa(j.mapa), p = m.puertas.find((q) => q.id === id); j.x = p.x * 16 + 8; j.y = p.y * 16 + 8; j.enPuerta = null; __juego.motor.cruzar(e, j, m); return j.mapa; }"
 RES = "() => { const e = __juego.est, em = e.mapas[e.jugadores.oli.mapa]; return em ? em.criaturas.filter((c) => c.res !== undefined).map((c) => [c.res, c.id, Math.round(c.x), Math.round(c.y), c.act, !!c.dur]) : []; }"
 def avanza_dialogo(pg, veces=12):
@@ -156,6 +156,43 @@ def sesion(p, clasico):
     # salir: hogar → Umbral → Nexus (pila de vuelta repuesta tras cargar dentro)
     r1 = pg.evaluate(CRUZA, 'salida'); pg.wait_for_timeout(600); r2 = pg.evaluate(CRUZA, 'portal_nexus'); pg.wait_for_timeout(600)
     ok(r1 == 'santuario/umbral' and r2 == 'nexus/plaza_cruce' and pg.evaluate("() => G.mundo.cargadas('santuario').length") == 0, '[%s] se sale hogar → Umbral → Nexus y el Santuario se descarga (%s, %s)' % (et, r1, r2))
+    # VISITAS (B6): el «otro móvil» se simula con un segundo estado dentro de la misma página (su Santuario y su resumen reales, sin red); la conexión real no se puede probar aquí
+    pg.evaluate(CRUZA, 'portal_santuario'); pg.wait_for_timeout(2600)
+    ok(pg.evaluate("() => __juego.mapa.id") == 'santuario/umbral', '[%s] (visitas) de vuelta en el Umbral' % et)
+    nom0 = pg.evaluate("() => G.santuario.rec(__juego.est, 'oli', false).nom"); br0 = pg.evaluate("() => __juego.est.jugadores.oli.brillos"); dim0 = pg.evaluate("() => JSON.stringify(__juego.est.dim)")
+    pg.evaluate("() => { const j = __juego.est.jugadores.oli; j.x = 9 * 16 + 8; j.y = 4 * 16 + 14; __juego.talk(); }"); pg.wait_for_timeout(500); avanza_dialogo(pg)
+    pg.locator('.dlg-op', has_text='Visitar el otro Santuario').click(); pg.wait_for_timeout(300)
+    for _ in range(4):
+        if pg.evaluate("() => G.santuario.visitando(__juego.est.jugadores.oli)") or not pg.locator('#dlg:not([hidden])').count(): break
+        pg.click('#dlg', position={'x': 195, 'y': 760}); pg.wait_for_timeout(400)
+    ok(pg.evaluate("() => __juego.mapa.id") == 'santuario/umbral' and 'conectado con Lali' in pg.evaluate("() => document.getElementById('who').textContent"), '[%s] sin conexión con el otro jugador, la entrada «Visitar el otro Santuario» avisa y no mueve a nadie' % et)
+    ok(pg.evaluate("""() => { const E = __juego.est, S = G.santuario, e2 = G.motor.crear(9), l2 = e2.jugadores.lali, l1 = E.jugadores.lali, ej = G.equipo.agregar(l2, { forma: 'fosforin', xp: 50 }), r = S.rec(e2, 'lali', true);
+        r.nom = 'Madriguera'; r.res[ej.id] = 0; r.des[ej.id] = 0; l2.mapa = l1.mapa; l2.x = l1.x; l2.y = l1.y; window.__ejL = ej.id;
+        return G.red.aplicar(E, 'lali', JSON.parse(JSON.stringify(G.red.resumen(e2, 'lali')))) && S.visita.recibir(E, 'lali', JSON.parse(JSON.stringify(S.visita.snapshot(e2, 'lali')))); }"""), '[%s] (visitas) el otro móvil (simulado) manda su resumen y se acepta' % et)
+    pg.evaluate("() => { const j = __juego.est.jugadores.oli; j.x = 9 * 16 + 8; j.y = 4 * 16 + 14; __juego.talk(); }"); pg.wait_for_timeout(500); avanza_dialogo(pg)
+    pg.locator('.dlg-op', has_text='Visitar el otro Santuario').click(); pg.wait_for_timeout(300)
+    for _ in range(5):
+        if pg.evaluate("() => G.santuario.visitando(__juego.est.jugadores.oli)"): break
+        pg.click('#dlg', position={'x': 195, 'y': 760}); pg.wait_for_timeout(400)
+    pg.wait_for_timeout(1500)
+    ok(pg.evaluate("() => __juego.mapa.id") == 'santuario/hogar_1_p_lali' and pg.evaluate("() => G.santuario.visitando(__juego.est.jugadores.oli)"), '[%s] Sela te deja entrar en el claro del otro (%s)' % (et, pg.evaluate("() => __juego.mapa.id")))
+    rs = pg.evaluate(RES); ok(len(rs) == 1 and rs[0][0] == pg.evaluate("() => window.__ejL"), '[%s] ves a SU residente en su hábitat (%s)' % (et, rs)); foto(pg, 'visita_hogar_' + et)
+    pg.evaluate("() => { const m = __juego.mapa, n = m.npcs[0], j = __juego.est.jugadores.oli; j.x = n.x * 16 + 8; j.y = (n.y + 1) * 16 + 14; __juego.talk(); }"); pg.wait_for_timeout(500); avanza_dialogo(pg)
+    pg.locator('.dlg-op', has_text='Residentes').click(); pg.wait_for_timeout(300)
+    for _ in range(4):
+        if pg.locator('#santu:not([hidden])').count(): break
+        pg.click('#dlg', position={'x': 195, 'y': 760}); pg.wait_for_timeout(400)
+    t = pg.inner_text('#santu') if pg.locator('#santu:not([hidden])').count() else ''
+    ok('SANTUARIO DE LALI' in t and 'Madriguera' in t and 'Hábitats y residentes' in t and 'Acoger' not in t and 'Brillos' not in t and pg.locator('#santu button:not(.x)').count() == 0, '[%s] Brezo te enseña el Santuario de Lali en un panel de solo lectura (sin botones de acción)' % et)
+    if clasico: foto(pg, 'visita_panel')
+    pg.click('#santu .x'); pg.wait_for_timeout(300)
+    if pg.locator('.dlg-x').count(): pg.click('.dlg-x'); pg.wait_for_timeout(300)
+    intento = pg.evaluate("""() => { const E = __juego.est, M = __juego.motor, r = ['nombrar', 'ampliar', 'acoger', 'retirar', 'decorar', 'derribar'].map((n) => M.aplicar(E, { j: 'oli', t: 'santuario.' + n, nom: 'Robado', id: window.__ejL, h: 0, d: 0, s: 0, tipo: 'farola' })); return [r.every((x) => !x), G.santuario.rec(E, 'lali', false).nom]; }""")
+    ok(intento[0] and intento[1] == 'Madriguera' and pg.evaluate("() => G.santuario.rec(__juego.est, 'oli', false).nom") == nom0 and pg.evaluate("() => __juego.est.jugadores.oli.brillos") == br0, '[%s] intentos de cambiar el Santuario ajeno: rechazados; tus Brillos y tu nombre intactos' % et)
+    ok(pg.evaluate("() => JSON.stringify(__juego.est.dim)") == dim0 and 'Madriguera' not in pg.evaluate("() => JSON.stringify(G.guardado.serializar(__juego.est))"), '[%s] nada del Santuario ajeno entra en tu partida ni en el guardado' % et)
+    r = pg.evaluate(CRUZA, 'salida'); pg.wait_for_timeout(1500)
+    ok(r == pg.evaluate("() => G.santuario.idHogar(__juego.est, 'oli')") and not pg.evaluate("() => G.santuario.visitando(__juego.est.jugadores.oli)") and pg.evaluate("() => __juego.mapa.id") == r, '[%s] al salir de la visita vuelves a TU Santuario (%s)' % (et, r))
+    r1 = pg.evaluate(CRUZA, 'salida'); pg.wait_for_timeout(600); r2 = pg.evaluate(CRUZA, 'portal_nexus'); pg.wait_for_timeout(600)
     b.close()
 with sync_playwright() as p:
     sesion(p, True); sesion(p, False)

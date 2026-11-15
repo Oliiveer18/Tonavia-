@@ -225,13 +225,16 @@
     return s;
   }
   const futura = (est) => plano(est.dim) && plano(est.dim[DIM]) && ent(est.dim[DIM].v) && est.dim[DIM].v > VERSION;
+  // VISITAS (B6): lo que el otro móvil DECLARA de su Santuario vive aquí, por jugador remoto, SIN guardar y sin tocar est.dim: es una representación de solo lectura que se descarta al perder la conexión.
+  const VIS = new WeakMap();
   function rec(est, jug, crear) {
-    if (!JUG.test(jug)) return null; const s = seccion(est, crear); if (!s) return null; let r = s.jugadores[jug];
+    if (!JUG.test(jug)) return null; const jr = est.jugadores && est.jugadores[jug]; if (jr && jr.remoto) { const v = VIS.get(jr); return v && v.r ? v.r : null; }   // el Santuario de otro jugador nunca se crea ni se escribe desde aquí
+    const s = seccion(est, crear); if (!s) return null; let r = s.jugadores[jug];
     if (!plano(r)) { if (!crear) return null; r = s.jugadores[jug] = nuevo(); limpios.add(r); return r; }
     if (!limpios.has(r)) { r = s.jugadores[jug] = limpiarRec(r); limpios.add(r); }
     return r;
   }
-  const cajaDe = (j) => (j && Array.isArray(j.sinId) ? j.sinId : []);
+  const cajaDe = (j) => (j && j.remoto ? (VIS.get(j) || {}).caja || [] : j && Array.isArray(j.sinId) ? j.sinId : []);
   const idHogar = (est, jug) => { const r = rec(est, jug, false) || nuevo(); return idHogarDe(r.n, r.hab, jug, r.ins, r.dec); };
   // residentes REALES ahora mismo: asignaciones cuyo ejemplar sigue en la caja (sacarlo al equipo, liberarlo o intercambiarlo lo quita de aquí sin tocar esos sistemas). No cambia nada.
   function residentes(est, j) {
@@ -390,7 +393,9 @@
   }
   const LEJOS = 26 * T;   // rendimiento: solo se mueve lo que algún jugador puede ver; el resto no cuesta nada y, al acercarse, aparece donde le toca (es una función del reloj)
   function avanzar(est, dt) {
-    const vistos = {}; Object.values(est.jugadores).forEach((j) => { if (esHogar(j.mapa)) (vistos[j.mapa] = vistos[j.mapa] || []).push(j); });
+    custodiar(est);
+    const locales = {}; Object.values(est.jugadores).forEach((j) => { if (!j.remoto && esHogar(j.mapa)) locales[j.mapa] = 1; });   // solo se simula lo que ve ESTE móvil (lo que ve el otro, lo simula el otro)
+    const vistos = {}; Object.values(est.jugadores).forEach((j) => { if (locales[j.mapa]) (vistos[j.mapa] = vistos[j.mapa] || []).push(j); });
     Object.keys(vistos).forEach((id) => {
       const p = trazar(id), em = motor.estadoMapa(est, id), seg = Math.floor(est.reloj); if (em.sanT !== seg) { em.sanT = seg; revisar(est, id, p); }
       const em2 = est.mapas[id] || em, L = em2.criaturas, gente = vistos[id], K = Math.floor(est.reloj / SO.bloque);
@@ -404,7 +409,7 @@
 
   // ───────────────────────── E) ÓRDENES Y LECTURAS ─────────────────────────
   const aviso = (est, j, texto) => est.avisos.push({ j: j.id, texto });
-  const propio = (j) => { const a = j ? (analizar(j.mapa) || analizarCab(j.mapa)) : null; return !!a && a.jug === j.id; };
+  const propio = (j) => { const a = j && !j.remoto ? (analizar(j.mapa) || analizarCab(j.mapa)) : null; return !!a && a.jug === j.id; };   // un jugador remoto (el otro móvil) nunca actúa aquí: sus órdenes no existen en este móvil
   const nombreDe = (e) => e.mote || G.CREATURES[e.forma].name, nivelCri = (e) => (G.nivel ? G.nivel.nivelDe(e.xp | 0) : 1);
   const ocupacion = (r) => { const c = new Array(r.hab.length).fill(0); Object.keys(r.res).forEach((k) => { c[r.res[k]]++; }); return c; };
   // precio en Brillos con el criterio de la tienda (v2.349): un nº de combates del nivel del jugador, nunca por debajo de un mínimo. Sin factor de dimensión: el Santuario cuesta lo mismo estés donde estés.
@@ -486,6 +491,7 @@
   // Muebles de la cabaña con uso (B5): LEEN el estado del Santuario y devuelven una «lectura» (título + secciones) que la interfaz muestra en el panel. No cambian nada, no dan nada.
   function muebleCerca(j) { const p = esCabana(j.mapa) ? trazarCab(j.mapa) : null; if (!p) return null; let m = null, dm = 24; p.muebles.forEach((q) => { if (!q.accion) return; const cx = Math.max(q.x * T, Math.min(j.x, (q.x + q.w) * T)), cy = Math.max(q.y * T, Math.min(j.y, (q.y + q.h) * T)), d = Math.hypot(j.x - cx, j.y - cy); if (d < dm) { dm = d; m = q; } }); return m; }
   function lectura(est, j, accion) {   // → { titulo, sub, secciones: [{ h, filas: [{ x, e? }] }] } (e: 'ok' | 'falta' | 'info')
+    if (visitando(j)) return lecturaVisita(est, j, accion);   // B6: en el Santuario de otro, lo que se lee es SU resumen (sin Brillos, costes ni progreso tuyo)
     const v = vista(est, j);
     if (accion === 'libro') {
       const hechas = v.instalaciones.filter((t) => t.hecha), pz = v.decoracion.huecos.filter((h) => h.pieza);
@@ -512,6 +518,66 @@
       ampliar: sig ? { nombre: sig.nombre, coste: precio(j, sig.coste), residentes: sig.residentes, habitats: sig.habitats, nuevos: Object.keys(HAB).filter((t) => HAB[t].nivel === r.n + 1).map((t) => HAB[t].nombre) } : null };
   }
 
+  // ───────────────────────── G) VISITAS (B6): ver el Santuario del otro jugador, SOLO LECTURA ─────────────────────────
+  // El dueño manda (k:'san') un resumen de su Santuario: registro limpio + SOLO sus residentes. El visitante lo valida y lo guarda en VIS (memoria, ligado al jugador remoto, nunca en est.dim ni en el guardado).
+  // El mapa del Santuario ajeno sale del id (igual que el propio); todas las órdenes del Santuario exigen `propio(j)`, así que desde una visita ninguna cambia nada. No es un dato verificable: es lo que el móvil del dueño declara.
+  const duenoDe = (id) => { const a = analizar(id) || analizarCab(id); return a ? a.jug : null; };
+  const visitando = (j) => { const d = j ? duenoDe(j.mapa) : null; return !!d && d !== j.id; };
+  const cap = (t) => t.charAt(0).toUpperCase() + t.slice(1), MAX_SAN = 16000, MAXCAJA = Math.max.apply(null, NIV.map((q) => q.residentes));
+  const visita = {
+    snapshot(est, id) {   // lo que MI móvil le manda al otro (solo lo mío, sin hoy/vivencias/Brillos/caja completa) → mensaje | null (si no hay jugador o es de una versión futura)
+      const j = est.jugadores[id]; if (!j || j.remoto || futura(est)) return null; const r = rec(est, id, false); if (!r) return { v: 1, k: 'san', r: null, caja: [] };
+      const q = residentes(est, j), res = {}, des = {}; q.forEach((x) => { res[x.e.id] = x.slot; if (r.des[x.e.id] !== undefined) des[x.e.id] = r.des[x.e.id]; });
+      return { v: 1, k: 'san', r: { n: r.n, hab: r.hab.slice(), res, des, ins: r.ins.slice(), dec: r.dec.slice(), nom: r.nom }, caja: q.map((x) => { const o = { id: x.e.id, forma: x.e.forma, xp: x.e.xp | 0 }; if (x.e.mote) o.mote = x.e.mote; if (typeof x.e.hp === 'number') o.hp = 1; return o; }) };
+    },
+    recibir(est, id, m) {   // → true si se aceptó. Solo vale del jugador REMOTO (el otro móvil): nunca del propio, ni de uno sin conexión. Se valida y se recorta todo; un mensaje roto o tramposo no cambia nada.
+      const j = est.jugadores[id]; if (!j || !j.remoto || !plano(m) || m.v !== 1 || m.k !== 'san') return false;
+      try { if (JSON.stringify(m).length > MAX_SAN) return false; } catch (e) { return false; }
+      if (m.r === null) { VIS.set(j, { r: null, caja: [] }); return true; }
+      if (!plano(m.r) || !Array.isArray(m.caja) || m.caja.length > MAXCAJA) return false;
+      const caja = [], vistos = {};
+      for (const q of m.caja) { if (!plano(q) || !ent(q.id) || q.id < 1 || q.id > 999999999 || vistos[q.id] || typeof q.forma !== 'string' || !G.CREATURES[q.forma] || !ent(q.xp) || q.xp < 0 || q.xp > 1e8) return false; vistos[q.id] = 1;
+        const e = { id: q.id, forma: q.forma, xp: q.xp }; if (typeof q.mote === 'string') { const t = q.mote.replace(/[^A-Za-zÀ-ÖØ-öø-ÿ0-9 '.\-]/g, '').replace(/\s+/g, ' ').trim().slice(0, 12).trim(); if (t) e.mote = t; } if (q.hp === 1) e.hp = 1; caja.push(e); }
+      const r = limpiarRec(m.r); Object.keys(r.res).forEach((k) => { if (!vistos[k]) { delete r.res[k]; delete r.des[k]; delete r.hoy[k]; } }); r.viv = 0;
+      VIS.set(j, { r, caja }); const mid = idHogarDe(r.n, r.hab, id, r.ins, r.dec); if (est.mapas[mid]) poblar(est, mid); return true;   // si ese hogar ya estaba cargado (el otro estaba en él), se pone al día al momento
+    },
+    soltar(est, id) { const j = est.jugadores[id]; if (j) VIS.delete(j); },   // se pierde la conexión: la representación se descarta (y quien visita vuelve a su Santuario)
+    hay(est, id) { const j = est.jugadores[id]; return !!j && !!j.remoto && VIS.has(j); },
+  };
+  function volver(est, j, texto) {   // salir de una visita: de vuelta a TU hogar (o al Umbral si aún no tienes)
+    const r = rec(est, j.id, false);
+    motor.aplicar(est, r ? { j: j.id, t: 'colocar', mapa: idHogar(est, j.id), ancla: 'entrada', dir: 'up' } : { j: j.id, t: 'colocar', mapa: UMBRAL, ancla: PUERTA_HOGAR, dir: 'down' });
+    aviso(est, j, (texto ? texto + ' · ' : '') + (r ? 'Vuelves a ' + (r.nom ? r.nom : 'tu Santuario') : 'Vuelves al Umbral'));
+  }
+  function custodiar(est) {   // cada fotograma: quien está en un Santuario AJENO solo puede estar si la visita sigue siendo legítima (conectado + resumen recibido); si el dueño cambia su hogar, se le recoloca
+    Object.values(est.jugadores).forEach((j) => { if (j.remoto || !visitando(j)) return; const d = duenoDe(j.mapa), o = est.jugadores[d], r = o && o.remoto ? rec(est, d, false) : null;
+      if (!r) { volver(est, j, 'La visita ha terminado'); return; }
+      if (esHogar(j.mapa)) { const bien = idHogarDe(r.n, r.hab, d, r.ins, r.dec); if (j.mapa !== bien) motor.aplicar(est, { j: j.id, t: 'colocar', mapa: bien, ancla: 'entrada', dir: 'up' }); } });
+  }
+  function destinoVisita(est, j, o) {   // → { id, r } o un motivo (texto)
+    const a = typeof o.a === 'string' ? o.a : Object.keys(est.jugadores).find((k) => k !== j.id), d = a && a !== j.id ? est.jugadores[a] : null;
+    if (!d) return 'No hay nadie a quien visitar'; if (!d.remoto) return 'Ahora mismo no estás conectado con ' + cap(a);
+    const v = VIS.get(d); if (!v) return 'El Santuario de ' + cap(a) + ' aún no ha llegado: prueba en un momento'; if (!v.r) return cap(a) + ' todavía no tiene Santuario'; return { id: a, r: v.r };
+  }
+  motor.ordenes.registrar('santuario.visitar', {   // { a? } · entras en el Santuario del otro jugador (solo mirar): no cuesta nada, no da nada y no cambia nada de nadie
+    validar(est, j, o) { if (j.remoto) return 'Solo lo hace su dueño'; if (est.combate) return 'Ahora no'; if (j.mapa !== UMBRAL) return 'Las visitas empiezan en el Umbral'; const d = destinoVisita(est, j, o); return typeof d === 'string' ? d : null; },
+    aplicar(est, j, o) { const d = destinoVisita(est, j, o); motor.aplicar(est, { j: j.id, t: 'colocar', mapa: idHogarDe(d.r.n, d.r.hab, d.id, d.r.ins, d.r.dec), ancla: 'entrada', dir: 'up' }); aviso(est, j, 'Visitas ' + (d.r.nom ? d.r.nom : 'el Santuario de ' + cap(d.id)) + ' · solo puedes mirar'); return { ok: true, a: d.id }; },
+  });
+  function lecturaVisita(est, j, accion) {   // → { titulo, sub, secciones } del Santuario que visitas (libro / vitrina / vista completa); null si no estás de visita
+    const dn = visitando(j) ? duenoDe(j.mapa) : null, o = dn ? est.jugadores[dn] : null, r = o && o.remoto ? rec(est, dn, false) : null; if (!r) return null;
+    const N = nivelDe(r.n), res = residentes(est, o), p = trazar(idHogarDe(r.n, r.hab, dn, r.ins, r.dec)), dim = (t) => { const d = t.origen && G.dimensiones && G.dimensiones.existe(t.origen) ? G.dimensiones.get(t.origen) : null; return d ? d.nombre : t.origen; };
+    const hechas = r.ins.filter((t) => t), pz = r.dec.map((t, d) => ({ t, d })).filter((q) => q.t), sub = r.nom || 'Sin nombre';
+    if (accion === 'aportes') {
+      const L = hechas.filter((t) => INS[t].origen).map((t) => INS[t].nombre + ' (Instalación, ' + dim(INS[t]) + ')').concat(r.hab.filter((t) => t && HAB[t].origen).map((t) => HAB[t].nombre + ' (Hábitat, ' + dim(HAB[t]) + ')'), pz.filter((q) => PIE[q.t].origen).map((q) => PIE[q.t].nombre + ' (Decoración, ' + dim(PIE[q.t]) + ')'));
+      return { titulo: 'Vitrina de aportes', sub, secciones: [{ h: 'Lo que han traído otras dimensiones a ' + cap(dn), filas: L.length ? L.map((x) => ({ x, e: 'ok' })) : [{ x: 'Aún no hay aportes de otras dimensiones.', e: 'info' }] }] };
+    }
+    const sec = [{ h: 'Santuario de ' + cap(dn), filas: [{ x: N.nombre + ' · ' + res.length + ' de ' + N.residentes + ' criaturas' }, { x: N.habitats + (N.habitats === 1 ? ' hábitat' : ' hábitats') + ' y ' + N.solares + (N.solares === 1 ? ' solar' : ' solares') }] }];
+    if (!accion) sec.push({ h: 'Hábitats y residentes', filas: r.hab.map((t, i) => { const v = res.filter((q) => q.slot === i).map((q) => nombreDe(q.e) + ' Nv ' + nivelCri(q.e)); return { x: (t ? HAB[t].nombre : 'Parcela vacía') + (t ? ': ' + (v.length ? v.join(', ') : 'sin residentes') : '') }; }) });
+    sec.push({ h: 'Instalaciones', filas: hechas.length ? hechas.map((t) => ({ x: INS[t].nombre + (INS[t].origen ? ' · aporte de ' + dim(INS[t]) : ''), e: 'ok' })) : [{ x: 'Todavía no hay ninguna.', e: 'info' }] });
+    sec.push({ h: 'Decoración', filas: pz.length ? pz.map((q) => ({ x: PIE[q.t].nombre + ' · ' + p.decor[q.d].nombre })) : [{ x: 'Sin piezas colocadas.', e: 'info' }] });
+    return { titulo: accion === 'libro' ? 'Libro del Santuario' : 'Santuario de ' + cap(dn), sub, secciones: sec };
+  }
+
   // ───────────────────────── F) GANCHOS EN EL MOTOR (mismo patrón que Profundidades: se envuelve, no se edita motor.js) ─────────────────────────
   mundo.proveedores.push(proveedor);
   function acceso() { try { const mm = mundo.mapa(D.acceso.mapa), pu = mm.puertas.find((q) => q.id === D.acceso.puerta); return pu ? { mapa: mm.id, tx: pu.x, ty: pu.y } : null; } catch (x) { return null; } }
@@ -523,11 +589,12 @@
       const tx = Math.floor(j.x / T), ty = Math.floor(j.y / T), p = mundo.puertaEn(m, tx, ty), ida = p && m.id === UMBRAL && p.id === PUERTA_HOGAR, vuelta = p && p.id === PUERTA_SALIDA && esHogar(m.id);
       // «volver» del Umbral: lo natural es salir por la puerta que lleva a él. Si la pila no la tiene arriba (partida cargada dentro: el guardado solo conserva puertas de mapas cargados), se repone.
       if (p && m.id === UMBRAL && p.destino && p.destino.ancla === 'volver' && j.enPuerta !== m.id + ':' + tx + ',' + ty) { const ac = acceso(), top = j.volver[j.volver.length - 1]; if (ac && !(top && top.mapa === ac.mapa)) j.volver.push(ac); }
-      const aCab = p && p.id === PUERTA_CABANA && esHogar(m.id), deCab = p && p.id === PUERTA_SALIDA && esCabana(m.id);   // B5: puerta de la cabaña (desde fuera) y salida de la cabaña (al hogar ACTUAL)
-      if (aCab || deCab) { const clave = m.id + ':' + tx + ',' + ty; if (j.enPuerta === clave) return; const r = rec(est, j.id, false);
-        if (aCab) { motor.aplicar(est, { j: j.id, t: 'colocar', mapa: idCabana(j.id), ancla: 'entrada', dir: 'up' }); aviso(est, j, (r && r.nom ? r.nom + ' · ' : '') + 'La cabaña'); } else motor.aplicar(est, { j: j.id, t: 'colocar', mapa: idHogar(est, j.id), ancla: 'cabana', dir: 'down' });
+      const aCab = p && p.id === PUERTA_CABANA && esHogar(m.id), deCab = p && p.id === PUERTA_SALIDA && esCabana(m.id), dn = (aCab || deCab || vuelta) ? duenoDe(m.id) : null;   // B5: puerta de la cabaña (desde fuera) y salida de la cabaña (al hogar ACTUAL)
+      if (aCab || deCab) { const clave = m.id + ':' + tx + ',' + ty; if (j.enPuerta === clave) return; const r = rec(est, dn, false);   // B6: la cabaña es la del DUEÑO del mapa (la tuya, o la que visitas)
+        if (aCab) { motor.aplicar(est, { j: j.id, t: 'colocar', mapa: idCabana(dn), ancla: 'entrada', dir: 'up' }); aviso(est, j, (r && r.nom ? r.nom + ' · ' : '') + 'La cabaña'); } else motor.aplicar(est, { j: j.id, t: 'colocar', mapa: idHogar(est, dn), ancla: 'cabana', dir: 'down' });
         return; }
-      if (ida || vuelta) { const clave = m.id + ':' + tx + ',' + ty; if (j.enPuerta === clave) return; if (!(ida ? entrar(est, j) : salir(est, j))) j.enPuerta = clave; return; }
+      if (ida || vuelta) { const clave = m.id + ':' + tx + ',' + ty; if (j.enPuerta === clave) return; if (vuelta && dn !== j.id) { volver(est, j, ''); return; }   // B6: salir de una visita te lleva a TU Santuario
+        if (!(ida ? entrar(est, j) : salir(est, j))) j.enPuerta = clave; return; }
     }
     return cruzar0.call(motor, est, j, m);
   };
@@ -552,6 +619,6 @@
     return aplicar0.call(motor, est, o);
   };
 
-  G.santuario = { activo: true, errores, VERSION, DIM, UMBRAL, D, validarDatos, mix, caracter, rasgoDe, afinidad, entrenar, vivir, topeHoy, topeViv, techoDe, nHuecos, limpiaNombre, desbloqueo, bonoViaje, dondeDe, enganchar, diaDe, precio, relacionar, emparejar, aSolas, analizar, idHogarDe, idHogar, esHogar, esCabana, analizarCab, idCabana, trazarCab, generarCab, muebleCerca, lectura, usarMueble, enSantuario, trazar, generar, proveedor, rec, limpiarRec, residentes, depurar, temperamento, actividad, punto, mover, hora, poblar, avanzar, entrar, salir, vista, cercana, nivelDe, cupoHab, propio, futura };
+  G.santuario = { activo: true, errores, VERSION, DIM, UMBRAL, D, validarDatos, mix, caracter, rasgoDe, afinidad, entrenar, vivir, topeHoy, topeViv, techoDe, nHuecos, limpiaNombre, desbloqueo, bonoViaje, dondeDe, enganchar, diaDe, precio, relacionar, emparejar, aSolas, analizar, idHogarDe, idHogar, esHogar, esCabana, analizarCab, idCabana, trazarCab, generarCab, muebleCerca, lectura, usarMueble, visita, visitando, lecturaVisita, enSantuario, trazar, generar, proveedor, rec, limpiarRec, residentes, depurar, temperamento, actividad, punto, mover, hora, poblar, avanzar, entrar, salir, vista, cercana, nivelDe, cupoHab, propio, futura };
   if (typeof module !== 'undefined' && module.exports) module.exports = G.santuario;
 })(typeof window !== 'undefined' ? window : globalThis);

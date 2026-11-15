@@ -18,12 +18,15 @@
   function enviarProgreso(fuerza) {   // F8: nuestro progreso personal (nivel, marcas, casco) para que el anfitrión pueda comprobar los requisitos de portal; solo se manda si cambió
     if (!R || !R.conn || !G.red.progreso) return; const m = G.red.progreso(R.est, R.me); if (!m) return; const t = JSON.stringify(m); if (!fuerza && t === R.prg) return; R.prg = t; R.conn.send(m);
   }
+  function enviarSan() {   // B6 (visitas): un resumen de SOLO LECTURA de mi Santuario (solo mis residentes) para que el otro pueda visitarlo; se manda al conectar y cuando cambia (se mira ~1 vez por segundo)
+    if (!R || !R.conn || !G.santuario || !G.santuario.visita) return; const m = G.santuario.visita.snapshot(R.est, R.me); if (!m) return; const t = JSON.stringify(m); if (t === R.san) return; R.san = t; R.conn.send(m);
+  }
   function enlazar(conn) {
     if (R.conn && R.conn !== conn) { try { R.conn.close(); } catch (e) { /* ya cerrada */ } }
-    R.conn = conn; const otro = OTRO[R.me];
+    R.conn = conn; R.san = undefined; R.ns = 0; const otro = OTRO[R.me];
     conn.on('open', () => { poner('conectado'); if (G.agentes && G.agentes.red) G.agentes.red.conectar(R.est, R.me === 'oli' ? 'anfitrion' : 'invitado');   /* v2.325: la población de entrenadores la manda Oli (el que crea la sala) */ try { conn.send(G.red.resumen(R.est, R.me)); R.prg = null; enviarProgreso(true); } catch (e) { /* se reintenta en el siguiente envío */ } });
-    conn.on('data', (m) => { if (!R || R.conn !== conn) return; if (m && m.k === 'prg') G.red.progresoAplicar(R.est, otro, m); else if (m && m.k && G.agentes && G.agentes.red) G.agentes.red.recibir(R.est, m); else G.red.aplicar(R.est, otro, m); });   /* F8: 'prg' = progreso declarado del otro móvil (requisitos de portal) */
-    const caida = () => { if (R && R.conn === conn) { R.conn = null; G.red.soltar(R.est, otro); if (G.agentes && G.agentes.red) G.agentes.red.conectar(R.est, null); poner(R.me === 'oli' ? 'esperando' : 'reintentando'); } };
+    conn.on('data', (m) => { if (!R || R.conn !== conn) return; if (m && m.k === 'prg') G.red.progresoAplicar(R.est, otro, m); else if (m && m.k === 'san') { if (G.santuario && G.santuario.visita) G.santuario.visita.recibir(R.est, otro, m); } else if (m && m.k && G.agentes && G.agentes.red) G.agentes.red.recibir(R.est, m); else G.red.aplicar(R.est, otro, m); });   /* F8: 'prg' = progreso declarado del otro móvil (requisitos de portal) */
+    const caida = () => { if (R && R.conn === conn) { R.conn = null; G.red.soltar(R.est, otro); if (G.santuario && G.santuario.visita) G.santuario.visita.soltar(R.est, otro); if (G.agentes && G.agentes.red) G.agentes.red.conectar(R.est, null); poner(R.me === 'oli' ? 'esperando' : 'reintentando'); } };
     conn.on('close', caida); conn.on('error', caida);
   }
   function unir() { // Lali: conecta con la sala de Oli; si falla, reintenta
@@ -53,10 +56,10 @@
     },
     tick(dt) { // desde el bucle del juego: manda el jugador local ~10 veces por segundo y reintenta la unión de Lali
       if (!R) return; R.acc += dt; if (R.acc < 1 / HZ) return; R.acc = 0;
-      if (R.conn && R.estado === 'conectado') { try { enviarProgreso(false); R.conn.send(G.red.resumen(R.est, R.me));  if (G.agentes && G.agentes.red) G.agentes.red.salida(R.est, 1 / HZ).forEach((m) => R.conn.send(m)); } catch (e) { /* la caída la gestiona 'close' */ } }
+      if (R.conn && R.estado === 'conectado') { try { enviarProgreso(false); if (R.san === undefined || (R.ns = (R.ns | 0) + 1) % 10 === 0) enviarSan(); R.conn.send(G.red.resumen(R.est, R.me));  if (G.agentes && G.agentes.red) G.agentes.red.salida(R.est, 1 / HZ).forEach((m) => R.conn.send(m)); } catch (e) { /* la caída la gestiona 'close' */ } }
       else if (R.me === 'lali' && R.peer && R.peer.open && (R.reint = (R.reint || 0) + 1) % 30 === 0) unir(); // cada ~3 s
     },
-    parar() { if (!R) return; try { if (R.peer) R.peer.destroy(); } catch (e) { /* ya cerrado */ } G.red.soltar(R.est, OTRO[R.me]); R = null; },
+    parar() { if (!R) return; try { if (R.peer) R.peer.destroy(); } catch (e) { /* ya cerrado */ } G.red.soltar(R.est, OTRO[R.me]); if (G.santuario && G.santuario.visita) G.santuario.visita.soltar(R.est, OTRO[R.me]); R = null; },
   };
     return redPeer;
   }

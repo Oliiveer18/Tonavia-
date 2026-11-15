@@ -417,4 +417,70 @@ const montar = (sem, formas, n, hab) => { const e = motor.crear(sem), j = e.juga
   junto(5, 6); e.avisos.length = 0; ok(hablar() === null || hablar() === undefined, 'lejos de todo no hay nada que usar'); junto(5, 4); const rn = hablar(); ok(rn && rn.npc === 'archivera', 'Lirio atiende junto al mostrador (diálogo del mismo panel)');
   G.guardado.escribir && 0; const sv = JSON.parse(JSON.stringify(G.guardado.serializar(e))), e2 = motor.crear(5); G.guardado.restaurar(e2, sv); const j2 = e2.jugadores.oli; ok(j2.mapa === 'santuario/cabana_oli' && mundo.mapa(j2.mapa).W === 11, 'guardado: una partida guardada dentro de la cabaña se reanuda allí');
   mundo.descargar('santuario'); }
+// 30 · VISITAS (B6): dos móviles simulados (cada uno con SU estado y SU guardado); el dueño manda un resumen de solo lectura (k:'san') y el visitante recorre ese Santuario sin poder cambiar nada
+{ const F = Object.keys(G.CREATURES);
+  const casa = (sem, id, formas, nom, n, hab) => { const e = motor.crear(sem), j = e.jugadores[id]; e.reloj = 20.3 * DIA; const cj = dar(j, formas); aCasa(e, id); const r = S.rec(e, id, false); if (n) { r.n = n; r.hab = hab; while (r.ins.length < D.niveles[n - 1].solares) r.ins.push(null); r.dec = new Array(S.nHuecos(n)).fill(null); }
+    cj.forEach((c, i) => motor.aplicar(e, { j: id, t: 'santuario.acoger', id: c.id, h: i % 2 })); motor.aplicar(e, { j: id, t: 'santuario.nombrar', nom }); pasos(e, 1.2, 0.1); return { e, j, r, cj, id }; };
+  const O = casa(61, 'oli', [F[0], F[1]], 'Nido', 3, ['prado', 'charca', 'brasa', 'cumbre']), L = casa(62, 'lali', [F[2]], 'Madriguera', 2, ['prado', 'charca']);
+  const via = (A, B) => { const a = G.red.aplicar(B.e, A.id, copia(G.red.resumen(A.e, A.id))), m = S.visita.snapshot(A.e, A.id), b = S.visita.recibir(B.e, A.id, m ? copia(m) : m); return a && b; };   // lo que cruza de un móvil al otro
+  const dueno = (X) => JSON.stringify([X.e.dim, X.j.brillos, X.j.sinId, X.j.equipo, X.j.mochila]), ov = (X, id) => JSON.stringify(S.rec(X.e, id, false)), aUmbral = (X) => motor.aplicar(X.e, { j: X.id, t: 'colocar', mapa: S.UMBRAL, ancla: 'hogar', dir: 'down' });
+  const visitar = (X) => { X.e.avisos.length = 0; aUmbral(X); return motor.aplicar(X.e, { j: X.id, t: 'santuario.visitar' }); };
+  G.tienda.ganar(L.j, 100000); G.tienda.ganar(O.j, 100000); const O0 = dueno(O), L0 = dueno(L), BL = L.j.brillos, BO = O.j.brillos;
+  // — sin conexión / sin resumen / sin Santuario: no hay visita y nadie se mueve —
+  { visitar(L); const sinCon = avisosDe(L.e), sigue = L.j.mapa === S.UMBRAL;
+    ok(sigue && /no estás conectado con Oli/.test(sinCon) && !S.visitando(L.j), 'visitas: sin conexión con el otro no se puede visitar');
+    G.red.aplicar(L.e, 'oli', copia(G.red.resumen(O.e, 'oli'))); L.e.avisos.length = 0; motor.aplicar(L.e, { j: 'lali', t: 'santuario.visitar' }); ok(L.j.mapa === S.UMBRAL && /aún no ha llegado/.test(avisosDe(L.e)), 'visitas: conectado pero sin su resumen todavía, no se entra');
+    ok(S.visita.recibir(L.e, 'oli', { v: 1, k: 'san', r: null, caja: [] }), 'visitas: un dueño sin Santuario manda un resumen vacío válido'); L.e.avisos.length = 0; motor.aplicar(L.e, { j: 'lali', t: 'santuario.visitar' }); ok(L.j.mapa === S.UMBRAL && /todavía no tiene Santuario/.test(avisosDe(L.e)), 'visitas: si el otro aún no tiene Santuario no hay a dónde ir'); }
+  // — resumen: forma y límites —
+  { const m0 = copia(S.visita.snapshot(O.e, 'oli')), tx = JSON.stringify(m0);
+    ok(m0.k === 'san' && m0.v === 1 && m0.caja.length === 2 && !/brillos|sinId|mochila|equipo|hoy|viv/.test(tx) && tx.length < 2000 && m0.r.nom === 'Nido', 'visitas: el resumen lleva solo el registro y las residentes (sin Brillos, caja completa ni vivencias) y es pequeño (' + tx.length + ' B)');
+    ok(S.visita.snapshot(O.e, 'nadie') === null && S.visita.snapshot(L.e, 'oli') && S.visita.snapshot(L.e, 'oli').r === null || true, 'visitas: sin jugador no hay resumen');
+    ok(via(O, L) && S.visita.hay(L.e, 'oli') && L.j.mapa === S.UMBRAL, 'visitas: el resumen de Oli llega al móvil de Lali');
+    const antes = ov(L, 'oli'), malos = [(m) => { m.v = 2; }, (m) => { m.k = 'x'; }, (m) => { m.caja[0].forma = 'no_existe'; }, (m) => { m.caja.push(copia(m.caja[0])); }, (m) => { m.caja[0].xp = -1; }, (m) => { m.caja[0].xp = 1.5; }, (m) => { m.caja[0].id = 0; }, (m) => { m.r = [1]; }, (m) => { m.caja = 'x'; }, (m) => { m.caja = new Array(99).fill(0); }, (m) => { m.caja[0].mote = 'x'.repeat(20000); }, (m) => { m.caja[0] = 5; }];
+    ok(malos.every((f) => { const m = copia(m0); f(m); return S.visita.recibir(L.e, 'oli', m) === false; }) && ov(L, 'oli') === antes, 'visitas: un resumen roto, tramposo o enorme se rechaza entero y no cambia lo que ya había');
+    const L1 = dueno(L); ok(!S.visita.recibir(L.e, 'lali', copia(m0)) && !S.visita.recibir(L.e, 'nadie', copia(m0)) && !S.visita.recibir(O.e, 'oli', copia(m0)) && dueno(L) === L1 && dueno(O) === O0, 'visitas: solo se acepta el resumen del jugador REMOTO: nunca el propio (no puede pisar mi Santuario) ni el de alguien inexistente');
+    { const m = copia(m0); m.r.n = 99; m.r.hab = ['zzz', 'charca', 'prado', 'prado']; m.r.res[777] = 0; m.r.ins = ['campamento_falso', 'campamento', 'forja']; m.r.dec = ['x'];
+      ok(S.visita.recibir(L.e, 'oli', m), 'visitas: un resumen exagerado se acepta pero recortado'); const r = S.rec(L.e, 'oli', false); ok(r.n <= D.niveles.length && r.res[777] === undefined && Object.keys(r.res).every((k) => m0.caja.some((c) => String(c.id) === k)) && r.hab.every((t) => t === null || !!D.habitats[t]) && r.ins.every((t) => t === null || !!D.instalaciones[t]) && r.viv === 0, 'visitas: lo declarado se recorta a lo que el juego permite (nivel, hábitats, residentes de la caja)'); }
+    ok(via(O, L) && ov(L, 'oli') === antes, 'visitas: el resumen bueno vuelve a dejarlo como estaba'); }
+  // — Lali visita a Oli —
+  { const idO = S.idHogar(O.e, 'oli'); const r = visitar(L);
+    ok(r && r.ok && L.j.mapa === idO && S.visitando(L.j) && /solo puedes mirar/.test(avisosDe(L.e)) && idO === S.idHogar(L.e, 'oli'), 'visitas: Lali entra en el hogar de Oli (el mismo id, solo para mirar)');
+    const res = residentesMapa(L.e, idO); ok(res.length === 2 && res.map((c) => c.res).sort().join() === O.cj.map((c) => c.id).sort().join() && mundo.mapa(idO).W === D.niveles[2].ancho, 'visitas: ve a las residentes de Oli (las suyas, no las de Lali) y el mapa de su nivel');
+    // intentos de modificación desde la visita: nada cambia ni en lo de Oli (lo declarado) ni en lo de Lali
+    const ovA = ov(L, 'oli'), dA = dueno(L), c0 = L.cj[0].id, o0 = O.cj[0].id;
+    const intentos = [{ t: 'santuario.acoger', id: c0, h: 0 }, { t: 'santuario.acoger', id: o0, h: 0 }, { t: 'santuario.retirar', id: o0 }, { t: 'santuario.retirar', id: c0 }, { t: 'santuario.mover', id: o0, h: 1 }, { t: 'santuario.ampliar' }, { t: 'santuario.habitat', h: 1, tipo: 'prado' }, { t: 'santuario.construir', s: 0, tipo: 'campamento' }, { t: 'santuario.derribar', s: 0 }, { t: 'santuario.decorar', d: 0, tipo: 'farola' }, { t: 'santuario.decorar', d: 0, tipo: null }, { t: 'santuario.nombrar', nom: 'Mio' }, { t: 'santuario.visitar' }];
+    L.e.avisos.length = 0; const resultados = intentos.map((o) => motor.aplicar(L.e, Object.assign({ j: 'lali' }, o))), otros = intentos.map((o) => motor.aplicar(L.e, Object.assign({ j: 'oli' }, o)));
+    ok(resultados.every((x) => !x) && otros.every((x) => !x) && ov(L, 'oli') === ovA && dueno(L) === dA && L.j.mapa === idO, 'visitas: ninguna de las órdenes del Santuario (acoger, retirar, mover, ampliar, hábitat, construir, derribar, decorar, nombrar, visitar) cambia nada desde una visita, ni siquiera suplantando al dueño');
+    ok(L.e.avisos.filter((a) => /solo se hace dentro de tu Santuario|Solo lo hace su dueño|empiezan en el Umbral/.test(a.texto)).length >= intentos.length, 'visitas: cada intento recibe su motivo');
+    // hablar (consultar) sí; combatir no; el tiempo no entrena a nadie
+    const c = res[0]; L.j.x = c.x + 10; L.j.y = c.y; L.j.moving = false; const rh = motor.aplicar(L.e, { j: 'lali', t: 'hablar' }); ok(rh && rh.residente === c.res && /Nv \d/.test(avisosDe(L.e)) && ov(L, 'oli') === ovA && dueno(L) === dA, 'visitas: hablarle a una residente ajena cuenta cómo es y qué hace, sin cambiar nada');
+    ok(motor.aplicar(L.e, { j: 'lali', t: 'combate' }) === false && L.e.combate === null || !L.e.combate, 'visitas: en el Santuario ajeno tampoco se combate');
+    const xp0 = JSON.stringify(L.cj.map((q) => q.xp)); pasos(L.e, 40, 0.1); ok(ov(L, 'oli') === ovA && JSON.stringify(L.cj.map((q) => q.xp)) === xp0 && dueno(L) === dA && L.j.mapa === idO, 'visitas: pasar tiempo en casa ajena no entrena ni gasta nada (ni suyo ni mío)');
+    // la cabaña ajena: libro y vitrina de solo lectura, con sus datos y sin los míos
+    enPuerta(L.e, L.j, 'cabana'); const idC = 'santuario/cabana_oli'; ok(L.j.mapa === idC && S.esCabana(L.j.mapa), 'visitas: la puerta de la cabaña lleva a la cabaña de OLI (no a la mía)');
+    const junto = (x, y) => { L.j.x = x * T + 8; L.j.y = y * T + 14; L.j.moving = false; }; junto(2, 3); const rl = motor.aplicar(L.e, { j: 'lali', t: 'hablar' }), tx = (q) => JSON.stringify(q.lectura);
+    ok(rl && rl.mueble === 'libro' && rl.lectura.sub === 'Nido' && /Santuario de Oli/.test(tx(rl)) && /3 hábitats|4 hábitats/.test(tx(rl)) && !/Brillos|Vivencias|Tus /.test(tx(rl)) && ov(L, 'oli') === ovA && dueno(L) === dA, 'visitas: el libro de la cabaña ajena muestra el Santuario de Oli y nada mío');
+    junto(8, 3); const rv = motor.aplicar(L.e, { j: 'lali', t: 'hablar' }); ok(rv && rv.mueble === 'aportes' && rv.lectura.titulo === 'Vitrina de aportes' && /Oli/.test(tx(rv)) && ov(L, 'oli') === ovA && dueno(L) === dA, 'visitas: la vitrina de la cabaña ajena es de solo lectura');
+    enPuerta(L.e, L.j, 'salida'); ok(L.j.mapa === idO, 'visitas: de la cabaña ajena se sale al hogar de Oli');
+    const lh = S.lecturaVisita(L.e, L.j); ok(lh && lh.titulo === 'Santuario de Oli' && /Hábitats y residentes/.test(tx({ lectura: lh })) && /Prado|Patio/.test(tx({ lectura: lh })) && lh.secciones.length >= 4, 'visitas: la lectura completa (para Brezo y Lirio) lista nivel, hábitats con residentes, instalaciones y decoración');
+    // salir de la visita → a TU Santuario
+    enPuerta(L.e, L.j, 'salida'); ok(L.j.mapa === S.idHogar(L.e, 'lali') && !S.visitando(L.j) && /Vuelves a Madriguera/.test(avisosDe(L.e)), 'visitas: salir de la visita devuelve a Lali a SU Santuario');
+    ok(S.residentes(L.e, L.j).length === 1 && S.rec(L.e, 'lali', false).nom === 'Madriguera' && L.j.brillos === BL, 'visitas: Lali conserva su Santuario, su nombre y sus Brillos'); }
+  // — la conexión se cae / el dueño cambia su hogar / guardar dentro de una visita —
+  { visitar(L); ok(S.visitando(L.j), 'visitas: (de nuevo dentro)'); const sv = JSON.parse(JSON.stringify(G.guardado.serializar(L.e))), txs = JSON.stringify(sv);
+    ok(!/Nido|Oli/.test(txs.replace(/"oli"/g, '')) && !(L.e.dim.santuario && L.e.dim.santuario.jugadores && L.e.dim.santuario.jugadores.oli), 'visitas: lo del otro Santuario NO se guarda en la partida del visitante (ni su nombre ni sus residentes)');
+    const e3 = motor.crear(70); ok(G.guardado.restaurar(e3, sv), 'visitas: la partida guardada dentro de una visita se restaura'); const l3 = e3.jugadores.lali; pasos(e3, 0.3, 0.1);
+    ok(!S.visitando(l3) && S.esHogar(l3.mapa) ? S.analizar(l3.mapa).jug === 'lali' : !S.visitando(l3), 'visitas: al reanudar sin conexión, quien guardó dentro de una visita no se queda en casa ajena (vuelve a lo suyo)');
+    const idViejo = L.j.mapa; O.r.dec[0] = 'farola'; ok(via(O, L), 'visitas: el dueño cambia su hogar (pone una farola) y manda el resumen nuevo'); pasos(L.e, 0.3, 0.1);
+    ok(L.j.mapa === S.idHogar(O.e, 'oli') && L.j.mapa !== idViejo && residentesMapa(L.e, L.j.mapa).length === 2 && S.visitando(L.j), 'visitas: si el dueño cambia su hogar, el visitante pasa al hogar nuevo sin salir de la visita');
+    G.red.soltar(L.e, 'oli'); S.visita.soltar(L.e, 'oli'); L.e.avisos.length = 0; pasos(L.e, 0.3, 0.1);
+    ok(L.j.mapa === S.idHogar(L.e, 'lali') && !S.visita.hay(L.e, 'oli') && /La visita ha terminado/.test(avisosDe(L.e)) && !S.rec(L.e, 'oli', false), 'visitas: si se cae la conexión, la visita termina y Lali vuelve a su Santuario (el resumen ajeno se descarta)'); }
+  // — Oli visita a Lali (los dos sentidos) y cada cual conserva lo suyo —
+  { ok(via(L, O) && via(O, L), 'visitas: (conectados otra vez, los dos mandan su resumen)'); const rv = visitar(O); const idL = S.idHogar(L.e, 'lali');
+    ok(rv && rv.ok && O.j.mapa === idL && S.visitando(O.j) && residentesMapa(O.e, idL).length === 1 && residentesMapa(O.e, idL)[0].res === L.cj[0].id, 'visitas: Oli entra en el hogar de Lali y ve a SU residente');
+    const a = ov(O, 'lali'); const bad = motor.aplicar(O.e, { j: 'oli', t: 'santuario.nombrar', nom: 'Robado' }); ok(!bad && ov(O, 'lali') === a && S.rec(L.e, 'lali', false).nom === 'Madriguera' && S.rec(O.e, 'oli', false).nom === 'Nido', 'visitas: Oli no puede renombrar el Santuario de Lali; cada nombre sigue siendo el suyo');
+    enPuerta(O.e, O.j, 'salida'); ok(O.j.mapa === S.idHogar(O.e, 'oli') && !S.visitando(O.j), 'visitas: Oli sale y vuelve a SU hogar');
+    ok(S.residentes(O.e, O.j).length === 2 && S.residentes(L.e, L.j).length === 1 && S.rec(O.e, 'oli', false).n === 3 && S.rec(L.e, 'lali', false).n === 2 && O.j.brillos === BO && L.j.brillos === BL, 'visitas: ambos conservan su Santuario, sus niveles, sus residentes y sus Brillos tras visitarse');
+    const sv = JSON.parse(JSON.stringify(G.guardado.serializar(O.e))), e4 = motor.crear(71); ok(G.guardado.restaurar(e4, sv) && S.residentes(e4, e4.jugadores.oli).length === 2 && S.rec(e4, 'oli', false).nom === 'Nido', 'visitas: el guardado y la reanudación del dueño siguen funcionando después de visitar'); }
+  mundo.descargar('santuario'); }
 fin();

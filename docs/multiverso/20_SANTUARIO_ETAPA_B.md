@@ -36,8 +36,10 @@ Cambiar un hábitat existente: 3 combates (mínimo 90). Simulación: `node tools
 
 **Hecho en el bloque 4 (v2.368):** personalización y decoración (`22_SANTUARIO_DECORACION.md`).
 
-**Hecho en el bloque 5 (v2.369):** interior de la cabaña (`23_SANTUARIO_CABANA.md`). Pendiente: visitas de solo lectura (bloque 6).
-Pendiente, en el orden aprobado: personalización y decoración libre · interior de la cabaña · visitas de solo lectura · HD-2D. Crafteo: no activado (los talleres no existen).
+**Hecho en el bloque 5 (v2.369, aprobado):** interior de la cabaña (`23_SANTUARIO_CABANA.md`).
+
+**Hecho en el bloque 6 (v2.370, funcionamiento aprobado):** visitas de solo lectura entre los dos Santuarios privados (`24_SANTUARIO_VISITAS.md`). Con esto la Etapa B queda **implementada**; el bloque 6 está probado en local y con la conexión simulada, **pendiente de una visita real entre dos dispositivos** (no se marca como validado).
+Pendiente, en el orden aprobado: HD-2D. Crafteo: no activado (los talleres no existen).
 
 ## 5. No probado
 iPhone/Safari, red real y en bucle local, HD-2D, `mapas_juego/minimapa/tablon.py` en esta versión, equilibrio con partidas reales.
