@@ -1,6 +1,6 @@
 # CLAUDE.md · Criaturas de Lali y Oli (instrucciones permanentes del proyecto)
 
-Lee primero `docs/CONTINUAR.md`, luego `docs/ROADMAP.md` y `docs/SESION.md`. Lo antiguo está en `docs/archivo/` (no se rehace ni se borra). Versión actual: v2.370 (15 nov 2026; referencia congelada del núcleo del Multiverso: v2.363). **Multiverso:** hoja de ruta oficial en `docs/multiverso/05_HOJA_DE_RUTA.md` (F1-F8 las hizo Fable; después, contenido con Sonnet). **Trabajo actual:** Santuario Universal, Etapa B por bloques (siguientes: 4 decoración y personalización, 5 interior de la cabaña, 6 visitas de solo lectura; no cerrar la etapa hasta completarlos); a partir del 15 nov solo Sonnet 5.5 (Medium o Low).
+Lee primero `docs/CONTINUAR.md`, luego `docs/ROADMAP.md` y `docs/SESION.md`. Lo antiguo está en `docs/archivo/` (no se rehace ni se borra). Versión actual: v2.371 (15 nov 2026; partidas múltiples en `docs/PARTIDAS.md`, rama `partidas`; v2.370 = referencia congelada del núcleo del Multiverso: v2.363). **Multiverso:** hoja de ruta oficial en `docs/multiverso/05_HOJA_DE_RUTA.md` (F1-F8 las hizo Fable; después, contenido con Sonnet). **Trabajo actual:** Santuario Universal, Etapa B por bloques (siguientes: 4 decoración y personalización, 5 interior de la cabaña, 6 visitas de solo lectura; no cerrar la etapa hasta completarlos); a partir del 15 nov solo Sonnet 5.5 (Medium o Low).
 
 ## Reglas de trabajo (del usuario)
 - Ingeniero senior autónomo. Responde SIEMPRE en español, breve y directo. Minimiza tokens y operaciones redundantes sin bajar la calidad.

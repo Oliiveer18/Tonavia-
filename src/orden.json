@@ -50,6 +50,8 @@
     "src/agentes_trato.js",
     "src/agentes_red.js",
     "src/guardado.js",
+    "src/partidas.js",
+    "src/partidas_ui.js",
     "src/red.js",
     "src/galeria.js",
     "src/mapas_ui.js",

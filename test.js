@@ -4101,4 +4101,23 @@ const alNivelF6 = (j, n) => { j.xpE = G.entrenador.xpPara(n); };
   ok(G.santuario && G.santuario.activo && G.motor.ordenes.lista().filter((t) => t.indexOf('santuario.') === 0).join() === 'santuario.acoger,santuario.ampliar,santuario.construir,santuario.decorar,santuario.derribar,santuario.habitat,santuario.mover,santuario.nombrar,santuario.retirar,santuario.visitar', 'Santuario: el módulo está activo y registra sus diez órdenes');
   { const re = cp.spawnSync(process.execPath, [require('path').join(__dirname, 'tools/economia_santuario.js')], { encoding: 'utf8' }); ok(re.status === 0 && /Santuario 5: \d+ ✦/.test(re.stdout), 'Santuario B1: la simulación de economía corre y llega al nivel 5'); }
   ok(typeof G.santuarioUI === 'object' && G.npc.GUION.cuidador.menu.some((o) => o.panel === 'residentes') && G.NAMES.guardiana === 'sela', 'Santuario A: la interfaz y los dos personajes están cableados'); }
-console.log(fallos ? fallos + ' fallo(s)' : 'Todo en orden (' + 131 + ' grupos de comprobaciones)'); process.exit(fallos ? 1 : 0);
+// ── v2.371 · Partidas múltiples: índice de ranuras, claves por ranura, borrar con copia, partida de pruebas ──
+{ const P = G.partidas, antesLS = global.localStorage, alm = {}, J = JSON.stringify;
+  global.localStorage = { getItem: (k) => (k in alm ? alm[k] : null), setItem: (k, v) => { alm[k] = String(v); }, removeItem: (k) => { delete alm[k]; } };
+  const nueva = () => { Object.keys(alm).forEach((k) => delete alm[k]); P._reset(); };
+  ok(P && G.guardado.fijarRanura && G.guardado.CLAVE === 'criaturas_partida', 'Partidas: módulo cargado y la ranura 1 usa la clave de siempre');
+  nueva(); ok(P.lista().length === 1 && P.activa().id === 'p1' && P.sufijo('p1') === '' && P.sufijo('p3') === '_p3', 'Partidas: sin índice hay una sola partida (la de siempre)');
+  ok(J(P._normal({ v: 9 })) === J(P._normal(null)) && P._normal({ v: 1, lista: [{ id: '__proto__' }, { id: 'p2', nombre: '<b>x</b>' }, { id: 'p2' }], activa: 'zz' }).lista.length === 1 && P._normal({ v: 1, lista: [{ id: 'p2', nombre: '<b>x</b>' }] }).lista[0].nombre === 'bx/b', 'Partidas: índice dañado o con ids raros se sanea');
+  const a = P.crear('Mi partida', 'normal'), b = P.crear('Pruebas', 'pruebas', { nivel: 999, brillos: -5 });
+  ok(a.ok && a.id === 'p2' && b.ok && b.id === 'p3' && P.buscar('p3').prep.nivel === G.entrenador.MAX && P.buscar('p3').prep.brillos === 0, 'Partidas: crear da ids nuevos y acota nivel y Brillos de pruebas');
+  ok(P.elegir('p2') && G.guardado.fijarRanura(P.sufijo('p2')) && G.guardado.CLAVE === 'criaturas_partida_p2' && G.guardado.CLAVE_BAK === 'criaturas_partida_p2_bak' && !G.guardado.fijarRanura('../x') && G.guardado.CLAVE === 'criaturas_partida_p2', 'Partidas: la ranura cambia las claves y rechaza sufijos raros');
+  { const e1 = G.motor.crear(7); e1.jugadores.oli.brillos = 321; G.guardado.escribir(e1); G.guardado.fijarRanura(''); const e2 = G.motor.crear(8); e2.jugadores.oli.brillos = 654; G.guardado.escribir(e2);
+    G.guardado.fijarRanura('_p2'); const r2 = G.guardado.cargar(() => G.motor.crear(1)); G.guardado.fijarRanura(''); const r1 = G.guardado.cargar(() => G.motor.crear(1));
+    ok(r2.estado === 'cargada' && r2.est.jugadores.oli.brillos === 321 && r1.estado === 'cargada' && r1.est.jugadores.oli.brillos === 654 && 'criaturas_partida' in alm && 'criaturas_partida_p2' in alm, 'Partidas: dos ranuras se guardan y cargan por separado'); }
+  P.elegir('p3'); { const e = G.motor.crear(5); ok(P.aplicarPrep(e) === true && e.jugadores.oli.xpE === G.entrenador.xpPara(G.entrenador.MAX) && G.entrenador.nivel(e.jugadores.lali) === G.entrenador.MAX && e.jugadores.oli.brillos === 0 && !P.buscar('p3').prep && P.aplicarPrep(G.motor.crear(5)) === false, 'Partidas: la partida de pruebas aplica nivel y Brillos a los dos personajes, una sola vez'); }
+  P.elegir('p2'); ok(P.aplicarPrep(G.motor.crear(5)) === false, 'Partidas: una partida normal no aplica nada');
+  ok(P.borrar('p2') && !('criaturas_partida_p2' in alm) && 'criaturas_partida_borrada' in alm && !P.buscar('p2') && P.activa().id !== 'p2', 'Partidas: borrar quita la ranura y deja una copia');
+  nueva(); ok(P.borrar('p1') === false, 'Partidas: no se puede borrar la única partida');
+  nueva(); for (let i = 0; i < P.MAX - 1; i++) P.crear('x', 'normal'); ok(P.lista().length === P.MAX && P.crear('y', 'normal').ok === false, 'Partidas: máximo ' + P.MAX);
+  nueva(); G.guardado.fijarRanura(''); global.localStorage = antesLS; }
+console.log(fallos ? fallos + ' fallo(s)' : 'Todo en orden (' + 132 + ' grupos de comprobaciones)'); process.exit(fallos ? 1 : 0);

@@ -456,3 +456,11 @@ Revisión de la implementación de F2 buscando fallos reales (no solo tests en v
 - **Aprobaciones (usuario, 15 nov 2026):** bloque 5 (v2.369) aprobado con sus dos decisiones (Lirio = segundo NPC dentro de la cabaña, Brezo fuera; libro y vitrina solo informativos y de solo lectura). Bloque 6 (v2.370) aprobado como funcionamiento: dos Santuarios privados e independientes, visitables sin modificar el progreso del otro. v2.370 es la entrega actual; las anteriores se conservan.
 - **Constancia:** el bloque 6 está IMPLEMENTADO y supera las pruebas locales y simuladas, pero sigue PENDIENTE DE VALIDACIÓN REAL entre dos dispositivos mediante PeerJS. Siguiente comprobación: una visita real entre los dos móviles. Sin más cambios funcionales hasta entonces.
 - Pendiente: validación real del bloque 6; HD-2D del Santuario.
+
+## v2.371 · Partidas múltiples y partida de pruebas (15 nov 2026, rama `partidas`)
+- Nuevos: `src/partidas.js` (índice `criaturas_partidas`, ranuras, crear/renombrar/borrar, preparación de pruebas), `src/partidas_ui.js` (pantalla «Partidas»), `docs/PARTIDAS.md`, `tools/prueba_partidas.py`. Tocados: `src/guardado.js` (`fijarRanura`; claves por ranura), `src/game.js` (aplica la preparación de pruebas una vez), `index.html` (botón y pantalla), `src/orden.json`, `test.js` (grupo 132).
+- La Partida 1 son las claves de siempre (`criaturas_partida…`): no se mueve ni migra nada. Las demás: `criaturas_partida_pN…`. Cada partida lleva a Oli y a Lali. Con una sola partida el menú no cambia; con varias se elige antes de jugar.
+- Partida de pruebas «PRUEBAS»: nivel de entrenador (1-50) y Brillos a elegir, aplicados una vez a los dos personajes. NO vale para validar la visita real del bloque 6 (sigue PENDIENTE entre dos móviles). Sin criaturas elegibles (no pedido).
+- Borrar pide confirmación y deja una copia en `criaturas_partida_borrada` (la última borrada). No se puede borrar la única partida. Máximo 6.
+- Verificado: `node build.js`, `node test.js` (132 grupos), huellas 2D y clásico IGUALES (el 2D no cambia), `prueba_partidas.py`, `prueba_guardado.py`. Revisión de pantalla a 390×844 hecha (`docs/capturas/partidas_v2371_*.png`).
+- Pendiente: las partidas viven en el dispositivo (no viajan por GitHub ni entre móviles); en dos móviles cada uno elige la suya, y para la visita real ambos deben usar partidas NO de pruebas.
